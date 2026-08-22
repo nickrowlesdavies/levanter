@@ -24,5 +24,5 @@ ax.text(500,282,"LEVANTER",color="white",fontsize=74,fontweight="heavy",va="base
 ax.text(600,338,"M A R K E T S   ·   S I G N A L S   ·   I N S I G H T",color="#e8f1ff",fontsize=19,fontweight="semibold",va="baseline",ha="center")
 ax.text(600,452,"Honest market intelligence, no hype.",color="white",fontsize=32,fontweight="medium",va="baseline",ha="center")
 ax.text(600,508,"Volatility yes, direction no.",color="#dbeafe",fontsize=33,fontweight="bold",va="baseline",ha="center")
-fig.savefig("brand/og.png",dpi=100)
+fig.savefig("brand/og.png",dpi=200)
 print("og.png saved")
