@@ -53,13 +53,23 @@ def convert(md, out):
             p = doc.add_paragraph(); add_runs(p, s)
         if quote: p.paragraph_format.left_indent = Inches(0.3)
     doc.save(out)
-    print("  ->", os.path.basename(out))
+    return out
 
-os.makedirs("reports/substack/docx", exist_ok=True)
-files = ["levanter-introducing-post","levanter-weekly-2026-08-22","levanter-monthly-2026-08",
-         "levanter-daily-2026-08-22","levanter-substack-launch-pack"]
-for base in files:
-    md = f"reports/substack/{base}.md"
-    if os.path.exists(md):
-        convert(md, f"reports/substack/docx/{base}.docx")
-print("done")
+
+def convert_dir(src_dir):
+    """Convert every .md in src_dir to src_dir/docx/*.docx."""
+    import glob
+    ddir = os.path.join(src_dir, "docx")
+    os.makedirs(ddir, exist_ok=True)
+    n = 0
+    for md in sorted(glob.glob(os.path.join(src_dir, "*.md"))):
+        base = os.path.splitext(os.path.basename(md))[0]
+        convert(md, os.path.join(ddir, base + ".docx"))
+        n += 1
+    return n
+
+
+if __name__ == "__main__":
+    import sys
+    d = sys.argv[1] if len(sys.argv) > 1 else "reports/substack"
+    print(f"converted {convert_dir(d)} files to {d}/docx/")

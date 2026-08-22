@@ -29,7 +29,9 @@ python build_dashboard.py --market-only --out public/index.html
 
 # Ship the Substack-ready writeups alongside the site so they can be pulled
 # from anywhere (build_dashboard.py wrote them to reports/substack).
-mkdir -p public/substack && cp -f reports/substack/*.md public/substack/ 2>/dev/null || true
+mkdir -p public/substack public/substack/docx
+cp -f reports/substack/*.md public/substack/ 2>/dev/null || true
+cp -f reports/substack/docx/*.docx public/substack/docx/ 2>/dev/null || true
 
 # Keep GitHub Pages from running the output through Jekyll.
 touch public/.nojekyll

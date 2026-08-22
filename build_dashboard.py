@@ -1515,6 +1515,13 @@ def write_writeups():
         p = os.path.join(out_dir, f"levanter-teaser-monthly-{month}.md")
         open(p, "w").write(mt)
         files["teaser_monthly"] = p
+    # Always mirror every piece to Word (.docx) for easy copy-paste
+    try:
+        import md2docx
+        md2docx.convert_dir(out_dir)
+        print(f"docx: mirrored {len(files)} pieces to {out_dir}/docx/")
+    except Exception as e:
+        print("docx skipped (python-docx not installed?):", e)
     return files
 
 
