@@ -1468,10 +1468,11 @@ def _teaser(kind, field):
     if kind == "weekly":
         return (f"New: the Levanter Weekly. A {reg} week, {top[1]} led the whole board and "
                 f"{bot[1]} lagged. The week in review, the week ahead, and an honest opinion on "
-                f"what actually matters. Read it at read.levantermarkets.com")
+                f"what actually matters.\n\nRead it: read.levantermarkets.com\n"
+                f"Live market dashboard: levantermarkets.com")
     return (f"New: the Levanter Monthly. {top[1]} led the month, {bot[1]} lagged. The macro "
-            f"picture, where we sit in the cycle, and a proper opinion piece. Read it at "
-            f"read.levantermarkets.com")
+            f"picture, where we sit in the cycle, and a proper opinion piece.\n\n"
+            f"Read it: read.levantermarkets.com\nLive market dashboard: levantermarkets.com")
 
 
 def write_writeups():
@@ -1656,8 +1657,11 @@ SUBSCRIBE_BOX = (
     '<div class="subbox-s">The weekly and monthly in your inbox, plus daily on the site. '
     'Honest, and free.</div></div>'
     '<div class="subbox-form">'
-    f'<iframe src="{SUBSCRIBE_EMBED}" title="Subscribe to Levanter" width="100%" height="95" '
-    'style="border:0;border-radius:10px;background:#fff;display:block" scrolling="no"></iframe>'
+    f'<iframe id="subEmbed" src="{SUBSCRIBE_EMBED}" title="Subscribe to Levanter" width="100%" '
+    'height="95" style="border:0;border-radius:10px;background:#fff;display:block" '
+    'scrolling="no"></iframe>'
+    f'<a id="subBtn" class="subbox-b" style="display:none" href="{SUBSCRIBE_URL}" target="_blank" '
+    'rel="noopener">Subscribe</a>'
     f'<a class="subbox-alt" href="{SUBSCRIBE_URL}" target="_blank" rel="noopener">'
     'or subscribe at read.levantermarkets.com</a></div></div>')
 
@@ -1681,7 +1685,12 @@ TAB_JS = (
     "if(g)g.textContent=gh<12?'Good morning':gh<18?'Good afternoon':'Good evening';"
     "var gd=document.getElementById('livedate');"
     "if(gd)gd.textContent=new Date().toLocaleDateString(undefined,"
-    "{weekday:'short',day:'numeric',month:'short',year:'numeric'});})();")
+    "{weekday:'short',day:'numeric',month:'short',year:'numeric'});"
+    "var se=document.getElementById('subEmbed');"
+    "if(se){se.addEventListener('load',function(){se.setAttribute('data-ok','1');});"
+    "setTimeout(function(){if(se.getAttribute('data-ok')!=='1'){var b=document.getElementById('subBtn');"
+    "if(b){se.style.display='none';b.style.display='inline-block';}}},2200);}"
+    "})();")
 
 # Client-side watchlist: persisted in localStorage, rendered from the global AD
 # object. No account, nothing uploaded - private to the viewer's browser.
