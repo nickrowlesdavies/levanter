@@ -1,0 +1,17 @@
+# fx-signal-engine scheduled jobs (added 2026-08-16)
+# Install:  crontab "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine/my.cron"
+# View:     crontab -l
+# Remove:   crontab -r
+#
+# 4h paper trial: check every 4 hours, act when a new 4h bar has closed.
+0 */4 * * * "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine/run.sh" paper_trade.py --once >> "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine/reports/cron.log" 2>&1
+# Carry overlay: rebalance once a month (06:30 on the 1st).
+30 6 1 * * "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine/run.sh" carry_signal.py >> "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine/reports/cron.log" 2>&1
+# Crypto momentum: weekly signal (Mondays 07:00).
+0 7 * * 1 "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine/run.sh" crypto_signal.py >> "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine/reports/cron.log" 2>&1
+# Combined portfolio tracker: weekly (Mondays 07:15).
+15 7 * * 1 "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine/run.sh" combined_tracker.py >> "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine/reports/cron.log" 2>&1
+# Vol-targeted basket tracker: weekly (Mondays 07:20).
+20 7 * * 1 "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine/run.sh" vol_basket_tracker.py >> "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine/reports/cron.log" 2>&1
+# (Dashboard auto-regeneration is handled by serve.sh's background loop while
+#  the phone server is running - no separate cron needed.)

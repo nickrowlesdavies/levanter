@@ -1,0 +1,23 @@
+# Secrets - never commit
+twelvedata.key
+*.key
+oanda.cfg
+.env
+
+# Virtualenv / Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Generated data + build output (CI regenerates these each run)
+reports/
+public/
+data/cache/
+*.parquet
+
+# Paper-trading state (local only, not for the public host)
+*_state.json
+
+# OS
+.DS_Store

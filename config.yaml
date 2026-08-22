@@ -1,0 +1,68 @@
+# =============================================================
+#  FX Signal Engine - central configuration
+#  Every knob that affects results lives here so backtests are
+#  reproducible and honest. Change nothing in the code to tune.
+# =============================================================
+
+account:
+  starting_equity: 10000        # base currency units (e.g. USD)
+  risk_per_trade_pct: 1.0       # % of equity risked per trade (stop distance)
+  max_daily_loss_pct: 3.0       # hard stop for the day (used in live/paper)
+  max_open_positions: 1         # v0.1 trades one position per instrument
+
+# Instruments to trade. Majors only for the trial.
+# `symbol` is the yfinance ticker; `pip` is the pip size for that pair.
+instruments:
+  - name: EURUSD
+    symbol: "EURUSD=X"
+    pip: 0.0001
+    spread_pips: 1.0            # realistic retail round-trip cost assumption
+  - name: GBPUSD
+    symbol: "GBPUSD=X"
+    pip: 0.0001
+    spread_pips: 1.2
+  - name: USDJPY
+    symbol: "USDJPY=X"
+    pip: 0.01
+    spread_pips: 1.0
+  - name: AUDUSD
+    symbol: "AUDUSD=X"
+    pip: 0.0001
+    spread_pips: 1.2
+  - name: USDCHF
+    symbol: "USDCHF=X"
+    pip: 0.0001
+    spread_pips: 1.5
+
+data:
+  # source: "yfinance" (free, daily, no key) | "twelvedata" (free key, 4h) | "oanda"
+  # For the trial: get a free Twelve Data key, then set source: "twelvedata"
+  # and interval: "4h" below. See check_twelvedata.py.
+  source: "twelvedata"
+  environment: "practice"     # OANDA only: "practice" or "live"
+  start: "2010-01-01"
+  end: "2024-12-31"
+  interval: "4h"              # yfinance: 1d only. twelvedata/oanda: 4h/1h/30m/15m too.
+  cache_dir: "data_cache"     # CSV cache so we don't re-download
+
+# Strategy selection + parameters.
+# Swap `name` to try different strategies; params are per-strategy.
+# mean_reversion validated as best risk-adjusted family (daily + 4h walk-forward).
+# Was trend_breakout; switched 2026-08-16 after research. Others still available:
+# trend_breakout / ma_crossover / momentum / carry.
+strategy:
+  name: "mean_reversion"
+  params:
+    bb_period: 20              # Bollinger lookback
+    bb_std: 2.0                # bands at +/- 2 std
+    rsi_period: 14
+    rsi_low: 30                # oversold -> long
+    rsi_high: 70               # overbought -> short
+    atr_period: 14
+    atr_stop_mult: 2.0         # stop = entry -/+ 2.0 * ATR
+    atr_target_mult: 1.5       # target = 1.5 * ATR (revert to mean quickly)
+
+backtest:
+  # Out-of-sample split: fit/inspect on the in-sample portion, then
+  # judge honestly on the untouched out-of-sample tail.
+  out_of_sample_start: "2021-01-01"

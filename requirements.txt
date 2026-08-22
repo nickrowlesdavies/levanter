@@ -1,0 +1,9 @@
+# Levanter cloud build (market + analysis only).
+# Only the deps the market-only site needs - no broker/live-trade libs.
+pandas>=2.0
+numpy>=1.24
+matplotlib>=3.7
+yfinance>=0.2.40
+requests>=2.31
+PyYAML>=6.0
+squarify>=0.4.4
