@@ -10,7 +10,8 @@ set -u
 
 run() {
   echo "::group::$1"
-  if python "$@"; then :; else echo "WARN: '$*' failed - continuing without it"; fi
+  # Hard 4-minute cap per script: a hung/geo-blocked feed must never stall the build.
+  if timeout 240 python "$@"; then :; else echo "WARN: '$*' failed or timed out - continuing without it"; fi
   echo "::endgroup::"
 }
 
