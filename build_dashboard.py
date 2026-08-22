@@ -1833,7 +1833,8 @@ def main():
     if os.path.exists(cf_path):
         _tok = open(cf_path).read().strip()
         if _tok:
-            cf_snippet = ('<script defer src="https://static.cloudflareinsights.com/beacon.min.js"'
+            cf_snippet = ('<script type="module" src="https://static.cloudflareinsights.com/'
+                          'beacon.min.js"'
                           f' data-cf-beacon=\'{{"token": "{_tok}"}}\'></script>')
 
     modal_data = build_modal_data()
