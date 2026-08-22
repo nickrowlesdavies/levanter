@@ -817,6 +817,17 @@ def _fmt_moves(lst):
     return ", ".join(f"{n} ({v:+.1f}%)" for n, v in lst) if lst else "none"
 
 
+def _sentences(parts):
+    """Join clause fragments as separate sentences (full stops, not semicolons)."""
+    out = []
+    for p in parts:
+        if not p:
+            continue
+        s = p[0].upper() + p[1:]
+        out.append(s if s.endswith(".") else s + ".")
+    return " ".join(out)
+
+
 def _macro_read(cm, fxm, com, field):
     pairs, items = fxm.get("pairs", []), com.get("items", [])
     cd = {c.get("name"): c for c in items}
@@ -941,6 +952,7 @@ def weekly_content():
         f"finished **{mac['dxi']}**, and commodities {'firmed' if ds and ds['avg'] > 0 else 'eased'} "
         f"on average ({ds['avg']:+.1f}%). The volatility model reads {tot_hi} of {tot_n} tracked "
         f"markets as turbulent looking a week out, so expect the ranges to stay {'wide' if tot_hi >= tot_n/2 else 'contained'}.")
+    lead.append("Follow the money, not the noise.")
 
     crypto = []
     if cs:
@@ -966,10 +978,10 @@ def weekly_content():
             cyc.append(f"the cycle clock reads {phase.lower()}")
         if eb.get("ratio") is not None:
             cyc.append(f"the ether-to-bitcoin ratio is {eb['ratio']:.4f}")
-        crypto.append(("On the structural picture, " + "; ".join(cyc) + "." if cyc else
-                       "The structural picture is little changed from last week.")
-                      + " None of that forecasts next week, but it frames how much room the move "
-                        "has before it is fighting its own history.")
+        struct = (_sentences(cyc) if cyc else
+                  "The structural picture is little changed from last week.")
+        crypto.append(struct + " None of that forecasts next week, but it frames how much room "
+                      "the move has before it is fighting its own history.")
 
     fx = []
     if fs:
@@ -1008,9 +1020,9 @@ def weekly_content():
             parts.append(f"and copper, the market's rough gauge of industrial demand, was "
                          f"{mac['copper']:+.1f}%")
         if parts:
-            comd.append("Splitting the complex, " + "; ".join(parts) + ". Copper firm alongside "
-                        "oil points to a growth impulse; copper soft while gold runs points the "
-                        "other way, toward caution and a hunt for safety.")
+            comd.append("Split the complex apart and it tells a fuller story. " + _sentences(parts)
+                        + " Copper firm alongside oil points to a growth impulse. Copper soft while "
+                        "gold runs points the other way, toward caution and a hunt for safety.")
 
     cross_read = []
     both = mac.get("gold") is not None and mac.get("capw") is not None
@@ -1031,11 +1043,14 @@ def weekly_content():
                    f"{'high enough that diversification was thin this week' if corr and corr > 0.5 else 'low enough that markets were still trading their own stories'}."
                    if corr is not None else "")
         cross_read.append(f"Read across the whole board, {tell}.{corrbit}")
+    if cross_read:
+        cross_read.append("One board beats one screen.")
 
     ahead = [
         "We do not forecast direction over the coming week, because in liquid markets it is close "
         "to a coin flip and pretending otherwise is how people lose money. What we forecast is "
         "weather.",
+        "So here it is.",
         f"The volatility model leans **{'turbulent' if hic >= max(1, nc)/2 else 'calmer'}** on "
         f"crypto, **{'turbulent' if hif >= max(1, nf)/2 else 'calmer'}** on FX and "
         f"**{'turbulent' if hid >= max(1, nd)/2 else 'calmer'}** on commodities. Expect the widest "
@@ -1071,7 +1086,7 @@ def _monthly_opinion(regime_on, phase, mac, bt):
              f"{acc90}% at a quarter, while our direction calls sit where theory says they should, "
              f"close to a coin flip." if acc30 and acc90 else "")
     if cool:
-        return [
+        body = [
             "Every cycle produces the same conversation at roughly the same point. The early move "
             "is dismissed, the middle is doubted, the top is celebrated as a new paradigm, and the "
             "cooldown is explained away as a healthy pause right up until it is not. We appear to be "
@@ -1083,6 +1098,12 @@ def _monthly_opinion(regime_on, phase, mac, bt):
             "world. That is not bearishness. It is arithmetic. The people who lose the most in this "
             "phase are the ones who size their expectations to the last cycle rather than the trend "
             "of cycles.",
+            "There is a subtler trap in a cooldown, which is that it can last far longer and feel "
+            "far more constructive than a crash. Sideways is not safe. A market that grinds within a "
+            "wide range for months trains people out of their discipline, rewards the sellers of "
+            "options and the takers of leverage, and then reminds everyone at once why those trades "
+            "carried a premium in the first place. Boredom is not the absence of risk. It is often "
+            "where risk quietly accumulates.",
             "None of that tells you what price does next month, and we will not pretend it does. "
             "What it tells you is how to hold whatever you hold: with position sizes that assume the "
             "drawdowns of this asset class are real and recurring, not theoretical, and with a plan "
@@ -1090,8 +1111,8 @@ def _monthly_opinion(regime_on, phase, mac, bt):
             "The broader point is that structure beats prediction. Where an asset sits against its "
             "own long history, how its volatility is behaving, and whether the whole board is moving "
             "as one are all knowable. The next candle is not." + skill]
-    if not regime_on:
-        return [
+    elif not regime_on:
+        body = [
             "The month closed risk-off, and risk-off months are where portfolios are quietly "
             "remade. The moves themselves are rarely the damage. The damage is in the decisions "
             "they provoke: the forced selling, the abandoned plan, the sudden discovery that "
@@ -1100,6 +1121,11 @@ def _monthly_opinion(regime_on, phase, mac, bt):
             "When the dollar firms and havens outperform while everything on the risk curve is "
             "marked down together, you are being shown, for free, which parts of your book actually "
             "diversify and which merely felt like they did in calmer weather.",
+            "The instinct in these months is to do something, and the something is almost always "
+            "wrong. Selling the bottom of a washout feels like risk management and is usually just "
+            "the crowd flinching in unison. The antidote is not bravery, which is unreliable, but "
+            "preparation: a book sized so that a bad month is survivable without heroics, and a list "
+            "written in advance of what you would want to own if it went on sale.",
             "We are not calling a bottom. We do not think anyone reliably can. The value in reading "
             "every market on one page is not prophecy, it is early awareness: seeing the tone change, "
             "trimming before you are forced to, and keeping enough cash and composure to act when "
@@ -1107,23 +1133,40 @@ def _monthly_opinion(regime_on, phase, mac, bt):
             "So the monthly opinion is boring on purpose. Hold less than you could. Owe nothing you "
             "could be forced to unwind. And treat the ability to do nothing under pressure as the "
             "edge it actually is." + skill]
-    return [
-        "A month like this one, broadly constructive and without a crisis to narrate, is the "
-        "hardest to write about honestly, because the temptation is to manufacture a story that "
-        "explains the gains and then quietly implies they will continue. We would rather not.",
-        "The durable truth underneath every month, up or down, is that direction over these "
-        "horizons is close to unforecastable and the returns that look like skill in a rising "
-        "market are mostly just exposure. That is not cynicism. It is the finding of every honest "
-        "backtest we have run, and it is oddly liberating, because it points you at the things that "
-        "do work.",
-        "Those things are unglamorous and they compound. Spread risk across markets that genuinely "
-        "move to different drummers. Size to the volatility you can actually measure rather than the "
-        "conviction you happen to feel. Cut what breaks quickly and let what works run without "
-        "interference. Do that for long enough and the arithmetic does more than any forecast ever "
-        "could.",
-        "That is the whole Levanter thesis in a paragraph, and we will keep saying it because the "
-        "industry keeps selling the opposite. Certainty is easy to market and process is not, but "
-        "process is the only one of the two that survives contact with reality." + skill]
+    else:
+        body = [
+            "A month like this one, broadly constructive and without a crisis to narrate, is the "
+            "hardest to write about honestly, because the temptation is to manufacture a story that "
+            "explains the gains and then quietly implies they will continue. We would rather not.",
+            "The durable truth underneath every month, up or down, is that direction over these "
+            "horizons is close to unforecastable and the returns that look like skill in a rising "
+            "market are mostly just exposure. That is not cynicism. It is the finding of every honest "
+            "backtest we have run, and it is oddly liberating, because it points you at the things that "
+            "do work.",
+            "It is worth being precise about what a green month does and does not tell you. It tells "
+            "you that risk was rewarded, which is useful history. It does not tell you that risk will "
+            "be rewarded again, which is the only thing anyone actually wants to know and the one "
+            "thing the month cannot say. Confusing the two is how good years end badly, with people "
+            "sizing up into strength precisely because it has felt easy.",
+            "Those things that do work are unglamorous and they compound. Spread risk across markets "
+            "that genuinely move to different drummers. Size to the volatility you can actually "
+            "measure rather than the conviction you happen to feel. Cut what breaks quickly and let "
+            "what works run without interference. Do that for long enough and the arithmetic does "
+            "more than any forecast ever could.",
+            "That is the whole Levanter thesis in a paragraph, and we will keep saying it because the "
+            "industry keeps selling the opposite. Certainty is easy to market and process is not, but "
+            "process is the only one of the two that survives contact with reality." + skill]
+    closers = [
+        "If that all sounds like a counsel of modesty, it is, and deliberately so. The single most "
+        "expensive belief in this business is that someone, somewhere, can tell you what happens "
+        "next, and the entire architecture of financial media exists to sell you that belief on a "
+        "monthly subscription. We are trying to sell you the opposite: a clear-eyed read of what is "
+        "knowable, an honest label on what is not, and no pretence in between.",
+        "So take from this what the data actually supports and leave the rest. Watch the volatility, "
+        "respect the cycle, read every market against every other, and let the process rather than "
+        "the prediction carry the weight. We will be back next month with the same discipline and, "
+        "in all likelihood, a different-looking market to apply it to."]
+    return body + closers
 
 
 def monthly_content():
@@ -1172,6 +1215,8 @@ def monthly_content():
         review.append(
             f"Commodities averaged {ds['avg']:+.1f}%, led by **{ds['bn']}** ({ds['bv']:+.0f}%) with "
             f"**{ds['wn']}** the laggard ({ds['wv']:+.0f}%).")
+    if review:
+        review.append("That is the month in four lines.")
 
     macro = []
     macro.append(
@@ -1203,6 +1248,7 @@ def monthly_content():
         f"{'while gold also bid suggests liquidity and a debasement theme rather than clean, confident risk-taking' if regime_on and (mac.get('gold') or 0) > 0 else 'while gold slipped is about as honest a risk-on signal as markets produce' if regime_on else 'with havens outperforming is the fingerprint of caution'}. "
         f"None of it is a prediction. All of it is context, and context is what stops you reading a "
         f"single market in a vacuum.")
+    macro.append("Everything else is downstream of the dollar.")
 
     cycle = []
     cparts = []
@@ -1216,9 +1262,14 @@ def monthly_content():
                       f"long-run power-law trend")
     if cga.get("ETH", {}).get("pct_vs_trend") is not None:
         v = cga["ETH"]["pct_vs_trend"]
-        cparts.append(f"ether about {abs(v):.0f}% {'above' if v >= 0 else 'below'} its own")
+        cparts.append(f"ether trades about {abs(v):.0f}% {'above' if v >= 0 else 'below'} its own "
+                      f"trend")
+    if cga.get("SOL", {}).get("pct_vs_trend") is not None:
+        v = cga["SOL"]["pct_vs_trend"]
+        cparts.append(f"solana sits about {abs(v):.0f}% {'above' if v >= 0 else 'below'} its own "
+                      f"trend")
     if cparts:
-        cycle.append("Where we sit, structurally: " + "; ".join(cparts) + ".")
+        cycle.append("Here is where we stand. " + _sentences(cparts))
     if eb.get("ratio") is not None:
         cycle.append(
             f"The ether-to-bitcoin ratio is {eb['ratio']:.4f}"
@@ -1231,11 +1282,78 @@ def monthly_content():
         "its youthful rate forever without eventually outgrowing everything else in existence. That "
         "is arithmetic, not pessimism, and it argues against assuming the next run rhymes with the "
         "biggest one you remember.")
-
-    essay = _monthly_opinion(regime_on, phase, mac, bt)
+    cycle.append("Arithmetic, not mood.")
 
     elevated = any(v.get("30d", {}).get("regime") == "HIGH"
                    for v in vr.get("assets", {}).values())
+    corr = cm.get("avg_corr")
+
+    rotation = []
+    capw, eqw = cm.get("cap_weighted_ret"), cm.get("equal_weighted_ret")
+    cls_avg = {"crypto": cs["avg"] if cs else None, "FX": fs["avg"] if fs else None,
+               "commodities": ds["avg"] if ds else None}
+    ranked = sorted(((k, v) for k, v in cls_avg.items() if v is not None),
+                    key=lambda kv: kv[1], reverse=True)
+    if ranked:
+        lc, lv = ranked[0]
+        gc, gv = ranked[-1]
+        rotation.append(
+            f"Step back from the individual names and the rotation is clearest at the asset-class "
+            f"level. On average **{lc}** did the most work this month ({lv:+.1f}%) and **{gc}** the "
+            f"least ({gv:+.1f}%). Which class leads tells you what the market is paying up for. Risk "
+            f"and liquidity, or safety and hard assets. That is worth more than any single ticker.")
+    if capw is not None and eqw is not None:
+        rotation.append(
+            f"Inside crypto, the equal-weighted basket returned {eqw:+.0f}% against {capw:+.0f}% "
+            f"cap-weighted. "
+            + ("The average coin beat the heavyweights, so the move broadened into smaller names. "
+               "Historically that signals healthy appetite, and also a later, frothier stage where "
+               "the quality bar quietly drops." if eqw > capw else
+               "The large names carried the tape while the average coin lagged. That is a narrower "
+               "and usually more durable kind of strength, but it leaves less fuel in the "
+               "speculative tail.")
+            + (f" Dominance near {dom:.0f}% fits the picture." if dom else ""))
+    rotation.append(
+        "Rotation is worth tracking because it turns before prices do. Leadership passing from the "
+        "majors to the small caps, from crypto to gold, or from growth-sensitive metals to "
+        "defensive ones, is the market rehearsing its next mood while the index still looks calm. "
+        "We would rather catch the rehearsal than wait for the show.")
+    rotation.append("Money moves first.")
+
+    risks = []
+    bull_bits, bear_bits = [], []
+    if regime_on:
+        bull_bits.append("the cross-market tape is risk-on")
+    if cs and cs["up"] > cs["n"] / 2:
+        bull_bits.append("crypto breadth is positive")
+    if mac["dollar"] < 0:
+        bull_bits.append("a softer dollar is easing conditions")
+    if regime_on and (mac.get("gold") or 0) > 0:
+        bull_bits.append("gold and crypto are bid together, a liquidity tailwind")
+    if phase and any(w in phase.lower() for w in ("peak", "cooldown", "late")):
+        bear_bits.append(f"the cycle reads {phase.lower()}")
+    bear_bits.append("the halving math points to diminishing returns")
+    if elevated:
+        bear_bits.append("the volatility model leans elevated")
+    if corr and corr > 0.5:
+        bear_bits.append(f"correlations are high near {corr:.2f}, so diversification is thin")
+    risks.append("No honest monthly skips the other side of the argument, so here is ours, plainly.")
+    risks.append(
+        "The bull case. " + (", ".join(bull_bits).capitalize() if bull_bits else
+                             "Few clean positives this month") + ". Taken together that is an "
+        "environment where risk has been rewarded and the path of least resistance has been up.")
+    risks.append(
+        "The bear case. " + (", ".join(bear_bits).capitalize() if bear_bits else
+                             "Few obvious negatives, which is itself a mild warning") + ". Taken "
+        "together that is an environment where the easy gains may already be behind and the margin "
+        "for error is thinner than it feels.")
+    risks.append(
+        "What would change our mind, either way. A decisive break in the dollar, gold rolling over "
+        "or accelerating, a spike in cross-asset correlation, or a flip in the volatility regime. "
+        "Those are the signals we watch. A loud headline is not one of them.")
+    risks.append("Both cases are real.")
+
+    essay = _monthly_opinion(regime_on, phase, mac, bt)
     ahead = [
         "For the month ahead we hold the same discipline. We will not tell you where prices are "
         "going, because we cannot and neither can anyone selling you the opposite. We will tell you "
@@ -1253,8 +1371,9 @@ def monthly_content():
     return dict(
         kicker="Levanter Monthly", title="The Month in Markets, and the Bigger Picture",
         dateline=f"{today:%B %Y}", standfirst=sf,
-        sections=[("The month in review", review), ("The macro picture", macro),
-                  ("Where we are in the cycle", cycle),
+        sections=[("The month in review", review), ("Rotation and leadership", rotation),
+                  ("The macro picture", macro), ("Where we are in the cycle", cycle),
+                  ("Risks, and what would change our mind", risks),
                   ("Opinion: the Levanter thesis", essay), ("The month ahead", ahead)])
 
 
