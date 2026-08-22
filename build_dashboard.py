@@ -684,6 +684,7 @@ def home_section(cards) -> str:
              f'<button class="brief-b" onclick="levTab(\'reviews\')">Full reviews →</button></div>')
 
     return (f'{brief}'
+            f'{SUBSCRIBE_BOX}'
             f'<div class="subh">Market regime · at a glance</div>'
             f'<div class="movers">{reg_cards}</div>'
             f'<div class="xboards">{board(top, "🔥 Top performers · 30d · all markets")}'
@@ -1394,6 +1395,10 @@ def render_piece_html(c):
             f'<h2 class="pc-title">{c["title"]}</h2>'
             f'<div class="pc-date">{c["dateline"]}</div>'
             f'<p class="pc-stand">{_md_bold_html(c["standfirst"])}</p>{secs}'
+            f'<div class="pc-cta">Explore the live dashboard, updated around the clock, at '
+            f'<a href="https://levantermarkets.com">levantermarkets.com</a>. '
+            f'Subscribe for the daily, weekly and monthly at '
+            f'<a href="https://read.levantermarkets.com">read.levantermarkets.com</a>.</div>'
             f'<div class="pc-foot">&copy; {datetime.now().year} Levanter. Educational market '
             f'analysis across crypto, FX and commodities. Not financial advice.</div></article>')
 
@@ -1412,8 +1417,14 @@ def render_piece_md(c):
         for p in real:
             out.append(p)
             out.append("")
-    out += ["---", f"*© {datetime.now().year} Levanter. Educational market analysis across "
-            "crypto, FX and commodities. Not financial advice.*"]
+    out += ["---",
+            "**Explore the live dashboard**, updated around the clock, with every market's full "
+            "history, charts and forecasts: levantermarkets.com",
+            "",
+            "**Subscribe** for the daily, weekly and monthly pieces: read.levantermarkets.com",
+            "",
+            f"*© {datetime.now().year} Levanter. Educational market analysis across crypto, FX "
+            "and commodities. Not financial advice.*"]
     return "\n".join(out)
 
 
@@ -1495,7 +1506,9 @@ def write_writeups():
         if para:
             dlines += [f"## {title}", "",
                        para.replace("<b>", "**").replace("</b>", "**"), ""]
-    dlines += ["---", "*Levanter. Educational, not financial advice.*"]
+    dlines += ["---",
+               "Live dashboard: levantermarkets.com     Subscribe: read.levantermarkets.com",
+               "", "*Levanter. Educational, not financial advice.*"]
     p = os.path.join(out_dir, f"levanter-daily-{today}.md")
     open(p, "w").write("\n".join(dlines))
     files["daily"] = p
@@ -1633,6 +1646,14 @@ HEADER_MARK = (
     '<path d="M28 40 C46 33 60 33 76 37" stroke-width="8" opacity="0.82"/></g>'
     '<path d="M86 46 l14 -6 -4 14" fill="none" stroke="#fff" stroke-width="8" '
     'stroke-linecap="round" stroke-linejoin="round"/></svg>')
+
+SUBSCRIBE_URL = "https://read.levantermarkets.com/subscribe"
+SUBSCRIBE_BOX = (
+    '<div class="subbox"><div class="subbox-tx">'
+    '<div class="subbox-t">Get Levanter in your inbox</div>'
+    '<div class="subbox-s">Daily, weekly and monthly analysis across crypto, FX and commodities. '
+    'Honest, and free.</div></div>'
+    f'<a class="subbox-b" href="{SUBSCRIBE_URL}" target="_blank" rel="noopener">Subscribe</a></div>')
 
 TAB_JS = (
     "(function(){var tabs=document.querySelectorAll('#tabs .tab');"
@@ -1964,7 +1985,18 @@ def main():
   .pc-h{{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
     color:var(--muted);margin:20px 0 6px}}
   .piece p{{font-size:14.5px;line-height:1.75;color:var(--fg);margin:0 0 12px}}
-  .pc-foot{{font-size:11.5px;color:var(--muted);margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}}
+  .pc-cta{{font-size:13px;line-height:1.6;color:var(--fg);margin-top:20px;padding:14px 16px;
+    background:rgba(59,130,246,.08);border:1px solid var(--line);border-radius:12px}}
+  .pc-cta a{{color:var(--brand);font-weight:700;text-decoration:none}}
+  .pc-foot{{font-size:11.5px;color:var(--muted);margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}}
+  .subbox{{background:var(--grad);color:#fff;border-radius:18px;padding:20px 24px;margin-bottom:20px;
+    box-shadow:var(--shadow);display:flex;align-items:center;gap:18px;flex-wrap:wrap}}
+  .subbox-tx{{flex:1;min-width:220px}}
+  .subbox-t{{font-size:18px;font-weight:800;letter-spacing:.2px}}
+  .subbox-s{{font-size:13px;opacity:.95;margin-top:3px;line-height:1.5}}
+  .subbox-b{{background:#fff;color:#1e3a8a;font-weight:800;font-size:14px;padding:11px 20px;
+    border-radius:11px;text-decoration:none;white-space:nowrap}}
+  .subbox-b:hover{{background:#eef2ff}}
   .revd{{border-left:3px solid var(--brand,#3b82f6);padding:2px 0 2px 12px;margin-bottom:10px;
     background:linear-gradient(90deg,rgba(59,130,246,.07),transparent)}}
   .about{{max-width:760px}}
@@ -1986,6 +2018,7 @@ def main():
   .lfoot-nav{{display:flex;flex-wrap:wrap;gap:6px 18px;margin-bottom:12px}}
   .lfoot-nav span{{font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}}
   .lfoot-nav span:hover{{color:var(--brand)}}
+  .lfoot-sub{{color:var(--brand);font-weight:800;text-decoration:none}}
   .lfoot-note{{font-size:11.5px;color:var(--muted);line-height:1.6;max-width:720px}}
   .lfoot-copy{{font-size:11.5px;color:var(--muted);margin-top:10px;font-weight:600}}
   figure img{{cursor:zoom-in}}
@@ -2044,7 +2077,8 @@ def main():
     <div class="lfoot-nav">
       <span onclick="levTab('home')">Home</span><span onclick="levTab('crypto')">Crypto</span>
       <span onclick="levTab('fx')">FX</span><span onclick="levTab('commodities')">Commodities</span>
-      <span onclick="levTab('reviews')">Reviews</span><span onclick="levTab('about')">About</span></div>
+      <span onclick="levTab('reviews')">Reviews</span><span onclick="levTab('about')">About</span>
+      <a href="{SUBSCRIBE_URL}" target="_blank" rel="noopener" class="lfoot-sub">Subscribe &rarr;</a></div>
     <div class="lfoot-note">Educational market analysis across crypto, FX and commodities.
     Historical moves and mechanical signals only, not forecasts, not financial advice.
     Data from public sources. Updated {stamp}.</div>
