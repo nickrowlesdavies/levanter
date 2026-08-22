@@ -1451,7 +1451,8 @@ def daily_note():
         f"({bot[2]:+.1f}%). {up} of {n} markets higher. Tape {reg}.",
         f"The volatility model leans {turb} across crypto, FX and commodities looking a week out.",
         "",
-        "Full board, charts and forecasts at levantermarkets.com",
+        "Full board, charts and forecasts: levantermarkets.com",
+        "Subscribe for the weekly and monthly: read.levantermarkets.com",
         "Educational, not advice.",
     ])
 
@@ -1648,12 +1649,17 @@ HEADER_MARK = (
     'stroke-linecap="round" stroke-linejoin="round"/></svg>')
 
 SUBSCRIBE_URL = "https://read.levantermarkets.com/subscribe"
+SUBSCRIBE_EMBED = "https://read.levantermarkets.com/embed"
 SUBSCRIBE_BOX = (
     '<div class="subbox"><div class="subbox-tx">'
     '<div class="subbox-t">Get Levanter in your inbox</div>'
-    '<div class="subbox-s">Daily, weekly and monthly analysis across crypto, FX and commodities. '
+    '<div class="subbox-s">The weekly and monthly in your inbox, plus daily on the site. '
     'Honest, and free.</div></div>'
-    f'<a class="subbox-b" href="{SUBSCRIBE_URL}" target="_blank" rel="noopener">Subscribe</a></div>')
+    '<div class="subbox-form">'
+    f'<iframe src="{SUBSCRIBE_EMBED}" title="Subscribe to Levanter" width="100%" height="95" '
+    'style="border:0;border-radius:10px;background:#fff;display:block" scrolling="no"></iframe>'
+    f'<a class="subbox-alt" href="{SUBSCRIBE_URL}" target="_blank" rel="noopener">'
+    'or subscribe at read.levantermarkets.com</a></div></div>')
 
 TAB_JS = (
     "(function(){var tabs=document.querySelectorAll('#tabs .tab');"
@@ -1997,6 +2003,9 @@ def main():
   .subbox-b{{background:#fff;color:#1e3a8a;font-weight:800;font-size:14px;padding:11px 20px;
     border-radius:11px;text-decoration:none;white-space:nowrap}}
   .subbox-b:hover{{background:#eef2ff}}
+  .subbox-form{{flex:0 0 auto;width:min(460px,100%)}}
+  .subbox-form iframe{{width:100%}}
+  .subbox-alt{{display:block;font-size:11px;color:#e8f1ff;margin-top:7px;text-decoration:underline}}
   .revd{{border-left:3px solid var(--brand,#3b82f6);padding:2px 0 2px 12px;margin-bottom:10px;
     background:linear-gradient(90deg,rgba(59,130,246,.07),transparent)}}
   .about{{max-width:760px}}
