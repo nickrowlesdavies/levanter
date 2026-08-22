@@ -1,0 +1,20 @@
+<svg width="1600" height="400" viewBox="0 0 1600 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0ea5e9"/>
+      <stop offset="0.55" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="400" fill="url(#g)"/>
+  <g transform="translate(220,78) scale(2.05)" fill="none" stroke="#ffffff" stroke-linecap="round">
+    <path d="M26 80 C50 70 68 70 90 76" stroke-width="8.5" opacity="0.5"/>
+    <path d="M26 60 C54 47 76 47 100 55" stroke-width="9"/>
+    <path d="M26 40 C46 32 62 32 80 37" stroke-width="8.5" opacity="0.82"/>
+    <path d="M90 48 l15 -6 -4 15" stroke-width="9" stroke-linejoin="round"/>
+  </g>
+  <text x="470" y="212" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif"
+        font-size="120" font-weight="800" letter-spacing="3" fill="#ffffff">LEVANTER</text>
+  <text x="474" y="270" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif"
+        font-size="33" font-weight="600" letter-spacing="9" fill="#e8f1ff">MARKETS · SIGNALS · INSIGHT</text>
+</svg>

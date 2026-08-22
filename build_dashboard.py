@@ -1394,8 +1394,8 @@ def render_piece_html(c):
             f'<h2 class="pc-title">{c["title"]}</h2>'
             f'<div class="pc-date">{c["dateline"]}</div>'
             f'<p class="pc-stand">{_md_bold_html(c["standfirst"])}</p>{secs}'
-            f'<div class="pc-foot">Levanter. Educational market analysis across crypto, FX and '
-            f'commodities. Not financial advice.</div></article>')
+            f'<div class="pc-foot">&copy; {datetime.now().year} Levanter. Educational market '
+            f'analysis across crypto, FX and commodities. Not financial advice.</div></article>')
 
 
 def render_piece_md(c):
@@ -1412,8 +1412,8 @@ def render_piece_md(c):
         for p in real:
             out.append(p)
             out.append("")
-    out += ["---", "*Levanter. Educational market analysis across crypto, FX and commodities. "
-            "Not financial advice.*"]
+    out += ["---", f"*© {datetime.now().year} Levanter. Educational market analysis across "
+            "crypto, FX and commodities. Not financial advice.*"]
     return "\n".join(out)
 
 
@@ -1645,6 +1645,7 @@ def main():
     cards = [] if market_only else collect()
     chart = "" if market_only else equity_chart(cards)
     stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    year = datetime.now().year
 
     research = [
         ("combined_portfolio.png", "Combined portfolio: core + trend sleeve (validated blend)"),
@@ -1918,6 +1919,7 @@ def main():
   .lfoot-nav span{{font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}}
   .lfoot-nav span:hover{{color:var(--brand)}}
   .lfoot-note{{font-size:11.5px;color:var(--muted);line-height:1.6;max-width:720px}}
+  .lfoot-copy{{font-size:11.5px;color:var(--muted);margin-top:10px;font-weight:600}}
   figure img{{cursor:zoom-in}}
   .lightbox{{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:60;
     align-items:center;justify-content:center;padding:22px;cursor:zoom-out}}
@@ -1978,6 +1980,7 @@ def main():
     <div class="lfoot-note">Educational market analysis across crypto, FX and commodities.
     Historical moves and mechanical signals only, not forecasts, not financial advice.
     Data from public sources. Updated {stamp}.</div>
+    <div class="lfoot-copy">&copy; {year} Levanter. All rights reserved.</div>
   </footer>
   {MODAL_HTML}
   <div id="lightbox" class="lightbox" onclick="this.style.display='none'"><img id="lbimg" alt="chart"></div>
