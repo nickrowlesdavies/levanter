@@ -1606,6 +1606,57 @@ def about_section() -> str:
         'Mediterranean and the Levant.</p></div>')
 
 
+def track_record_section() -> str:
+    vr = _read("vol_regime.json") or {}
+    ps = _read("prediction_state.json") or {}
+    bt = vr.get("backtest", {})
+    hs = vr.get("horizons", [])
+    intro = ('<div class="cbanner on"><div class="reg">Track record</div>'
+             '<div class="rec">We score every call against reality, in public. The point of '
+             'Levanter is honesty, so here is the evidence, updated as the data resolves.</div></div>')
+
+    volcards = ""
+    for h in hs:
+        b = bt.get(h)
+        if not b:
+            continue
+        e = b.get("edge", 0)
+        volcards += (f'<div class="trk-card"><div class="trk-h">{h}</div>'
+                     f'<div class="trk-acc">{b.get("acc", 0)}%</div>'
+                     f'<div class="trk-sub {"up" if e > 0 else "down" if e < 0 else "mut"}">'
+                     f'{e:+d} vs baseline</div>'
+                     f'<div class="trk-n">{b.get("n", 0):,} tests</div></div>')
+    vol = (f'<div class="subh">Volatility model, the forecast that works</div>'
+           f'<div class="trk-note">We predict whether the next period will be turbulent or calm. '
+           f'Backtested over five years, point-in-time, on non-overlapping samples. It carries '
+           f'real skill, because volatility clusters. Accuracy against a coin-flip baseline:</div>'
+           f'<div class="trk-grid">{volcards}</div>') if volcards else ""
+
+    acc, rc = ps.get("accuracy"), ps.get("resolved_count", 0)
+    byc = ps.get("accuracy_by_class", {})
+    dparts = [f"{lab} {byc[k]:.0f}%" for k, lab in
+              [("crypto", "Crypto"), ("fx", "FX"), ("commodity", "Commodities")]
+              if byc.get(k) is not None]
+    dirscore = ('<div class="subh">Direction calls, the honest scoreboard</div>'
+                '<div class="trk-note">We also log directional up and down calls and score them '
+                'against what actually happened. As theory predicts in efficient markets, this '
+                'sits near a coin flip. We publish it anyway, because pretending otherwise is how '
+                'the rest of the industry loses your money.</div>')
+    if rc and acc is not None:
+        dirscore += (f'<div class="trk-line"><b>{acc:.0f}% correct</b> across <b>{rc:,}</b> scored '
+                     f'calls' + (f' ({" · ".join(dparts)})' if dparts else '') + '. Near the 50% '
+                     f'baseline, exactly where an honest model should sit.</div>')
+    else:
+        dirscore += ('<div class="trk-line">The live scoreboard is filling up now. '
+                     'Calls are logged the day they are made and scored when they mature.</div>')
+
+    method = ('<div class="mnote">Everything is tested point-in-time with no look-ahead, from '
+              'public data. Volatility forecasting has real, measurable skill. Price-direction '
+              'forecasting does not, and we will never sell you the illusion that it does. '
+              'Educational, not financial advice.</div>')
+    return intro + vol + dirscore + method
+
+
 def build_modal_data() -> str:
     """One global AD object (crypto + FX + commodities) + the modal script,
     so a click on any row in any tab opens the same detail popup."""
@@ -1776,6 +1827,15 @@ def main():
     if os.path.exists(icon_path):
         icon_b64 = base64.b64encode(open(icon_path, "rb").read()).decode()
 
+    # Cloudflare Web Analytics: drop your token into cf_analytics.token (git-ignored)
+    cf_snippet = ""
+    cf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cf_analytics.token")
+    if os.path.exists(cf_path):
+        _tok = open(cf_path).read().strip()
+        if _tok:
+            cf_snippet = ('<script defer src="https://static.cloudflareinsights.com/beacon.min.js"'
+                          f' data-cf-beacon=\'{{"token": "{_tok}"}}\'></script>')
+
     modal_data = build_modal_data()
 
     try:
@@ -1805,6 +1865,20 @@ def main():
 <meta http-equiv="refresh" content="300">
 <title>Levanter · Markets, Signals, Insight</title>
 <link rel="icon" href="data:image/svg+xml;base64,{icon_b64}">
+<meta name="description" content="Honest market intelligence across crypto, FX and commodities. Volatility yes, direction no. Daily on the site, weekly and monthly in your inbox.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Levanter">
+<meta property="og:title" content="Levanter · Markets, Signals, Insight">
+<meta property="og:description" content="Honest market intelligence across crypto, FX and commodities. Volatility yes, direction no.">
+<meta property="og:url" content="https://levantermarkets.com">
+<meta property="og:image" content="https://levantermarkets.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Levanter · Markets, Signals, Insight">
+<meta name="twitter:description" content="Honest market intelligence across crypto, FX and commodities. Volatility yes, direction no.">
+<meta name="twitter:image" content="https://levantermarkets.com/og.png">
+{cf_snippet}
 <style>
   :root{{--bg:#eef1f6;--panel:#ffffff;--fg:#0f172a;--muted:#64748b;--line:#e2e8f0;
     --shadow:0 1px 3px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.05);
@@ -2013,6 +2087,16 @@ def main():
   .subbox-form{{flex:0 0 auto;width:min(460px,100%)}}
   .subbox-form iframe{{width:100%}}
   .subbox-alt{{display:block;font-size:11px;color:#e8f1ff;margin-top:7px;text-decoration:underline}}
+  .trk-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:12px;margin-bottom:8px}}
+  .trk-card{{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 12px;
+    box-shadow:var(--shadow);text-align:center}}
+  .trk-h{{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700}}
+  .trk-acc{{font-size:30px;font-weight:800;letter-spacing:-.5px;margin:4px 0 2px;color:var(--brand)}}
+  .trk-sub{{font-size:12px;font-weight:700}}
+  .trk-n{{font-size:11px;color:var(--muted);margin-top:2px}}
+  .trk-note{{font-size:13px;line-height:1.6;color:var(--fg);margin:0 4px 12px}}
+  .trk-line{{font-size:15px;line-height:1.6;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);margin-bottom:8px}}
   .revd{{border-left:3px solid var(--brand,#3b82f6);padding:2px 0 2px 12px;margin-bottom:10px;
     background:linear-gradient(90deg,rgba(59,130,246,.07),transparent)}}
   .about{{max-width:760px}}
@@ -2063,6 +2147,7 @@ def main():
     <button class="tab" data-t="fx">FX</button>
     <button class="tab" data-t="commodities">Commodities</button>
     <button class="tab" data-t="reviews">Reviews</button>
+    <button class="tab" data-t="track">Track record</button>
     <button class="tab" data-t="watchlist">☆ Watchlist</button>
     {strat_btn}
     <button class="tab" data-t="about">About</button>
@@ -2072,6 +2157,7 @@ def main():
   <section class="tabpane" id="pane-fx">{fx_section()}</section>
   <section class="tabpane" id="pane-commodities">{commodities_tab_section()}</section>
   <section class="tabpane" id="pane-reviews">{reviews_section()}</section>
+  <section class="tabpane" id="pane-track">{track_record_section()}</section>
   <section class="tabpane" id="pane-watchlist">
     <div class="subh">Your watchlist <span class="mut">(saved privately in this browser)</span></div>
     <div class="watchadd"><input id="watchAdd" list="watchOpts" autocomplete="off"

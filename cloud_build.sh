@@ -33,6 +33,9 @@ mkdir -p public/substack public/substack/docx
 cp -f reports/substack/*.md public/substack/ 2>/dev/null || true
 cp -f reports/substack/docx/*.docx public/substack/docx/ 2>/dev/null || true
 
+# Social share image (Open Graph) served at /og.png
+cp -f brand/og.png public/og.png 2>/dev/null || true
+
 # Keep GitHub Pages from running the output through Jekyll.
 touch public/.nojekyll
 
