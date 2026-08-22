@@ -1417,6 +1417,51 @@ def render_piece_md(c):
     return "\n".join(out)
 
 
+def daily_note():
+    """Short, punchy daily for Substack Notes (does not email). Links to the dashboard."""
+    cm = _read("crypto_map.json") or {}
+    vr = _read("vol_regime.json") or {}
+    cross = _cross_movers("chg1")
+    if not cross:
+        return ""
+    top, bot = cross[0], cross[-1]
+    up = sum(1 for _, _, v in cross if v > 0)
+    n = len(cross)
+    hic, nc = _vol_outlook(vr, "crypto")
+    hif, nf = _vol_outlook(vr, "fx")
+    hid, nd = _vol_outlook(vr, "commodity")
+    turb = "turbulent" if (hic + hif + hid) >= max(1, nc + nf + nd) / 2 else "calmer"
+    reg = "risk-on" if cm.get("regime_on", True) else "risk-off"
+    date = datetime.now().strftime("%A %-d %B")
+    return "\n".join([
+        f"Levanter daily · {date}",
+        "",
+        f"{top[1]} led the board yesterday ({top[2]:+.1f}%), {bot[1]} lagged "
+        f"({bot[2]:+.1f}%). {up} of {n} markets higher. Tape {reg}.",
+        f"The volatility model leans {turb} across crypto, FX and commodities looking a week out.",
+        "",
+        "Full board, charts and forecasts at levantermarkets.com",
+        "Educational, not advice.",
+    ])
+
+
+def _teaser(kind, field):
+    """One-line Note to post when a big piece drops. Links to the newsletter."""
+    cross = _cross_movers(field)
+    if not cross:
+        return ""
+    top, bot = cross[0], cross[-1]
+    cm = _read("crypto_map.json") or {}
+    reg = "risk-on" if cm.get("regime_on", True) else "risk-off"
+    if kind == "weekly":
+        return (f"New: the Levanter Weekly. A {reg} week, {top[1]} led the whole board and "
+                f"{bot[1]} lagged. The week in review, the week ahead, and an honest opinion on "
+                f"what actually matters. Read it at read.levantermarkets.com")
+    return (f"New: the Levanter Monthly. {top[1]} led the month, {bot[1]} lagged. The macro "
+            f"picture, where we sit in the cycle, and a proper opinion piece. Read it at "
+            f"read.levantermarkets.com")
+
+
 def write_writeups():
     """Write Substack-ready Markdown for the daily, weekly and monthly pieces."""
     out_dir = os.path.join(R, "substack")
@@ -1454,6 +1499,22 @@ def write_writeups():
     p = os.path.join(out_dir, f"levanter-daily-{today}.md")
     open(p, "w").write("\n".join(dlines))
     files["daily"] = p
+    # Short daily Note + one-line teasers for the weekly/monthly
+    note = daily_note()
+    if note:
+        p = os.path.join(out_dir, f"levanter-note-daily-{today}.md")
+        open(p, "w").write(note)
+        files["note"] = p
+    wt = _teaser("weekly", "chg7")
+    if wt:
+        p = os.path.join(out_dir, f"levanter-teaser-weekly-{today}.md")
+        open(p, "w").write(wt)
+        files["teaser_weekly"] = p
+    mt = _teaser("monthly", "chg30")
+    if mt:
+        p = os.path.join(out_dir, f"levanter-teaser-monthly-{month}.md")
+        open(p, "w").write(mt)
+        files["teaser_monthly"] = p
     return files
 
 
