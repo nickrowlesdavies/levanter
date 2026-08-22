@@ -563,7 +563,7 @@ def _asset_table(rows, keyfield, price_fmt, headers):
 def fx_section() -> str:
     d = _read("fx_map.json")
     if not d:
-        return '<div class="sig">FX data not available yet. Run <code>python fx_map.py</code>.</div>'
+        return '<div class="sig">FX data is being updated. Please check back shortly.</div>'
     pairs = d.get("pairs", [])
     best = max(pairs, key=lambda c: c.get("chg30") or -999) if pairs else None
     worst = min(pairs, key=lambda c: c.get("chg30") or 999) if pairs else None
@@ -588,8 +588,8 @@ def fx_section() -> str:
 def commodities_tab_section() -> str:
     d = _read("commodities_map.json")
     if not d:
-        return ('<div class="sig">Commodities data not available yet. '
-                'Run <code>python commodities_map.py</code>.</div>')
+        return ('<div class="sig">Commodities data is being updated. '
+                'Please check back shortly.</div>')
     items = d.get("items", [])
     best = items[0] if items else None
     worst = items[-1] if items else None
@@ -1574,9 +1574,7 @@ def reviews_section() -> str:
             f'<div id="rev-monthly" class="rev-pane">{monthly_html}</div>'
             f'<div id="rev-daily" class="rev-pane">{daily_html}'
             f'<div class="mnote">Daily notes are mechanical (1-day recap plus a volatility '
-            f'watch-list). Not a direction forecast or advice.</div></div>'
-            f'<div class="mnote">The weekly and monthly pieces are also written to '
-            f'<code>reports/substack/</code> as paste-ready Markdown for Substack.</div>')
+            f'watch-list). Not a direction forecast or advice.</div></div>')
 
 
 def about_section() -> str:
