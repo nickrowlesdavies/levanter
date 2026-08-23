@@ -22,6 +22,7 @@ run fx_map.py                # 16 FX majors/crosses (yfinance)
 run commodities_map.py       # 12 metals/energy/ags (yfinance)
 run cycle_gauge.py --live    # power-law + halving cycle gauge (+ proj PNGs)
 run vol_regime.py --live     # volatility-regime forecast
+run btc_metcalfe.py          # BTC network-value gauge (adoption power-law + Metcalfe diagnostic)
 run orderflow.py             # Binance taker-buy / funding (may be geo-blocked on US runners)
 run predict.py               # educational directional predictions
 

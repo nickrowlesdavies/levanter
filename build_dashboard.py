@@ -340,6 +340,41 @@ def cycle_gauge_section() -> str:
             f'<div class="cyc-grid">{cards}</div>{ebline}{proj_block}')
 
 
+def btc_network_value_section() -> str:
+    """Bitcoin network-value read: dollar fair value + adoption floor (power-law /
+    Peterson LPF family), plus the honest Metcalfe-on-addresses decoupling note.
+    Complements the cycle gauge above, which shows the same trend as a meter."""
+    d = _read("btc_metcalfe.json")
+    if not d or not d.get("fair_value"):
+        return ""
+    fair, floor, top = d["fair_value"], d["floor"], d["frothy_top"]
+    ou, pos, read = d["over_under_pct"], d.get("band_position", 50), d.get("read", "")
+    updown = "down" if ou < 0 else "up"
+    side = "below" if ou < 0 else "above"
+    meter = (f'<div class="meter"><div class="mmark" style="left:{pos:.0f}%"></div></div>'
+             f'<div class="mlbl"><span>floor {_kfmt(floor)}</span>'
+             f'<span>fair {_kfmt(fair)}</span><span>frothy {_kfmt(top)}</span></div>')
+    m = d.get("metcalfe_diagnostic") or {}
+    metc = ""
+    if m:
+        metc = ('<div class="nv-metc">We also tested <b>Metcalfe’s Law</b>, the classic '
+                'network model that values a chain by its active addresses. It held until '
+                f'about 2018 but has since <b>decoupled</b> (the fit since 2019 has an '
+                f'R² of {m.get("r2", 0):.2f} and the wrong sign), because exchange '
+                'batching, layer-2s and post-ETF custody pull real users off the on-chain '
+                'count. So we do not use it. What still holds is the adoption trend above.</div>')
+    return ('<div class="subh">Bitcoin network value</div>'
+            '<div class="nv-card">'
+            f'<div class="nv-lead">Against its long-term adoption trend, bitcoin looks '
+            f'<b class="{updown}">{read}</b>: about <b>{abs(ou):.0f}% {side}</b> a fair value '
+            f'near <b>{_kfmt(fair)}</b>, with the model’s adoption floor around '
+            f'<b>{_kfmt(floor)}</b>, a level roughly 95% of history has sat above.</div>'
+            f'{meter}{metc}'
+            '<div class="mnote">Long-horizon valuation context, not a signal or a price '
+            'target. The power law is a fit to price over time with no hard economic '
+            'mechanism and cannot call tops. Educational, not advice.</div></div>')
+
+
 def prediction_section(cls="crypto") -> str:
     d = _read("prediction_state.json")
     if not d:
@@ -540,6 +575,7 @@ def crypto_section() -> str:
             f'<div class="rec">{rec_txt}</div></div>'
             f'{hl}'
             f'{cycle_gauge_section()}'
+            f'{btc_network_value_section()}'
             f'{prediction_section("crypto")}'
             f'{vol_regime_section({"crypto", "equity"})}'
             f'{orderflow_section()}'
@@ -995,6 +1031,10 @@ def weekly_content():
         if btc_vt is not None:
             cyc.append(f"bitcoin itself trades about {abs(btc_vt):.0f}% "
                        f"{'above' if btc_vt >= 0 else 'below'} its long-run power-law trend")
+        nvw = _read("btc_metcalfe.json") or {}
+        if nvw.get("floor"):
+            cyc.append(f"its long-term adoption floor, the level roughly 95% of history has sat "
+                       f"above, sits near {_kfmt(nvw['floor'])}")
         if phase:
             cyc.append(f"the cycle clock reads {phase.lower()}")
         if eb.get("ratio") is not None:
@@ -1277,10 +1317,14 @@ def monthly_content():
         cparts.append(f"the cycle clock reads **{phase.lower()}**")
     if days_h:
         cparts.append(f"we are roughly {days_h} days past the 2024 halving")
+    nvm = _read("btc_metcalfe.json") or {}
     if cga.get("BTC", {}).get("pct_vs_trend") is not None:
         v = cga["BTC"]["pct_vs_trend"]
         cparts.append(f"bitcoin sits about {abs(v):.0f}% {'above' if v >= 0 else 'below'} its "
                       f"long-run power-law trend")
+        if nvm.get("floor") and nvm.get("fair_value"):
+            cparts.append(f"its network-value fair value works out near {_kfmt(nvm['fair_value'])}, "
+                          f"with an adoption floor around {_kfmt(nvm['floor'])}")
     if cga.get("ETH", {}).get("pct_vs_trend") is not None:
         v = cga["ETH"]["pct_vs_trend"]
         cparts.append(f"ether trades about {abs(v):.0f}% {'above' if v >= 0 else 'below'} its own "
@@ -1291,6 +1335,17 @@ def monthly_content():
                       f"trend")
     if cparts:
         cycle.append("Here is where we stand. " + _sentences(cparts))
+    md = nvm.get("metcalfe_diagnostic") or {}
+    if md and md.get("r2") is not None:
+        cycle.append(
+            "A word on how we value the network, because it is fashionable to quote Metcalfe's "
+            "Law, the idea that a network is worth the square of its users. It is a good idea that "
+            "has stopped working for bitcoin. Fit against active addresses since 2019 it has an "
+            f"R-squared of about {md['r2']:.2f} and the wrong sign, because exchange batching, "
+            "layer-two activity and post-ETF custody now hide real users from the on-chain count. "
+            "What still holds is the plain adoption trend, price against network age, and that is "
+            "the fair value and floor we quote. We would rather tell you which model broke than "
+            "quote you a number that sounds clever and means nothing.")
     if eb.get("ratio") is not None:
         cycle.append(
             f"The ether-to-bitcoin ratio is {eb['ratio']:.4f}"
@@ -2042,6 +2097,11 @@ def main():
   .peg .nm{{font-weight:700;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px}}
   .peg .px{{font-size:18px;font-weight:800}} .peg .lo{{font-size:11px;color:var(--muted)}}
   .up{{color:#059669;font-weight:600}} .down{{color:#dc2626;font-weight:600}} .mut{{color:var(--muted)}}
+  .nv-card{{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:16px 18px;box-shadow:var(--shadow);margin-bottom:14px}}
+  .nv-lead{{font-size:14px;line-height:1.65;margin-bottom:6px}}
+  .nv-metc{{font-size:12.5px;line-height:1.6;color:var(--muted);margin-top:14px;
+    border-top:1px solid var(--line);padding-top:11px}}
   .cbanner{{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;justify-content:space-between;
     border-radius:16px;padding:14px 18px;margin-bottom:16px;box-shadow:var(--shadow);color:#fff}}
   .cbanner.on{{background:linear-gradient(120deg,#065f46,#10b981)}}
