@@ -12,7 +12,7 @@ import base64
 import io
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import matplotlib
 matplotlib.use("Agg")
@@ -1797,7 +1797,9 @@ def main():
 
     cards = [] if market_only else collect()
     chart = "" if market_only else equity_chart(cards)
-    stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    # Build runners are UTC; Levanter is a Dubai (GST, UTC+4) publication, so
+    # stamp the "last updated" time in GST explicitly rather than an unlabelled UTC.
+    stamp = (datetime.utcnow() + timedelta(hours=4)).strftime("%Y-%m-%d %H:%M") + " GST"
     year = datetime.now().year
 
     research = [
