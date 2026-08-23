@@ -25,8 +25,10 @@ run vol_regime.py --live     # volatility-regime forecast
 run orderflow.py             # Binance taker-buy / funding (may be geo-blocked on US runners)
 run predict.py               # educational directional predictions
 
-# Required: assemble the market-only page (no paper-strategy tab).
-python build_dashboard.py --market-only --out public/index.html
+# Marketing landing page at the root; the live dashboard app under /app.
+mkdir -p public/app
+python build_dashboard.py --market-only --out public/app/index.html
+cp -f landing.html public/index.html
 
 # Ship the Substack-ready writeups alongside the site so they can be pulled
 # from anywhere (build_dashboard.py wrote them to reports/substack).
