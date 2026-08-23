@@ -35,18 +35,22 @@ jobs:
       - name: Regenerate market data + build site
         run: bash cloud_build.sh
 
-      # Keep past daily/weekly/monthly reviews: the build appends today's to
-      # reports/review_archive.json; commit it back so it survives the next
-      # rebuild. A GITHUB_TOKEN push does not retrigger workflows, so no loop.
-      - name: Persist review archive
+      # Persist two things back to the repo so the next rebuild is resilient:
+      #  - review_archive.json: keeps past daily/weekly/monthly reviews.
+      #  - the crypto_map seed (data + embedded charts): CoinGecko rate-limits CI,
+      #    so a committed seed lets the crypto tab render from last-good data when
+      #    the live fetch is skipped or fails. reports/ is gitignored, hence -f.
+      # A GITHUB_TOKEN push does not retrigger workflows, so there is no loop.
+      - name: Persist data cache + review archive
         run: |
           git config user.name "levanter-bot"
           git config user.email "actions@users.noreply.github.com"
           git add review_archive.json
+          git add -f reports/crypto_map.json reports/crypto_map_treemap.png reports/crypto_map_correlation.png 2>/dev/null || true
           if git diff --staged --quiet; then
-            echo "review archive unchanged"
+            echo "nothing to persist"
           else
-            git commit -m "Update review archive [skip ci]"
+            git commit -m "Update data cache + review archive [skip ci]"
             git push origin HEAD:main
           fi
 

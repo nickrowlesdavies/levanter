@@ -21,7 +21,10 @@ run() {
 
 mkdir -p reports public
 
-run --timeout 600 crypto_map.py   # coins/stablecoins (CoinGecko cold-cache fetch is slow; needs headroom)
+run --timeout 300 crypto_map.py   # coins/stablecoins. Committed seed (reports/crypto_map.json) is the
+                                  # fallback: on CI the checkout reads "fresh" so the slow CoinGecko
+                                  # fetch is skipped and the tab renders from the seed. A live refresh
+                                  # commits a newer seed back; a failure just keeps the last-good one.
 run fx_map.py                # 16 FX majors/crosses (yfinance)
 run commodities_map.py       # 12 metals/energy/ags (yfinance)
 run cycle_gauge.py --live    # power-law + halving cycle gauge (+ proj PNGs)
