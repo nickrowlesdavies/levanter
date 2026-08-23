@@ -1725,15 +1725,15 @@ def reviews_section() -> str:
                     + archive_body)
 
     nav = ('<div class="rev-tabs">'
-           '<button class="rev-tab on" onclick="revShow(\'rev-weekly\',this)">Weekly</button>'
+           '<button class="rev-tab on" onclick="revShow(\'rev-daily\',this)">Daily</button>'
+           '<button class="rev-tab" onclick="revShow(\'rev-weekly\',this)">Weekly</button>'
            '<button class="rev-tab" onclick="revShow(\'rev-monthly\',this)">Monthly</button>'
-           '<button class="rev-tab" onclick="revShow(\'rev-daily\',this)">Daily</button>'
            '<button class="rev-tab" id="rev-archive-btn" onclick="revShow(\'rev-archive\',this)">'
            'Archive</button></div>')
     return (f'{nav}'
-            f'<div id="rev-weekly" class="rev-pane active">{weekly_html}</div>'
+            f'<div id="rev-daily" class="rev-pane active">{daily_html}</div>'
+            f'<div id="rev-weekly" class="rev-pane">{weekly_html}</div>'
             f'<div id="rev-monthly" class="rev-pane">{monthly_html}</div>'
-            f'<div id="rev-daily" class="rev-pane">{daily_html}</div>'
             f'<div id="rev-archive" class="rev-pane">{archive_html}</div>')
 
 
