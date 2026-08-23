@@ -20,6 +20,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 R = "reports"
+# Archive lives at the repo root (reports/ is gitignored) so the CI job can
+# commit it back and past reviews survive each rebuild.
+ARCHIVE_PATH = "review_archive.json"
 
 
 def _read(path):
@@ -28,6 +31,23 @@ def _read(path):
         return None
     with open(p) as f:
         return json.load(f)
+
+
+def _load_archive():
+    if not os.path.exists(ARCHIVE_PATH):
+        return {}
+    with open(ARCHIVE_PATH) as f:
+        return json.load(f)
+
+
+def _save_archive(a):
+    with open(ARCHIVE_PATH, "w") as f:
+        json.dump(a, f, ensure_ascii=False)
+
+
+def _now_gst():
+    # Levanter is a Dubai (GST, UTC+4) publication; build runners are UTC.
+    return datetime.utcnow() + timedelta(hours=4)
 
 
 def _series_from_history(hist, key="equity"):
@@ -1479,8 +1499,8 @@ def write_writeups():
     """Write Substack-ready Markdown for the daily, weekly and monthly pieces."""
     out_dir = os.path.join(R, "substack")
     os.makedirs(out_dir, exist_ok=True)
-    today = datetime.now().strftime("%Y-%m-%d")
-    month = datetime.now().strftime("%Y-%m")
+    today = _now_gst().strftime("%Y-%m-%d")
+    month = _now_gst().strftime("%Y-%m")
     files = {}
     wk, mo = weekly_content(), monthly_content()
     if wk:
@@ -1540,13 +1560,12 @@ def write_writeups():
     return files
 
 
-def reviews_section() -> str:
+def _daily_blocks_html() -> str:
+    """The three per-class daily review blocks (crypto / FX / commodities)."""
     cm = _read("crypto_map.json") or {}
     fxm = _read("fx_map.json") or {}
     com = _read("commodities_map.json") or {}
     vr = _read("vol_regime.json") or {}
-
-    # Daily: quick per-class notes (yesterday + coming session)
     dblocks = []
     for title, rows, kf, lbl, vrc in [
         ("Crypto", cm.get("coins", []), "coin", "Coins", "crypto"),
@@ -1560,10 +1579,85 @@ def reviews_section() -> str:
         dblock = f'<div class="revd">{daily}</div>' if daily else ""
         dblocks.append(f'<div class="rev"><div class="revh">{title}</div>'
                        f'<div class="revb">{dblock}{txt}</div></div>')
-    daily_html = "".join(dblocks)
+    return "".join(dblocks)
 
-    weekly_html = render_piece_html(weekly_content())
-    monthly_html = render_piece_html(monthly_content())
+
+def update_review_archive() -> dict:
+    """Persist today's daily / weekly / monthly reviews into review_archive.json
+    so past pieces are kept and shown in an archive, not overwritten each build.
+    Keyed by day / ISO week / month, so re-running the same day updates in place."""
+    now = _now_gst()
+    arch = _load_archive()
+    daily = dict(arch.get("daily", {}))
+    weekly = dict(arch.get("weekly", {}))
+    monthly = dict(arch.get("monthly", {}))
+
+    dhtml = _daily_blocks_html()
+    if dhtml:
+        dkey = now.strftime("%Y-%m-%d")
+        daily[dkey] = {"date": dkey, "label": now.strftime("%A, %-d %B %Y"), "html": dhtml}
+
+    wk = weekly_content()
+    if wk:
+        mon = now - timedelta(days=now.weekday())
+        wkey = now.strftime("%G-W%V")
+        weekly[wkey] = {"key": wkey, "label": "Week of " + mon.strftime("%-d %B %Y"),
+                        "title": wk.get("title", ""), "html": render_piece_html(wk)}
+
+    mo = monthly_content()
+    if mo:
+        mkey = now.strftime("%Y-%m")
+        monthly[mkey] = {"key": mkey, "label": now.strftime("%B %Y"),
+                         "title": mo.get("title", ""), "html": render_piece_html(mo)}
+
+    def _cap(d, n):
+        return {k: d[k] for k in sorted(d.keys(), reverse=True)[:n]}
+
+    arch = {"daily": _cap(daily, 60), "weekly": _cap(weekly, 16),
+            "monthly": _cap(monthly, 18), "updated": now.strftime("%Y-%m-%d %H:%M GST")}
+    _save_archive(arch)
+    return arch
+
+
+def _arch_list(title, items) -> str:
+    if not items:
+        return ""
+    rows = "".join(
+        f'<details class="rev-arch-item"><summary>{it["label"]}'
+        + (f' <span class="rev-arch-t">{it["title"]}</span>' if it.get("title") else "")
+        + f'</summary><div class="rev-arch-b">{it["html"]}</div></details>'
+        for it in items)
+    return f'<div class="rev-arch"><div class="rev-arch-h">{title}</div>{rows}</div>'
+
+
+def reviews_section() -> str:
+    arch = _load_archive()
+
+    def _desc(d):
+        return [d[k] for k in sorted(d.keys(), reverse=True)]
+
+    wl, ml, dl = _desc(arch.get("weekly", {})), _desc(arch.get("monthly", {})), _desc(arch.get("daily", {}))
+
+    # Weekly: current piece on top, older weeks in an archive below.
+    cur_w = wl[0]["html"] if wl else render_piece_html(weekly_content())
+    weekly_html = cur_w + _arch_list("Earlier weekly reviews", wl[1:11])
+
+    # Monthly: current on top, past months archived below.
+    cur_m = ml[0]["html"] if ml else render_piece_html(monthly_content())
+    monthly_html = cur_m + _arch_list("Past months", ml[1:13])
+
+    # Daily: a dated list, newest first, each day expandable with its date.
+    if not dl:
+        live = _daily_blocks_html()
+        dl = [{"label": _now_gst().strftime("%A, %-d %B %Y"), "html": live}] if live else []
+    day_items = ""
+    for i, d in enumerate(dl[:60]):
+        op = " open" if i == 0 else ""
+        day_items += (f'<details class="rev-day"{op}><summary>{d["label"]}</summary>'
+                      f'<div class="rev-day-b">{d["html"]}</div></details>')
+    daily_html = (f'<div class="rev-daily-list">{day_items}</div>'
+                  f'<div class="mnote">Daily notes are mechanical (1-day recap plus a volatility '
+                  f'watch-list), one entry per day. Not a direction forecast or advice.</div>')
 
     nav = ('<div class="rev-tabs">'
            '<button class="rev-tab on" onclick="revShow(\'rev-weekly\',this)">Weekly</button>'
@@ -1572,9 +1666,7 @@ def reviews_section() -> str:
     return (f'{nav}'
             f'<div id="rev-weekly" class="rev-pane active">{weekly_html}</div>'
             f'<div id="rev-monthly" class="rev-pane">{monthly_html}</div>'
-            f'<div id="rev-daily" class="rev-pane">{daily_html}'
-            f'<div class="mnote">Daily notes are mechanical (1-day recap plus a volatility '
-            f'watch-list). Not a direction forecast or advice.</div></div>')
+            f'<div id="rev-daily" class="rev-pane">{daily_html}</div>')
 
 
 def about_section() -> str:
@@ -1847,6 +1939,13 @@ def main():
     except Exception as e:
         print("writeups skipped:", e)
 
+    try:
+        a = update_review_archive()
+        print("review archive: %d daily, %d weekly, %d monthly kept"
+              % (len(a.get("daily", {})), len(a.get("weekly", {})), len(a.get("monthly", {}))))
+    except Exception as e:
+        print("review archive skipped:", e)
+
     if market_only:
         strat_btn = strat_pane = ""
     else:
@@ -2065,6 +2164,20 @@ def main():
     font-weight:700;font-size:12.5px;padding:7px 16px;border-radius:10px;cursor:pointer;font-family:inherit}}
   .rev-tab.on{{background:var(--grad);color:#fff;border-color:transparent}}
   .rev-pane{{display:none}} .rev-pane.active{{display:block}}
+  .rev-arch{{margin-top:26px;border-top:1px solid var(--line);padding-top:16px}}
+  .rev-arch-h{{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;
+    color:var(--muted);margin-bottom:10px}}
+  details.rev-arch-item,details.rev-day{{border:1px solid var(--line);border-radius:11px;
+    margin-bottom:8px;background:var(--panel)}}
+  details.rev-arch-item>summary,details.rev-day>summary{{cursor:pointer;padding:12px 15px;
+    font-weight:700;font-size:14px;list-style:none;user-select:none}}
+  details>summary::-webkit-details-marker{{display:none}}
+  details.rev-day>summary::before,details.rev-arch-item>summary::before{{content:'\\25B8';
+    color:var(--muted);margin-right:9px;font-size:11px}}
+  details[open].rev-day>summary::before,details[open].rev-arch-item>summary::before{{content:'\\25BE'}}
+  .rev-day-b,.rev-arch-b{{padding:2px 15px 12px}}
+  .rev-arch-t{{color:var(--muted);font-weight:600}}
+  .rev-daily-list details.rev-day:first-child{{border-color:var(--brand)}}
   .piece{{max-width:720px;background:var(--panel);border:1px solid var(--line);border-radius:16px;
     padding:26px 28px;box-shadow:var(--shadow)}}
   .pc-kicker{{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--brand)}}

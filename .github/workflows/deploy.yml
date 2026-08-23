@@ -7,9 +7,9 @@ on:
   push:
     branches: [ main ]
 
-# Least-privilege token that can publish to Pages.
+# Token can publish to Pages and commit the review archive back to the repo.
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -34,6 +34,21 @@ jobs:
 
       - name: Regenerate market data + build site
         run: bash cloud_build.sh
+
+      # Keep past daily/weekly/monthly reviews: the build appends today's to
+      # reports/review_archive.json; commit it back so it survives the next
+      # rebuild. A GITHUB_TOKEN push does not retrigger workflows, so no loop.
+      - name: Persist review archive
+        run: |
+          git config user.name "levanter-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add review_archive.json
+          if git diff --staged --quiet; then
+            echo "review archive unchanged"
+          else
+            git commit -m "Update review archive [skip ci]"
+            git push origin HEAD:main
+          fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
