@@ -9,15 +9,19 @@
 set -u
 
 run() {
+  # Optional per-script cap: "run --timeout N script.py". Default 240s.
+  # A hung/geo-blocked feed must never stall the build; slow-but-healthy feeds
+  # (CoinGecko cold cache) get a longer budget so the tab does not vanish.
+  local t=240
+  if [ "$1" = "--timeout" ]; then t="$2"; shift 2; fi
   echo "::group::$1"
-  # Hard 4-minute cap per script: a hung/geo-blocked feed must never stall the build.
-  if timeout 240 python "$@"; then :; else echo "WARN: '$*' failed or timed out - continuing without it"; fi
+  if timeout "$t" python "$@"; then :; else echo "WARN: '$*' failed or timed out after ${t}s - continuing without it"; fi
   echo "::endgroup::"
 }
 
 mkdir -p reports public
 
-run crypto_map.py            # coins, stablecoins, treemap, commodities (CoinGecko + yfinance)
+run --timeout 600 crypto_map.py   # coins/stablecoins (CoinGecko cold-cache fetch is slow; needs headroom)
 run fx_map.py                # 16 FX majors/crosses (yfinance)
 run commodities_map.py       # 12 metals/energy/ags (yfinance)
 run cycle_gauge.py --live    # power-law + halving cycle gauge (+ proj PNGs)
