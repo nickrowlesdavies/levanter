@@ -1638,18 +1638,17 @@ def reviews_section() -> str:
 
     wl, ml, dl = _desc(arch.get("weekly", {})), _desc(arch.get("monthly", {})), _desc(arch.get("daily", {}))
 
-    # Weekly: current piece on top, older weeks in an archive below.
-    cur_w = wl[0]["html"] if wl else render_piece_html(weekly_content())
-    weekly_html = cur_w + _arch_list("Earlier weekly reviews", wl[1:11])
-
-    # Monthly: current on top, past months archived below.
-    cur_m = ml[0]["html"] if ml else render_piece_html(monthly_content())
-    monthly_html = cur_m + _arch_list("Past months", ml[1:13])
+    # Weekly / Monthly current tabs show the latest piece only; every past piece
+    # lives on the Archive tab so there is one clear place to browse the history.
+    weekly_html = wl[0]["html"] if wl else render_piece_html(weekly_content())
+    monthly_html = ml[0]["html"] if ml else render_piece_html(monthly_content())
 
     # Daily: a dated list, newest first, each day expandable with its date.
     if not dl:
         live = _daily_blocks_html()
-        dl = [{"label": _now_gst().strftime("%A, %-d %B %Y"), "html": live}] if live else []
+        if live:
+            dl = [{"date": _now_gst().strftime("%Y-%m-%d"),
+                   "label": _now_gst().strftime("%A, %-d %B %Y"), "html": live}]
     day_items = ""
     for i, d in enumerate(dl[:60]):
         op = " open" if i == 0 else ""
@@ -1659,14 +1658,28 @@ def reviews_section() -> str:
                   f'<div class="mnote">Daily notes are mechanical (1-day recap plus a volatility '
                   f'watch-list), one entry per day. Not a direction forecast or advice.</div>')
 
+    # Archive: one place with every review we have kept, grouped and dated.
+    archive_body = (_arch_list("Monthly", ml[:24]) + _arch_list("Weekly", wl[:26])
+                    + _arch_list("Daily", dl[:45]))
+    if not archive_body:
+        archive_body = ('<div class="mnote">The archive is filling up. Past daily, weekly and '
+                        'monthly reviews collect here as they publish.</div>')
+    archive_html = ('<div class="rev-arch-intro">Every review we publish is kept. The latest sits on '
+                    'the Weekly, Monthly and Daily tabs; the full run is below, newest first. One '
+                    'daily entry per day, a weekly each weekend, a monthly once a month.</div>'
+                    + archive_body)
+
     nav = ('<div class="rev-tabs">'
            '<button class="rev-tab on" onclick="revShow(\'rev-weekly\',this)">Weekly</button>'
            '<button class="rev-tab" onclick="revShow(\'rev-monthly\',this)">Monthly</button>'
-           '<button class="rev-tab" onclick="revShow(\'rev-daily\',this)">Daily</button></div>')
+           '<button class="rev-tab" onclick="revShow(\'rev-daily\',this)">Daily</button>'
+           '<button class="rev-tab" id="rev-archive-btn" onclick="revShow(\'rev-archive\',this)">'
+           'Archive</button></div>')
     return (f'{nav}'
             f'<div id="rev-weekly" class="rev-pane active">{weekly_html}</div>'
             f'<div id="rev-monthly" class="rev-pane">{monthly_html}</div>'
-            f'<div id="rev-daily" class="rev-pane">{daily_html}</div>')
+            f'<div id="rev-daily" class="rev-pane">{daily_html}</div>'
+            f'<div id="rev-archive" class="rev-pane">{archive_html}</div>')
 
 
 def about_section() -> str:
@@ -1815,13 +1828,16 @@ TAB_JS = (
     "if(b)b.classList.add('active');if(el)el.classList.add('active');}"
     "tabs.forEach(function(b){b.addEventListener('click',function(){go(b.dataset.t);"
     "history.replaceState(null,'','#'+b.dataset.t);window.scrollTo(0,0);});});"
-    "var h=location.hash.replace('#','');if(h&&document.getElementById('pane-'+h))go(h);"
     "window.levTab=go;"
     "window.revShow=function(id,btn){var ps=document.querySelectorAll('.rev-pane');"
     "for(var i=0;i<ps.length;i++)ps[i].classList.remove('active');"
     "var el=document.getElementById(id);if(el)el.classList.add('active');"
     "if(btn){var ts=btn.parentNode.querySelectorAll('.rev-tab');"
     "for(var j=0;j<ts.length;j++)ts[j].classList.remove('on');btn.classList.add('on');}};"
+    "var h=location.hash.replace('#','');"
+    "if(h=='archive'){go('reviews');var ab=document.getElementById('rev-archive-btn');"
+    "if(ab)window.revShow('rev-archive',ab);}"
+    "else if(h&&document.getElementById('pane-'+h))go(h);"
     "var gh=new Date().getHours(),g=document.getElementById('greet');"
     "if(g)g.textContent=gh<12?'Good morning':gh<18?'Good afternoon':'Good evening';"
     "var gd=document.getElementById('livedate');"
@@ -2178,6 +2194,8 @@ def main():
   .rev-day-b,.rev-arch-b{{padding:2px 15px 12px}}
   .rev-arch-t{{color:var(--muted);font-weight:600}}
   .rev-daily-list details.rev-day:first-child{{border-color:var(--brand)}}
+  .rev-arch-intro{{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:20px;max-width:640px}}
+  #rev-archive .rev-arch:first-of-type{{margin-top:0;border-top:0;padding-top:0}}
   .piece{{max-width:720px;background:var(--panel);border:1px solid var(--line);border-radius:16px;
     padding:26px 28px;box-shadow:var(--shadow)}}
   .pc-kicker{{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--brand)}}
