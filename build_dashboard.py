@@ -240,7 +240,7 @@ function showAsset(k){ var c=AD[k]; if(!c) return;
   if(window.renderIChart) renderIChart(_lastN(window._curHist, 90));
   var mvs=[['7d',c.chg7,7],['14d',c.chg14,14],['28d',c.chg28,28],['30d',c.chg30,30],['60d',c.chg60,60],['6mo',c.chg180,180],['12mo',c.chg365,365]];
   document.getElementById('mMoves').innerHTML = mvs.map(function(m){return '<div class="mvcell tfcell'+(m[2]===90?' on':'')+'" title="show '+m[0]+' history" onclick="setTF('+m[2]+',this)"><div class="mvk">'+m[0]+'</div>'+_mv(m[1])+'</div>';}).join('');
-  var rows=[['Signal',c.signal||'-'],['Trend',c.trend||'-'],['Risk',(c.risk!=null?c.risk+' / 100 ('+c.risk_band+')':'-')],['Rank (90d mom)',c.rank||'-'],['Market cap',c.market_cap?'$'+(c.market_cap/1e9).toFixed(1)+'B':'-'],['90d volatility',c.vol!=null?c.vol.toFixed(0)+'%':'-'],['90d max drawdown',c.dd!=null?c.dd.toFixed(0)+'%':'-'],['90d return',_mv(c.ret)]];
+  var rows=[['Signal',c.signal||'-'],['Trend',c.trend||'-'],['Risk',(c.risk!=null?c.risk+' / 100 ('+c.risk_band+')':'-')],['Momentum rank',c.rank||'-'],['Market cap',c.market_cap?'$'+(c.market_cap/1e9).toFixed(1)+'B':'-'],['Volatility',c.vol!=null?c.vol.toFixed(0)+'%':'-'],['Max drawdown',c.dd!=null?c.dd.toFixed(0)+'%':'-'],['Return',_mv(c.ret)]];
   document.getElementById('mStats').innerHTML = rows.map(function(r){return '<div class="mrow"><span class="mk">'+r[0]+'</span><span class="mvv">'+r[1]+'</span></div>';}).join('');
   window._curAsset=k; if(window.renderStar)renderStar(k);
   document.getElementById('coinModal').style.display='flex';
@@ -562,7 +562,7 @@ def crypto_section() -> str:
 
     mv = data.get("movers", {})
     mv_cards = ""
-    for label in ["7d", "14d", "28d", "60d", "6mo", "12mo"]:
+    for label in ["7d", "14d", "30d", "6mo", "12mo"]:
         items = "".join(
             f'<div class="mvrow"><span class="mvc">{t["coin"]}</span>'
             f'<span class="{"up" if t["ret"] >= 0 else "down"}">{t["ret"]:+.0f}%</span></div>'
