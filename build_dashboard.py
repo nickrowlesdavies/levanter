@@ -1398,7 +1398,7 @@ def render_piece_html(c):
             f'<div class="pc-cta">Explore the live dashboard, updated around the clock, at '
             f'<a href="https://levantermarkets.com">levantermarkets.com</a>. '
             f'Subscribe for the daily, weekly and monthly at '
-            f'<a href="https://levantermarkets.substack.com">levantermarkets.substack.com</a>.</div>'
+            f'<a href="https://read.levantermarkets.com">read.levantermarkets.com</a>.</div>'
             f'<div class="pc-foot">&copy; {datetime.now().year} Levanter. Educational market '
             f'analysis across crypto, FX and commodities. Not financial advice.</div></article>')
 
@@ -1421,7 +1421,7 @@ def render_piece_md(c):
             "**Explore the live dashboard**, updated around the clock, with every market's full "
             "history, charts and forecasts: levantermarkets.com",
             "",
-            "**Subscribe** for the daily, weekly and monthly pieces: levantermarkets.substack.com",
+            "**Subscribe** for the daily, weekly and monthly pieces: read.levantermarkets.com",
             "",
             f"*© {datetime.now().year} Levanter. Educational market analysis across crypto, FX "
             "and commodities. Not financial advice.*"]
@@ -1452,7 +1452,7 @@ def daily_note():
         f"The volatility model leans {turb} across crypto, FX and commodities looking a week out.",
         "",
         "Full board, charts and forecasts: levantermarkets.com",
-        "Subscribe for the weekly and monthly: levantermarkets.substack.com",
+        "Subscribe for the weekly and monthly: read.levantermarkets.com",
         "Educational, not advice.",
     ])
 
@@ -1468,11 +1468,11 @@ def _teaser(kind, field):
     if kind == "weekly":
         return (f"New: the Levanter Weekly. A {reg} week, {top[1]} led the whole board and "
                 f"{bot[1]} lagged. The week in review, the week ahead, and an honest opinion on "
-                f"what actually matters.\n\nRead it: levantermarkets.substack.com\n"
+                f"what actually matters.\n\nRead it: read.levantermarkets.com\n"
                 f"Live market dashboard: levantermarkets.com")
     return (f"New: the Levanter Monthly. {top[1]} led the month, {bot[1]} lagged. The macro "
             f"picture, where we sit in the cycle, and a proper opinion piece.\n\n"
-            f"Read it: levantermarkets.substack.com\nLive market dashboard: levantermarkets.com")
+            f"Read it: read.levantermarkets.com\nLive market dashboard: levantermarkets.com")
 
 
 def write_writeups():
@@ -1509,7 +1509,7 @@ def write_writeups():
             dlines += [f"## {title}", "",
                        para.replace("<b>", "**").replace("</b>", "**"), ""]
     dlines += ["---",
-               "Live dashboard: levantermarkets.com     Subscribe: levantermarkets.substack.com",
+               "Live dashboard: levantermarkets.com     Subscribe: read.levantermarkets.com",
                "", "*Levanter. Educational, not financial advice.*"]
     p = os.path.join(out_dir, f"levanter-daily-{today}.md")
     open(p, "w").write("\n".join(dlines))
@@ -1698,8 +1698,8 @@ HEADER_MARK = (
     '<path d="M86 46 l14 -6 -4 14" fill="none" stroke="#fff" stroke-width="8" '
     'stroke-linecap="round" stroke-linejoin="round"/></svg>')
 
-SUBSCRIBE_URL = "https://levantermarkets.substack.com/subscribe"
-SUBSCRIBE_EMBED = "https://levantermarkets.substack.com/embed"
+SUBSCRIBE_URL = "https://read.levantermarkets.com/subscribe"
+SUBSCRIBE_EMBED = "https://read.levantermarkets.com/embed"
 SUBSCRIBE_BOX = (
     '<div class="subbox"><div class="subbox-tx">'
     '<div class="subbox-t">Get Levanter in your inbox</div>'
@@ -1712,7 +1712,7 @@ SUBSCRIBE_BOX = (
     f'<a id="subBtn" class="subbox-b" style="display:none" href="{SUBSCRIBE_URL}" target="_blank" '
     'rel="noopener">Subscribe</a>'
     f'<a class="subbox-alt" href="{SUBSCRIBE_URL}" target="_blank" rel="noopener">'
-    'or subscribe at levantermarkets.substack.com</a></div></div>')
+    'or subscribe at read.levantermarkets.com</a></div></div>')
 
 TAB_JS = (
     "(function(){var tabs=document.querySelectorAll('#tabs .tab');"
