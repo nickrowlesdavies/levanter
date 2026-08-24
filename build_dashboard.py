@@ -40,6 +40,14 @@ def _load_archive():
         return json.load(f)
 
 
+def _read_root(path):
+    """Read a committed JSON file from the repo root (not under reports/)."""
+    if not os.path.exists(path):
+        return None
+    with open(path) as f:
+        return json.load(f)
+
+
 def _save_archive(a):
     with open(ARCHIVE_PATH, "w") as f:
         json.dump(a, f, ensure_ascii=False)
@@ -1657,7 +1665,9 @@ def _daily_blocks_html() -> str:
 def update_review_archive() -> dict:
     """Persist today's daily / weekly / monthly reviews into review_archive.json
     so past pieces are kept and shown in an archive, not overwritten each build.
-    Keyed by day / ISO week / month, so re-running the same day updates in place."""
+    Daily keyed by day, monthly by month (upsert). Weekly is anchored to the Sunday
+    that ENDS the week and FROZEN once, so a re-run mid-week and the Sunday->Monday
+    ISO-week roll cannot create a second near-identical weekly."""
     now = _now_gst()
     arch = _load_archive()
     daily = dict(arch.get("daily", {}))
@@ -1671,10 +1681,15 @@ def update_review_archive() -> dict:
 
     wk = weekly_content()
     if wk:
-        mon = now - timedelta(days=now.weekday())
-        wkey = now.strftime("%G-W%V")
-        weekly[wkey] = {"key": wkey, "label": "Week of " + mon.strftime("%-d %B %Y"),
-                        "title": wk.get("title", ""), "html": render_piece_html(wk)}
+        # Sunday that ends the current week; weekly is "The Week in Review", so the
+        # slug date is the week's END. Freeze once (do not overwrite) so the number
+        # of weekly entries is exactly one per week.
+        sunday = (now - timedelta(days=(now.weekday() + 1) % 7)).date()
+        wkey = sunday.isoformat()
+        if wkey not in weekly:
+            weekly[wkey] = {"key": wkey, "date": wkey,
+                            "label": "Week ending " + sunday.strftime("%-d %B %Y"),
+                            "title": wk.get("title", ""), "html": render_piece_html(wk)}
 
     mo = monthly_content()
     if mo:
@@ -1692,19 +1707,14 @@ def update_review_archive() -> dict:
 
 
 def _review_slug(cadence, entry):
-    """Permalink slug matching build_reviews.py: daily/monthly by key, weekly by
-    its ISO-week Monday."""
+    """Permalink slug matching build_reviews.py. Daily key is a date, weekly key is
+    the week-ending Sunday date, monthly key is YYYY-MM."""
     try:
-        if cadence == "weekly":
-            mon = datetime.strptime(entry["key"] + "-1", "%G-W%V-%u").date()
-            return f"{mon.isoformat()}-weekly"
         if cadence == "daily":
             return f"{entry['date']}-daily"
-        if cadence == "monthly":
-            return f"{entry['key']}-monthly"
+        return f"{entry['key']}-{cadence}"
     except Exception:
         return None
-    return None
 
 
 def _perma_row(cadence, entry):
@@ -1834,24 +1844,22 @@ def track_record_section() -> str:
            f'real skill, because volatility clusters. Accuracy against a coin-flip baseline:</div>'
            f'<div class="trk-grid">{volcards}</div>') if volcards else ""
 
-    acc, rc = ps.get("accuracy"), ps.get("resolved_count", 0)
-    byc = ps.get("accuracy_by_class", {})
-    dparts = [f"{lab} {byc[k]:.0f}%" for k, lab in
-              [("crypto", "Crypto"), ("fx", "FX"), ("commodity", "Commodities")]
-              if byc.get(k) is not None]
+    bt = _read_root("direction_backtest.json") or {}
     dirscore = ('<div class="subh">Direction calls, the honest scoreboard</div>'
                 '<div class="trk-note">We backtest directional up and down calls against what '
                 'actually happened, and log new ones as they are made. As theory predicts in '
                 'efficient markets, this sits near a coin flip. We publish it anyway, because '
                 'pretending otherwise is how the rest of the industry loses your money.</div>')
-    if rc and acc is not None:
-        dirscore += (f'<div class="trk-line"><b>{acc:.0f}% correct</b> across <b>{rc:,}</b> backtested '
-                     f'calls' + (f' ({" · ".join(dparts)})' if dparts else '') + '. Near the 50% '
-                     f'baseline, exactly where an honest model should sit. The live scoreboard, '
-                     f'logged as calls are made, is filling up now.</div>')
-    else:
-        dirscore += ('<div class="trk-line">The live scoreboard is filling up now. '
-                     'Calls are logged the day they are made and scored when they mature.</div>')
+    if bt.get("n") and bt.get("accuracy") is not None:
+        byc = bt.get("by_class", {})
+        dparts = [f"{lab} {byc[k]:.0f}%" for k, lab in
+                  [("crypto", "crypto"), ("commodity", "commodities")] if byc.get(k) is not None]
+        dirscore += (f'<div class="trk-line"><b>Backtested, {bt.get("period", "")}:</b> '
+                     f'<b>{bt["accuracy"]:.0f}% correct</b> across <b>{bt["n"]:,}</b> direction calls'
+                     + (f' ({" · ".join(dparts)})' if dparts else '') + ', point-in-time against '
+                     f'known outcomes. Near the 50% baseline, exactly where an honest model should sit.</div>')
+    dirscore += ('<div class="trk-line">The live scoreboard, logged as calls are made, is filling '
+                 'up now, and each new call is scored as it matures.</div>')
 
     method = ('<div class="mnote">Everything is tested point-in-time with no look-ahead, from '
               'public data. Volatility forecasting has real, measurable skill. Price-direction '

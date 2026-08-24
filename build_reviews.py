@@ -49,22 +49,15 @@ def _trim(s, n):
     return cut.rstrip(".,;: ") + "…"
 
 
-def _monday(week_key):
-    return dt.datetime.strptime(week_key + "-1", "%G-W%V-%u").date()
-
-
 def slug(cadence, key):
-    if cadence == "weekly":
-        return f"{_monday(key).isoformat()}-weekly"
-    return f"{key}-{cadence}"          # daily key is a date, monthly key is YYYY-MM
+    # daily key is a date, weekly key is the week-ending Sunday date, monthly is YYYY-MM
+    return f"{key}-{cadence}"
 
 
 def pub_date(cadence, entry, key):
-    if cadence == "daily":
-        return entry.get("date", key)
-    if cadence == "weekly":
-        return _monday(key).isoformat()
-    return f"{key}-01"                 # monthly: first of month
+    if cadence == "monthly":
+        return f"{key}-01"            # first of month
+    return entry.get("date", key)      # daily and weekly keys are dates
 
 
 def load_reviews():

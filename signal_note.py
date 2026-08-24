@@ -40,6 +40,14 @@ def _read(p):
         return {}
 
 
+def _read_root(p):
+    """Committed JSON at the repo root (e.g. direction_backtest.json)."""
+    try:
+        return json.load(open(p))
+    except Exception:
+        return {}
+
+
 def _now_gst():
     return dt.datetime.utcnow() + dt.timedelta(hours=4)
 
@@ -302,20 +310,21 @@ def compose():
         P += ["- " + w]
     P.append("")
 
-    # ===== Scoreboard =====
-    acc = ps.get("accuracy")
-    rc = ps.get("resolved_count", 0)
-    byc = ps.get("accuracy_by_class", {}) or {}
+    # ===== Scoreboard (committed backtest fact, matches the track-record page) =====
+    bt = _read_root("direction_backtest.json")
+    n, dacc, period = bt.get("n"), bt.get("accuracy"), bt.get("period", "")
+    dbyc = bt.get("by_class", {}) or {}
     P += ["## The honest scoreboard", ""]
-    if acc is not None and rc:
-        parts = [f"{lab} {byc[k]:.0f}%" for k, lab in
-                 [("crypto", "crypto"), ("commodity", "commodities")] if byc.get(k) is not None]
+    if n and dacc is not None:
+        parts = [f"{lab} {dbyc[k]:.0f}%" for k, lab in
+                 [("crypto", "crypto"), ("commodity", "commodities")] if dbyc.get(k) is not None]
         P.append(
             f"Because it is the reason to trust the rest. Our volatility calls carry "
             f"measurable skill, in the high sixties to mid seventies. Our direction calls, "
-            f"backtested point-in-time, come in at {acc:.0f} percent across {rc:,} "
+            f"backtested {period}, come in at {dacc:.0f} percent across {n:,} "
             f"calls" + (f" ({', '.join(parts)})" if parts else "") + ", almost exactly a "
-            f"coin flip, and we publish that number rather than hide it. The knowable this "
+            f"coin flip. We publish that number rather than hide it, and you can check it "
+            f"against the track record on the site. The knowable this "
             f"week is where the volatility is and where bitcoin sits on a long-horizon "
             f"valuation. The unknowable is which way any of it closes on Friday, and we "
             f"will not sell you the second one dressed as the first.")
@@ -327,11 +336,11 @@ def compose():
           "volatility-regime flip, a stablecoin starting to wobble, bitcoin touching its "
           "floor, are for subscribers. Educational market analysis, not financial advice.*",
           "", "*Subscribe: read.levantermarkets.com*"]
-    return "\n".join(P), (loud_txt, quiet_txt, ou, acc, rc, nv)
+    return "\n".join(P), (loud_txt, quiet_txt, ou, nv, n, dacc, period)
 
 
 def teaser(meta):
-    loud_txt, quiet_txt, ou, acc, rc, nv = meta
+    loud_txt, quiet_txt, ou, nv, n, dacc, period = meta
     T = []
     T.append("Most market commentary this week will tell you where prices are going. "
              "Here is what a model can actually tell you, and what it cannot.")
@@ -351,10 +360,11 @@ def teaser(meta):
         T.append("")
     T.append("What is not knowable:")
     T.append("")
-    if acc is not None and rc:
+    if n and dacc is not None:
         T.append(f"Which way any of it closes on Friday. Our direction calls, backtested "
-                 f"point-in-time, come in at {acc:.0f} percent across {rc:,} of them. Almost "
-                 f"exactly a coin flip, and we publish that rather than hide it.")
+                 f"{period}, come in at {dacc:.0f} percent across {n:,} of them. Almost "
+                 f"exactly a coin flip, and we publish that on the track record rather than "
+                 f"hide it.")
         T.append("")
     T.append("That is the whole idea of Levanter. Forecast what is forecastable, say so "
              "plainly about the rest, and show the scorecard.")

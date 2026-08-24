@@ -1,0 +1,11 @@
+{
+  "n": 410,
+  "accuracy": 52,
+  "by_class": {
+    "crypto": 49,
+    "commodity": 62
+  },
+  "period": "May to August 2026",
+  "as_of": "2026-08-22",
+  "note": "Backfilled/backtested point-in-time direction calls scored against known outcomes. Not a live public record; the live scoreboard is logged going forward."
+}
