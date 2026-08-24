@@ -344,6 +344,18 @@ def compose(launch=False, monday=None):
         + ". The gains were broad, but the largest moves stayed further out on the risk curve, and the "
         "dollar and most FX ranges were comparatively quiet.")
     P.append("")
+    metals_hi = [m for m in g["commodity"][0] if m in ("gold", "silver", "platinum")]
+    if metals_hi and g["crypto"][0] and len(g["fx"][1]) > len(g["fx"][0]):
+        P.append(
+            "Read across the three markets, the shape is concentration, not breadth: the range sits in "
+            "the metals and the largest coins while the dollar stays quiet. A safety bid in metals "
+            "beside a speculative bid in crypto reads as hedging, not conviction.")
+    else:
+        P.append(
+            f"Read across the three markets, the turbulence is concentrated in {_join(all_high)} while "
+            f"the rest stays quiet. That is specific pockets of risk, not a broad regime shift, so "
+            f"weigh the loud names on their own terms and treat the calm majority as the backdrop.")
+    P.append("")
 
     # ===== Watchlist + review =====
     P += ["## Subscriber watchlist, with levels", ""]

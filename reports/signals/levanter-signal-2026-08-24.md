@@ -2,7 +2,7 @@
 
 > **New: the Levanter Signal.** A weekly read of volatility, valuation and the week ahead across crypto, FX and commodities. It is free this week and next, then moves to subscribers. Subscribe at read.levantermarkets.com.
 
-*Data captured at 19:20 GST on 24 August 2026. Every figure below is stamped to a period. This is the accountable read behind the free weekly: the changes since last week, the levels to watch, and a claim we will score in the next issue.*
+*Data captured at 19:30 GST on 24 August 2026. Every figure below is stamped to a period. This is the accountable read behind the free weekly: the changes since last week, the levels to watch, and a claim we will score in the next issue.*
 
 ---
 
@@ -36,7 +36,9 @@ From next week this section flags which markets newly flipped turbulent or calm 
 
 ## The week behind, and what it rhymes with
 
-Over the past seven days crypto was broad and speculative-led: 32 of 35 coins higher, cap-weighted about +25 percent on the week and +25 percent over thirty days, led by the speculative end, PUMP +72 percent and ZEC +65 percent, with a best-to-worst spread near 76 points. Dominance held near 68 percent and the stablecoins we track kept their pegs. In foreign exchange the biggest seven-day move was NZDUSD at +1.2 percent, ranges otherwise tight. In commodities the metals led the week, platinum +7 percent, gold +7 percent and silver +4 percent. The gains were broad, but the largest moves stayed further out on the risk curve, and the dollar and most FX ranges were comparatively quiet.
+Over the past seven days crypto was broad and speculative-led: 32 of 35 coins higher, cap-weighted about +26 percent on the week and +26 percent over thirty days, led by the speculative end, PUMP +71 percent and ZEC +68 percent, with a best-to-worst spread near 74 points. Dominance held near 68 percent and the stablecoins we track kept their pegs. In foreign exchange the biggest seven-day move was NZDUSD at +1.2 percent, ranges otherwise tight. In commodities the metals led the week, platinum +7 percent, gold +7 percent and silver +4 percent. The gains were broad, but the largest moves stayed further out on the risk curve, and the dollar and most FX ranges were comparatively quiet.
+
+Read across the three markets, the shape is concentration, not breadth: the range sits in the metals and the largest coins while the dollar stays quiet. A safety bid in metals beside a speculative bid in crypto reads as hedging, not conviction.
 
 ## Subscriber watchlist, with levels
 
