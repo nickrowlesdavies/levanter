@@ -133,7 +133,8 @@ def _vol_groups(vr):
         r = assets.get(sym, {}).get("7d", {})
         if not r:
             continue
-        (out[c][0] if r.get("regime") == "HIGH" else out[c][1]).append(_name(sym))
+        nm = sym if c == "fx" else _name(sym)   # FX: the model forecasts the pair, e.g. USDCHF
+        (out[c][0] if r.get("regime") == "HIGH" else out[c][1]).append(nm)
     return out
 
 
@@ -150,6 +151,8 @@ def compose(launch=False, monday=None):
     acc7 = (bt.get("7d") or {}).get("acc")
     acc30 = (bt.get("30d") or {}).get("acc")
     acc90 = (bt.get("90d") or {}).get("acc")
+    edge7 = (bt.get("7d") or {}).get("edge")
+    edge30 = (bt.get("30d") or {}).get("edge")
     g = _vol_groups(vr)
 
     # ---- crypto week (7-day moves) ----
@@ -221,14 +224,12 @@ def compose(launch=False, monday=None):
 
     P = ["# Levanter Signal", ""]
     if launch:
-        P += ["> **New: the Levanter Signal, a weekly newsletter.** This is the first issue. It reads "
-              "volatility, valuation and the week ahead across crypto, foreign exchange and commodities, "
-              "and it is honest about what a model can and cannot forecast. It is **free this week and "
-              "next**, then it moves to subscribers. Subscribe at read.levantermarkets.com to keep it.",
-              ""]
-    P += [f"*Data captured at {stamp}. Every figure below is stamped to a period, because they move. "
-          f"This is the accountable read behind the free weekly: the changes since last week, the "
-          f"levels to watch, and a claim we will score in the next issue.*", "", "---", ""]
+        P += ["> **New: the Levanter Signal.** A weekly read of volatility, valuation and the week "
+              "ahead across crypto, FX and commodities. It is free this week and next, then moves to "
+              "subscribers. Subscribe at read.levantermarkets.com.", ""]
+    P += [f"*Data captured at {stamp}. Every figure below is stamped to a period. This is the "
+          f"accountable read behind the free weekly: the changes since last week, the levels to watch, "
+          f"and a claim we will score in the next issue.*", "", "---", ""]
     P += ["> **Editor's line (add before publishing, then delete this prompt):** one sentence of your "
           "own read of the week. Two minutes. What it means for how you are positioned, or the single "
           "thing you would tell a friend who asked. This is the line the model cannot write.", ""]
@@ -237,7 +238,7 @@ def compose(launch=False, monday=None):
     if fair:
         P += ["## The one chart: bitcoin against its adoption model", ""]
         P.append(
-            f"Bitcoin is near {_kfmt(price)} dollars, captured {stamp}. We value it against network "
+            f"Bitcoin is near {_kfmt(price)} dollars. We value it against network "
             f"age with a power-law fit. Fair value on that fit lands near {_kfmt(fair)}, about "
             f"{abs(ou):.0f} percent {'below' if ou < 0 else 'above'} the line, and the fitted floor "
             f"sits near {_kfmt(floor)}. Bitcoin has closed above that floor line for roughly 95 percent "
@@ -256,10 +257,10 @@ def compose(launch=False, monday=None):
     # ===== Limits of the model =====
     P += ["## What the model can and cannot do", ""]
     P.append(
-        "The limits matter more than the headline. The power law is a fit of price to time. It has no "
-        "economic mechanism behind it, it cannot call tops, and a line that holds in the historical "
-        "sample can break out of it. It is a valuation anchor, not a timing tool. Treat the fair value "
-        "and the floor as distant reference points, never as targets and never as a reason to size up.")
+        "The power law is a fit of price to time. It has no economic mechanism behind it, it cannot "
+        "call tops, and a line that holds in the historical sample can break out of it. It is a "
+        "valuation anchor, not a timing tool. Treat the fair value and the floor as distant reference "
+        "points, never as targets and never as a reason to size up.")
     P.append("")
 
     # ===== Seven-day volatility map =====
@@ -267,10 +268,11 @@ def compose(launch=False, monday=None):
     if acc7 and acc30:
         P.append(
             f"This is the part with measurable skill. The model tags each market turbulent or calm for "
-            f"the week ahead. Against a 50 percent coin-flip baseline it is right about {acc7} percent "
-            f"of the time at seven days and {acc30} percent at thirty, backtested point-in-time over "
-            f"five years on non-overlapping samples. That is a backtest, not a live forward record: the "
-            f"live scoreboard is only now starting to fill.")
+            f"the week ahead. In the five-year point-in-time backtest it classified the seven-day "
+            f"regime correctly about {acc7} percent of the time, {edge7} percentage points above its "
+            f"naive baseline, and {acc30} percent at thirty days, {edge30} points above baseline. That "
+            f"is a backtest, not a live forward record: the live scoreboard is only now starting to "
+            f"fill.")
         P.append("")
     calm_bits = f"{_num(fx_low)} of the {_num(fx_total)} displayed FX pairs"
     if spx and spx.get("regime") == "LOW":
@@ -281,24 +283,22 @@ def compose(launch=False, monday=None):
         f"For the coming week the model reads {_num(len(all_high))} markets turbulent: {_join(all_high)}. "
         f"The rest is calm, including {calm_bits}. So the average market is contained while the "
         f"turbulence is concentrated, which settles the apparent tension in the free weekly between a "
-        f"mostly-calm board and loud pockets. Both are true, because only the metals and big crypto are "
-        f"carrying the range.")
+        f"mostly-calm board and loud pockets.")
     P.append("")
     if vb and ve:
         P.append(
             f"The loudest reads are in big crypto. Bitcoin's one-week volatility is near {vb['now']} "
             f"percent against a {vb['med']} median, and ether near {ve['now']} against {ve['med']}, "
-            f"close to double its normal. Both are turbulent on the week while their one-month regime "
-            f"is still calm, so this is a near-term spike rather than a change of character. The metals "
+            f"close to double its normal. Both are turbulent at seven days while their thirty-day "
+            f"classifications remain calm. The disagreement between the horizons identifies a near-term "
+            f"disturbance. It does not yet establish whether that disturbance will persist. The metals "
             f"read turbulent on both the one-week and one-month horizons, so their wider ranges are more "
             f"persistent.")
         P.append("")
     if cr.get("n") and cr.get("acc") is not None:
         P.append(
-            f"On direction the model is close to a coin flip, which is the thesis rather than a "
-            f"shortfall: {cr['acc']:.0f} percent over {cr['n']:,} backtested crypto calls, the class "
-            f"with the most data. The full per-class breakdown, and why the commodities figure is not "
-            f"an edge, sit on the track record. We forecast volatility, not direction.")
+            f"On direction the model is close to a coin flip: {cr['acc']:.0f} percent over "
+            f"{cr['n']:,} backtested crypto calls. We forecast volatility, not direction.")
         P.append("")
 
     # ===== What changed =====
@@ -321,9 +321,9 @@ def compose(launch=False, monday=None):
         P.append("Week on week: " + _sentences([_cap(b) for b in bits]) + ".")
     else:
         P.append(
-            "This is the first issue, so there is no prior Signal to compare against. From next week "
-            "this section flags which markets newly flipped turbulent or calm and how far bitcoin moved "
-            "against its fitted value, so you see the model changing its mind, not just its latest state.")
+            "From next week this section flags which markets newly flipped turbulent or calm and how "
+            "far bitcoin moved against its fitted value, so you can see what changed rather than only "
+            "the latest state.")
     P.append("")
 
     # ===== The week behind =====
@@ -341,20 +341,24 @@ def compose(launch=False, monday=None):
         f"biggest seven-day move was {fp[-1][0]} at {fp[-1][1]:+.1f} percent, ranges otherwise tight. "
         f"In commodities the metals led the week, "
         + _join([f"{_name(nn)} {vv:+.0f} percent" for nn, vv in metals[-3:][::-1]])
-        + ". Risk appetite is running in the tail while the majors and the dollar sit quiet.")
+        + ". The gains were broad, but the largest moves stayed further out on the risk curve, and the "
+        "dollar and most FX ranges were comparatively quiet.")
     P.append("")
 
     # ===== Watchlist + review =====
     P += ["## Subscriber watchlist, with levels", ""]
     bullets = [
         (f"- **Bitcoin.** Fitted floor near {_kfmt(floor)}, fair value near {_kfmt(fair)}. A weekly "
-         f"close below the floor line would be the first in most of the sample.") if fair else "",
-        (f"- **Ether volatility.** Watch it fall back toward its {ve['med']} median. Holding near "
-         f"{ve['now']} would turn the spike into a regime.") if ve else "",
+         f"close below the fitted floor would be historically unusual and would challenge the model, "
+         f"rather than automatically creating a buying opportunity.") if fair else "",
+        (f"- **Ether volatility.** Current annualised volatility is near {ve['now']} percent against a "
+         f"historical median around {ve['med']}. Watch whether the thirty-day classification also flips "
+         f"from calm to turbulent.") if ve else "",
         (f"- **The metals.** Whether the turbulent bid broadens beyond {_join(g['commodity'][0])} or "
          f"fades back to calm.") if g["commodity"][0] else "",
-        (f"- **Pegs and dominance.** Stablecoins holding, dominance near {dom:.0f} percent. A peg "
-         f"under 0.995 or a sharp dominance move is the early risk-off tell."),
+        (f"- **Pegs and dominance.** Stablecoins are holding and bitcoin dominance is near {dom:.0f} "
+         f"percent. A tracked peg below 0.995 would trigger Levanter's wobble alert. A sharp dominance "
+         f"move would show the balance within crypto changing."),
     ]
     P += [b for b in bullets if b]
     P.append("")
@@ -370,10 +374,10 @@ def compose(launch=False, monday=None):
                   "keep getting it. The daily, weekly and monthly reviews stay free at "
                   "levantermarkets.com. Educational market analysis, not financial advice.*")
     else:
-        footer = ("*This is a Levanter Signal, the weekly subscriber note. The daily, weekly and "
-                  "monthly reviews stay free at levantermarkets.com. Educational market analysis, not "
-                  "financial advice.*")
-    P += ["---", "", footer, "", "*Subscribe: read.levantermarkets.com*"]
+        footer = ("*This is a Levanter Signal, the weekly subscriber note. Subscribe at "
+                  "read.levantermarkets.com. The daily, weekly and monthly reviews stay free at "
+                  "levantermarkets.com. Educational market analysis, not financial advice.*")
+    P += ["---", "", footer]
 
     hist[mon] = cur_state
     for k in sorted(hist)[:-8]:
@@ -385,64 +389,44 @@ def compose(launch=False, monday=None):
 
 def teaser(meta):
     loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, launch = meta
+    byc = {c.get("cls"): c for c in cls}
+    cr, co = byc.get("crypto", {}), byc.get("commodity", {})
     T = []
     if launch:
-        T.append("Introducing the Levanter Signal, a new weekly newsletter. Honest market intelligence "
-                 "across crypto, foreign exchange and commodities, from the site that forecasts "
-                 "volatility and refuses to forecast direction. Free this week and next, then it moves "
-                 "to subscribers.")
-        T.append("")
-        T.append("Here is the first one, the honest version:")
+        T += ["Introducing the Levanter Signal, our new weekly newsletter.", "",
+              "Market intelligence across crypto, foreign exchange and commodities, from a site that "
+              "models volatility and refuses to pretend it can forecast direction.", "",
+              "It is free this week and next. After that, it moves to subscribers.", "",
+              "Here is the first Signal in one minute."]
     else:
-        T.append("Most market commentary this week will tell you where prices are going. "
-                 "Here is what a model can actually tell you, and what it cannot.")
-        T.append("")
-        T.append("The week's Levanter Signal is out. The honest version:")
-    T.append("")
-    T.append("What is knowable:")
-    T.append("")
-    T.append(f"Volatility clusters, so a turbulent-or-calm call carries real skill. This "
-             f"week the model puts the wider ranges in {loud_txt} and the calm in "
-             f"{quiet_txt}. If you hold the loud names, plan for it. If you trade the "
-             f"quiet ones, expect a duller week.")
-    T.append("")
+        T += ["This week's Levanter Signal is out.", "",
+              "Market intelligence across crypto, foreign exchange and commodities, from a site that "
+              "models volatility and refuses to pretend it can forecast direction.", "",
+              "Here is this week's Signal in one minute."]
+    T += ["", "What is knowable:", "",
+          f"Volatility clusters, so a turbulent-or-calm classification can carry measurable skill. This "
+          f"week the model expects wider ranges in {loud_txt}, with calmer conditions across most of "
+          f"{quiet_txt}.", ""]
     if ou is not None:
-        T.append(f"On the longer view, bitcoin is trading around {abs(ou):.0f} percent "
-                 f"{'below' if ou < 0 else 'above'} its network-value (adoption-model) fair value.")
-        T.append("")
-    T.append("What is not knowable:")
-    T.append("")
-    if n and dacc is not None:
-        cbits = []
-        for c in cls:
-            lab = c.get("label", c.get("cls", ""))
-            lab = lab if lab == "FX" else lab.lower()
-            cbits.append(f"{lab} {c['acc']:.0f}%" if c.get("n") and c.get("acc") is not None
-                         else f"{lab} not yet scored")
-        byc = {c.get("cls"): c for c in cls}
-        cr, co = byc.get("crypto", {}), byc.get("commodity", {})
-        T.append(f"Which way any of it closes on Friday. On direction we backtest every class and "
-                 f"show them all: {_join(cbits)}.")
-        T.append("")
-        T.append(f"The crypto row is our biggest sample at {cr.get('n', 0):,} calls, and at "
-                 f"{cr.get('acc', 0):.0f} percent it sits right on the coin flip. That is the whole "
-                 f"thesis. Commodities looks stronger at {co.get('acc', 0):.0f} percent, but it is "
-                 f"{co.get('n', 0)} calls in a trending tape, not an edge. FX has no resolved calls "
-                 f"yet. Read the rows, not the blend.")
-        T.append("")
-    T.append("That is the whole idea of Levanter. Forecast what is forecastable, say so "
-             "plainly about the rest, and show the scorecard.")
-    T.append("")
+        T += [f"On the longer view, bitcoin is trading about {abs(ou):.0f} percent "
+              f"{'below' if ou < 0 else 'above'} the fitted fair value produced by Levanter's adoption "
+              f"model. That is valuation context, not a price target or a prediction for Friday.", ""]
+    T += ["What is not knowable:", "", "Direction.", ""]
+    if cr.get("n") and cr.get("acc") is not None and co.get("n") and co.get("acc") is not None:
+        T += [f"The current scorecard says crypto {cr['acc']:.0f} percent, commodities {co['acc']:.0f} "
+              f"percent and FX not yet scored. Crypto provides the largest sample, with {cr['n']:,} "
+              f"calls, and its result sits almost exactly at chance.", "",
+              f"The commodities figure looks better, but {co['acc']:.0f} percent from {co['n']} calls in "
+              f"a strongly trending market does not establish an edge. FX has no resolved calls yet.", "",
+              "Read the individual rows, not a flattering blended number.", ""]
+    T += ["That is Levanter's approach: model what can be modelled, identify what cannot, and publish "
+          "the scorecard.", ""]
     if launch:
-        T.append("The Signal is free this week and next, then it moves to subscribers. Subscribe now "
-                 "to get it while it is free, and to keep it after: read.levantermarkets.com")
+        T += ["The Signal is free this week and next. Subscribe now to read the first issue and "
+              "continue receiving it afterwards:", "", "read.levantermarkets.com", ""]
     else:
-        T.append("The daily, weekly and monthly reviews are free at levantermarkets.com. "
-                 "The Signal and the alerts are for subscribers.")
-        T.append("")
-        T.append("Read the full Signal: read.levantermarkets.com")
-    T.append("")
-    T.append("#markets #bitcoin #crypto #investing #volatility")
+        T += ["Subscribe to read the full Signal:", "", "read.levantermarkets.com", ""]
+    T += ["#markets #bitcoin #crypto #investing #volatility"]
     return "\n".join(T)
 
 
