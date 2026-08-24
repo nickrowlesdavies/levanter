@@ -48,6 +48,14 @@ cp -f reports/substack/docx/*.docx public/substack/docx/ 2>/dev/null || true
 # Social share image (Open Graph) served at /og.png
 cp -f brand/og.png public/og.png 2>/dev/null || true
 
+# Static discovery files (robots.txt, llms.txt, .well-known/security.txt) into the
+# site root. "static/." copies hidden files/dirs (like .well-known) too.
+if [ -d static ]; then cp -R static/. public/; fi
+
+# Brand logo referenced by JSON-LD, served at /assets/levanter-logo-square.png
+mkdir -p public/assets
+cp -f brand/levanter-logo-square.png public/assets/levanter-logo-square.png 2>/dev/null || true
+
 # Keep GitHub Pages from running the output through Jekyll.
 touch public/.nojekyll
 

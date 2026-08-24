@@ -1,0 +1,6 @@
+# https://levantermarkets.com/.well-known/security.txt
+Contact: mailto:security@levantermarkets.com
+Preferred-Languages: en
+Canonical: https://levantermarkets.com/.well-known/security.txt
+Policy: https://levantermarkets.com/#about
+Expires: 2027-08-22T00:00:00.000Z

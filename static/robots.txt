@@ -1,0 +1,60 @@
+# levantermarkets.com
+# Levanter — honest market intelligence across crypto, FX and commodities.
+# Educational analysis only. Not financial advice.
+
+# ---------------------------------------------------------------------------
+# Content Signals (Cloudflare / contentsignals.org)
+# search      = may be used to build a search index and link back
+# ai-input    = may be retrieved at query time to ground an AI answer
+# ai-train    = may be retained to train or fine-tune a model
+#
+# Levanter wants to be indexed and cited. It does not consent to its analysis
+# being absorbed into training corpora.
+# ---------------------------------------------------------------------------
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+
+User-agent: *
+Allow: /
+Disallow: /assets/tmp/
+Disallow: /*?utm_
+
+# Named AI assistants that retrieve at query time and cite the source.
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Bulk training crawlers. Content-Signal above states the preference; these
+# lines state it in the syntax each crawler actually honours.
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+Sitemap: https://levantermarkets.com/sitemap.xml

@@ -1970,6 +1970,28 @@ document.addEventListener('click',function(e){var t=e.target;if(t&&t.tagName==='
 '''
 
 
+APP_JSONLD = """<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "@id": "https://levantermarkets.com/app/#dataset",
+  "name": "Levanter cross-market dashboard",
+  "description": "Daily readings across 35 crypto assets, 16 FX pairs and 12 commodities: price, multi-horizon returns, volatility regime classification (turbulent or calm) at 7, 30, 60 and 90 days, stablecoin peg monitoring, and long-horizon bitcoin valuation models. Built from free public sources and tested point-in-time with no look-ahead.",
+  "url": "https://levantermarkets.com/app/",
+  "creator": { "@id": "https://levantermarkets.com/#organization" },
+  "license": "https://levantermarkets.com/app/#about",
+  "isAccessibleForFree": true,
+  "keywords": ["crypto", "foreign exchange", "commodities", "volatility", "market regime", "backtest"],
+  "measurementTechnique": "Point-in-time backtested volatility regime classification with no look-ahead",
+  "temporalCoverage": "2021/..",
+  "variableMeasured": [
+    { "@type": "PropertyValue", "name": "Volatility regime", "description": "TURBULENT or CALM classification at 7, 30, 60 and 90 day horizons. Backtested accuracy 66%, 72%, 72% and 74% respectively." },
+    { "@type": "PropertyValue", "name": "Experimental direction call", "description": "Mechanical up or down lean. Explicitly experimental. Expect accuracy near a coin flip." }
+  ]
+}
+</script>"""
+
+
 def main():
     import sys
     market_only = "--market-only" in sys.argv
@@ -2071,6 +2093,7 @@ def main():
 <meta name="twitter:description" content="Honest market intelligence across crypto, FX and commodities. Volatility yes, direction no.">
 <meta name="twitter:image" content="https://levantermarkets.com/og.png">
 {cf_snippet}
+{APP_JSONLD}
 <style>
   :root{{--bg:#eef1f6;--panel:#ffffff;--fg:#0f172a;--muted:#64748b;--line:#e2e8f0;
     --shadow:0 1px 3px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.05);

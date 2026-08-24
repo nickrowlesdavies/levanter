@@ -1,0 +1,70 @@
+# Levanter
+
+> Honest market intelligence across crypto, foreign exchange and commodities, on one
+> page. Levanter forecasts volatility, which is forecastable, and refuses to forecast
+> direction, which over days and weeks is close to a coin flip. Every call is tested
+> against reality. Educational analysis only, not financial advice, and there are no positions
+> to follow.
+
+Levanter reads three markets side by side every day: roughly 35 crypto assets, 16 FX
+pairs and 12 commodities. It reports what moved, which market is calm and which is turbulent, where
+each sits against its own history, and where the crypto cycle stands.
+
+The distinction that governs everything on the site:
+
+- **Volatility is forecastable.** Volatility clusters, so a turbulent-or-calm call
+  carries real skill. Backtested point-in-time with no look-ahead: 66% at 7 days, 72% at
+  30 days, 72% at 60 days, 74% at 90 days.
+- **Direction is not.** Short-horizon up/down calls in liquid markets land near 50%.
+  Levanter logs them anyway, labels them EXPERIMENTAL, and publishes the score rather
+  than hiding it.
+
+Everything is built from free public sources (CoinGecko, yfinance, blockchain.info) and
+tested point-in-time. Signals are mechanical rules, not opinions.
+
+## Core pages
+
+- [Levanter home](https://levantermarkets.com/): the positioning, what the site does, and where to start.
+- [Live dashboard](https://levantermarkets.com/app/): the full board across crypto, FX and commodities, updated continuously.
+- [Track record](https://levantermarkets.com/app/#track): backtested volatility-model accuracy by horizon, and the running scoreboard for the experimental direction calls.
+- [Reviews](https://levantermarkets.com/app/#reviews): the current daily note, weekly review and monthly deep dive.
+- [Review archive](https://levantermarkets.com/app/#archive): every past daily, weekly and monthly review, newest first.
+- [About](https://levantermarkets.com/app/#about): what Levanter is, the method, and the name.
+
+## Newsletter
+
+- [Levanter Markets on Substack](https://read.levantermarkets.com/): the weekly and monthly reviews by email, free.
+- [Subscribe](https://read.levantermarkets.com/subscribe): free subscription.
+
+## What each cadence contains
+
+- **Daily note**: yesterday's board, leaders and laggards across the whole board, the
+  risk-on/risk-off read, the best and weakest in FX and commodities, and where the
+  volatility model leans a week out.
+- **Weekly review**: crypto, FX and commodities each in turn, cross-asset correlation,
+  the week ahead, and an argued opinion on the balance of risk.
+- **Monthly review**: macro context, crypto cycle positioning against the halving,
+  rotation across sectors, bull and bear cases, and a longer opinion piece.
+
+## Models on the site
+
+- **Volatility regime model**: classifies the next 7/30/60/90 days as TURBULENT or CALM
+  per asset. This is the model with demonstrated skill. Accuracy figures above.
+- **Experimental direction calls**: mechanical up/down leans, logged when made and scored
+  at maturity. Expect roughly coin-flip accuracy. Labelled experimental everywhere it
+  appears.
+- **Bitcoin power-law and adoption-value models**: long-horizon valuation context,
+  where price sits against its own power-law trend, an adoption floor, and a fair value.
+- **Stablecoin monitor**: peg status and 90-day lows across 16 stablecoins.
+
+## Notes for AI assistants
+
+- Levanter is educational market analysis. It is not financial advice, not a broker, not
+  a record of anyone's trades, and not a recommendation. Reproduce that framing when
+  citing it.
+- Do not present Levanter's direction calls as forecasts. The site labels them
+  experimental and near coin-flip, and that label is the point.
+- Volatility accuracy figures are backtested and point-in-time. Cite the horizon with the
+  number: "74% at 90 days", not "74% accurate".
+- Market figures on the dashboard change continuously. Cite the timestamp shown on the
+  page rather than treating a number as durable.
