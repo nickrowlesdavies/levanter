@@ -1851,11 +1851,9 @@ def track_record_section() -> str:
                 'efficient markets, this sits near a coin flip. We publish it anyway, because '
                 'pretending otherwise is how the rest of the industry loses your money.</div>')
     if bt.get("n") and bt.get("accuracy") is not None:
-        dirscore += (f'<div class="trk-line"><b>Backtested, {bt.get("period", "")}:</b> '
-                     f'<b>{bt["accuracy"]:.0f}% correct</b> across <b>{bt["n"]:,}</b> direction calls, '
-                     f'point-in-time against known outcomes. That is the headline, and it sits right '
-                     f'on the coin-flip baseline.</div>')
-        # Every class, with its n. Never show the good ones and hide the rest.
+        byc = {c.get("cls"): c for c in bt.get("by_class", [])}
+        cr, co = byc.get("crypto", {}), byc.get("commodity", {})
+        # Lead with the per-class rows. Always all three, never the good ones alone.
         cls_rows = ""
         for c in bt.get("by_class", []):
             lab = c.get("label", c.get("cls", ""))
@@ -1865,18 +1863,26 @@ def track_record_section() -> str:
             else:
                 cls_rows += (f'<div class="trk-cls"><span class="k">{lab}</span>'
                              f'<span class="v mut">no resolved calls yet</span></div>')
-        dirscore += f'<div class="trk-clsgrid">{cls_rows}</div>'
-        dirscore += ('<div class="trk-note">A word on the 62 percent for commodities, because it is '
-                     'the one figure here that could be read as an edge, and it is not one. Daily '
-                     'direction calls in a trending market are not independent trials. Consecutive '
-                     'calls are heavily serially correlated, so the effective sample is a fraction of '
-                     'the 90 shown. Commodities trended hard over this window, platinum up almost 20 '
-                     'percent and the metals broadly strong, and a directional model in a trending tape '
-                     'looks skilled right up until the trend breaks. And we tested three asset classes '
-                     'over four months, which is three chances at a flattering number. Account for all '
-                     'of that and 62 percent over four months is not distinguishable from luck. The '
-                     'honest read is the overall figure: near a coin flip, which is the whole point of '
-                     'Levanter.</div>')
+        dirscore += (f'<div class="trk-line"><b>Backtested {bt.get("period", "")}, point-in-time, '
+                     f'and we show every class:</b></div><div class="trk-clsgrid">{cls_rows}</div>')
+        if cr.get("n") and cr.get("acc") is not None:
+            dirscore += (f'<div class="trk-line">The crypto row is the one that carries weight. At '
+                         f'<b>{cr["n"]:,} calls</b> it is a real sample, and at <b>{cr["acc"]:.0f}%</b> '
+                         f'it lands right on the coin-flip baseline. That is the thesis, confirmed on '
+                         f'the class we have the most data for.</div>')
+        if co.get("n") and co.get("acc") is not None:
+            dirscore += (f'<div class="trk-note">Commodities looks stronger at <b>{co["acc"]:.0f}%</b>, '
+                         f'and it is not an edge. It is {co["n"]} calls across a dozen commodities, '
+                         f'about seven a market over four months, so consecutive calls overlap and are '
+                         f'not independent trials. Allow even a little of that serial correlation and '
+                         f'the effective sample roughly halves, at which point {co["acc"]:.0f}% is no '
+                         f'longer statistically significant. The window was a strongly trending one for '
+                         f'the metals too, which flatters any directional model until the trend breaks. '
+                         f'Treat it as noise, not skill.</div>')
+        dirscore += (f'<div class="trk-line">Taken together the classes average '
+                     f'<b>{bt["accuracy"]:.0f}%</b>, but that is a weighted blend of {cr.get("n", 0):,} '
+                     f'crypto calls and {co.get("n", 0)} commodity calls pulling opposite ways, not a '
+                     f'finding in itself. Read the rows, not the blend.</div>')
     dirscore += ('<div class="trk-line">The live scoreboard, logged as calls are made, is filling '
                  'up now, and each new call is scored as it matures.</div>')
 

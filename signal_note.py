@@ -315,6 +315,8 @@ def compose():
     n, dacc, period = bt.get("n"), bt.get("accuracy"), bt.get("period", "")
     cls = bt.get("by_class", []) or []
     P += ["## The honest scoreboard", ""]
+    byc = {c.get("cls"): c for c in cls}
+    cr, co = byc.get("crypto", {}), byc.get("commodity", {})
     if n and dacc is not None:
         cbits = []
         for c in cls:
@@ -324,16 +326,26 @@ def compose():
                          if c.get("n") and c.get("acc") is not None else f"{lab} not yet scored")
         P.append(
             f"Because it is the reason to trust the rest. Our volatility calls carry measurable "
-            f"skill, in the high sixties to mid seventies. Our direction calls, backtested {period}, "
-            f"come in at {dacc:.0f} percent across {n:,} calls, almost exactly a coin flip. By "
-            f"class, and we always show all three: {_join(cbits)}.")
+            f"skill, in the high sixties to mid seventies. On direction we backtest every class and "
+            f"show them all: {_join(cbits)}.")
         P.append("")
+        if cr.get("n"):
+            P.append(
+                f"The crypto row is the one that means something. At {cr['n']:,} calls it is a real "
+                f"sample, and at {cr['acc']:.0f} percent it lands right on the coin-flip baseline. That "
+                f"is the thesis working, on the class we have the most data for.")
+            P.append("")
+        if co.get("n"):
+            P.append(
+                f"Commodities looks stronger at {co['acc']:.0f} percent and is not an edge. It is "
+                f"{co['n']} calls across a dozen commodities in a strongly trending window, so the "
+                f"calls overlap and are not independent trials. Allow even a little serial correlation "
+                f"and it stops being significant. Treat it as noise, not skill.")
+            P.append("")
         P.append(
-            "Do not read the commodities number as an edge. Daily direction calls in a trending "
-            "market are not independent trials, and commodities trended hard over this window, so "
-            "once you account for serial correlation and for testing three classes over four months, "
-            "62 percent is not distinguishable from luck. The honest read is the overall figure, near "
-            "a coin flip, and you can check the full working on the track record on the site.")
+            f"Taken together the classes average {dacc:.0f} percent, but that is a weighted blend "
+            f"pulling opposite ways, not a finding. Read the rows, not the blend, and you can check "
+            f"all of it on the track record on the site.")
         P.append("")
         P.append(
             "The knowable this week is where the volatility is and where bitcoin sits on a "
@@ -378,14 +390,16 @@ def teaser(meta):
             lab = lab if lab == "FX" else lab.lower()
             cbits.append(f"{lab} {c['acc']:.0f}%" if c.get("n") and c.get("acc") is not None
                          else f"{lab} not yet scored")
-        T.append(f"Which way any of it closes on Friday. Our direction calls, backtested {period}, "
-                 f"come in at {dacc:.0f} percent across {n:,} of them, almost exactly a coin flip. "
-                 f"By class, all three: {_join(cbits)}.")
+        byc = {c.get("cls"): c for c in cls}
+        cr, co = byc.get("crypto", {}), byc.get("commodity", {})
+        T.append(f"Which way any of it closes on Friday. On direction we backtest every class and "
+                 f"show them all: {_join(cbits)}.")
         T.append("")
-        T.append("The commodities figure is a trending-window artefact, not an edge. Once you "
-                 "account for serial correlation and for testing three classes over four months, it "
-                 "is not distinguishable from luck. The honest read is the coin-flip overall, and the "
-                 "full working is on the track record.")
+        T.append(f"The crypto row is our biggest sample at {cr.get('n', 0):,} calls, and at "
+                 f"{cr.get('acc', 0):.0f} percent it sits right on the coin flip. That is the whole "
+                 f"thesis. Commodities looks stronger at {co.get('acc', 0):.0f} percent, but it is "
+                 f"{co.get('n', 0)} calls in a trending tape, not an edge. FX has no resolved calls "
+                 f"yet. Read the rows, not the blend.")
         T.append("")
     T.append("That is the whole idea of Levanter. Forecast what is forecastable, say so "
              "plainly about the rest, and show the scorecard.")
