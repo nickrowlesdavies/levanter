@@ -1851,13 +1851,32 @@ def track_record_section() -> str:
                 'efficient markets, this sits near a coin flip. We publish it anyway, because '
                 'pretending otherwise is how the rest of the industry loses your money.</div>')
     if bt.get("n") and bt.get("accuracy") is not None:
-        byc = bt.get("by_class", {})
-        dparts = [f"{lab} {byc[k]:.0f}%" for k, lab in
-                  [("crypto", "crypto"), ("commodity", "commodities")] if byc.get(k) is not None]
         dirscore += (f'<div class="trk-line"><b>Backtested, {bt.get("period", "")}:</b> '
-                     f'<b>{bt["accuracy"]:.0f}% correct</b> across <b>{bt["n"]:,}</b> direction calls'
-                     + (f' ({" · ".join(dparts)})' if dparts else '') + ', point-in-time against '
-                     f'known outcomes. Near the 50% baseline, exactly where an honest model should sit.</div>')
+                     f'<b>{bt["accuracy"]:.0f}% correct</b> across <b>{bt["n"]:,}</b> direction calls, '
+                     f'point-in-time against known outcomes. That is the headline, and it sits right '
+                     f'on the coin-flip baseline.</div>')
+        # Every class, with its n. Never show the good ones and hide the rest.
+        cls_rows = ""
+        for c in bt.get("by_class", []):
+            lab = c.get("label", c.get("cls", ""))
+            if c.get("n") and c.get("acc") is not None:
+                cls_rows += (f'<div class="trk-cls"><span class="k">{lab}</span>'
+                             f'<span class="v">{c["acc"]:.0f}% over {c["n"]:,} calls</span></div>')
+            else:
+                cls_rows += (f'<div class="trk-cls"><span class="k">{lab}</span>'
+                             f'<span class="v mut">no resolved calls yet</span></div>')
+        dirscore += f'<div class="trk-clsgrid">{cls_rows}</div>'
+        dirscore += ('<div class="trk-note">A word on the 62 percent for commodities, because it is '
+                     'the one figure here that could be read as an edge, and it is not one. Daily '
+                     'direction calls in a trending market are not independent trials. Consecutive '
+                     'calls are heavily serially correlated, so the effective sample is a fraction of '
+                     'the 90 shown. Commodities trended hard over this window, platinum up almost 20 '
+                     'percent and the metals broadly strong, and a directional model in a trending tape '
+                     'looks skilled right up until the trend breaks. And we tested three asset classes '
+                     'over four months, which is three chances at a flattering number. Account for all '
+                     'of that and 62 percent over four months is not distinguishable from luck. The '
+                     'honest read is the overall figure: near a coin flip, which is the whole point of '
+                     'Levanter.</div>')
     dirscore += ('<div class="trk-line">The live scoreboard, logged as calls are made, is filling '
                  'up now, and each new call is scored as it matures.</div>')
 
@@ -2367,6 +2386,10 @@ def main():
   .trk-sub{{font-size:12px;font-weight:700}}
   .trk-n{{font-size:11px;color:var(--muted);margin-top:2px}}
   .trk-note{{font-size:13px;line-height:1.6;color:var(--fg);margin:0 4px 12px}}
+  .trk-clsgrid{{display:flex;flex-wrap:wrap;gap:8px;margin:2px 4px 12px}}
+  .trk-cls{{display:flex;gap:8px;align-items:baseline;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:8px 12px;font-size:13px}}
+  .trk-cls .k{{font-weight:800}} .trk-cls .v.mut{{color:var(--muted)}}
   .trk-line{{font-size:15px;line-height:1.6;background:var(--panel);border:1px solid var(--line);
     border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);margin-bottom:8px}}
   .revd{{border-left:3px solid var(--brand,#3b82f6);padding:2px 0 2px 12px;margin-bottom:10px;

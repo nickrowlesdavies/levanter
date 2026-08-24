@@ -1,11 +1,27 @@
 {
   "n": 410,
   "accuracy": 52,
-  "by_class": {
-    "crypto": 49,
-    "commodity": 62
-  },
   "period": "May to August 2026",
+  "by_class": [
+    {
+      "cls": "crypto",
+      "label": "Crypto",
+      "n": 320,
+      "acc": 49
+    },
+    {
+      "cls": "commodity",
+      "label": "Commodities",
+      "n": 90,
+      "acc": 62
+    },
+    {
+      "cls": "fx",
+      "label": "FX",
+      "n": 0,
+      "acc": null
+    }
+  ],
   "as_of": "2026-08-22",
-  "note": "Backfilled/backtested point-in-time direction calls scored against known outcomes. Not a live public record; the live scoreboard is logged going forward."
+  "note": "Backfilled point-in-time direction calls scored against known outcomes. Not a live public record. The 62% commodity figure is not an edge; see the caveat on the track-record page (serial correlation, a trending window, three asset classes tested)."
 }

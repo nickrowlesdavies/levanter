@@ -313,21 +313,32 @@ def compose():
     # ===== Scoreboard (committed backtest fact, matches the track-record page) =====
     bt = _read_root("direction_backtest.json")
     n, dacc, period = bt.get("n"), bt.get("accuracy"), bt.get("period", "")
-    dbyc = bt.get("by_class", {}) or {}
+    cls = bt.get("by_class", []) or []
     P += ["## The honest scoreboard", ""]
     if n and dacc is not None:
-        parts = [f"{lab} {dbyc[k]:.0f}%" for k, lab in
-                 [("crypto", "crypto"), ("commodity", "commodities")] if dbyc.get(k) is not None]
+        cbits = []
+        for c in cls:
+            lab = c.get("label", c.get("cls", ""))
+            lab = lab if lab == "FX" else lab.lower()
+            cbits.append(f"{lab} {c['acc']:.0f} percent over {c['n']:,} calls"
+                         if c.get("n") and c.get("acc") is not None else f"{lab} not yet scored")
         P.append(
-            f"Because it is the reason to trust the rest. Our volatility calls carry "
-            f"measurable skill, in the high sixties to mid seventies. Our direction calls, "
-            f"backtested {period}, come in at {dacc:.0f} percent across {n:,} "
-            f"calls" + (f" ({', '.join(parts)})" if parts else "") + ", almost exactly a "
-            f"coin flip. We publish that number rather than hide it, and you can check it "
-            f"against the track record on the site. The knowable this "
-            f"week is where the volatility is and where bitcoin sits on a long-horizon "
-            f"valuation. The unknowable is which way any of it closes on Friday, and we "
-            f"will not sell you the second one dressed as the first.")
+            f"Because it is the reason to trust the rest. Our volatility calls carry measurable "
+            f"skill, in the high sixties to mid seventies. Our direction calls, backtested {period}, "
+            f"come in at {dacc:.0f} percent across {n:,} calls, almost exactly a coin flip. By "
+            f"class, and we always show all three: {_join(cbits)}.")
+        P.append("")
+        P.append(
+            "Do not read the commodities number as an edge. Daily direction calls in a trending "
+            "market are not independent trials, and commodities trended hard over this window, so "
+            "once you account for serial correlation and for testing three classes over four months, "
+            "62 percent is not distinguishable from luck. The honest read is the overall figure, near "
+            "a coin flip, and you can check the full working on the track record on the site.")
+        P.append("")
+        P.append(
+            "The knowable this week is where the volatility is and where bitcoin sits on a "
+            "long-horizon valuation. The unknowable is which way any of it closes on Friday, and we "
+            "will not sell you the second one dressed as the first.")
         P.append("")
 
     P += ["---", "",
@@ -336,11 +347,11 @@ def compose():
           "volatility-regime flip, a stablecoin starting to wobble, bitcoin touching its "
           "floor, are for subscribers. Educational market analysis, not financial advice.*",
           "", "*Subscribe: read.levantermarkets.com*"]
-    return "\n".join(P), (loud_txt, quiet_txt, ou, nv, n, dacc, period)
+    return "\n".join(P), (loud_txt, quiet_txt, ou, nv, n, dacc, period, cls)
 
 
 def teaser(meta):
-    loud_txt, quiet_txt, ou, nv, n, dacc, period = meta
+    loud_txt, quiet_txt, ou, nv, n, dacc, period, cls = meta
     T = []
     T.append("Most market commentary this week will tell you where prices are going. "
              "Here is what a model can actually tell you, and what it cannot.")
@@ -361,10 +372,20 @@ def teaser(meta):
     T.append("What is not knowable:")
     T.append("")
     if n and dacc is not None:
-        T.append(f"Which way any of it closes on Friday. Our direction calls, backtested "
-                 f"{period}, come in at {dacc:.0f} percent across {n:,} of them. Almost "
-                 f"exactly a coin flip, and we publish that on the track record rather than "
-                 f"hide it.")
+        cbits = []
+        for c in cls:
+            lab = c.get("label", c.get("cls", ""))
+            lab = lab if lab == "FX" else lab.lower()
+            cbits.append(f"{lab} {c['acc']:.0f}%" if c.get("n") and c.get("acc") is not None
+                         else f"{lab} not yet scored")
+        T.append(f"Which way any of it closes on Friday. Our direction calls, backtested {period}, "
+                 f"come in at {dacc:.0f} percent across {n:,} of them, almost exactly a coin flip. "
+                 f"By class, all three: {_join(cbits)}.")
+        T.append("")
+        T.append("The commodities figure is a trending-window artefact, not an edge. Once you "
+                 "account for serial correlation and for testing three classes over four months, it "
+                 "is not distinguishable from luck. The honest read is the coin-flip overall, and the "
+                 "full working is on the track record.")
         T.append("")
     T.append("That is the whole idea of Levanter. Forecast what is forecastable, say so "
              "plainly about the rest, and show the scorecard.")
