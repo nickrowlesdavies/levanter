@@ -313,7 +313,7 @@ def compose():
         P.append(
             f"Because it is the reason to trust the rest. Our volatility calls carry "
             f"measurable skill, in the high sixties to mid seventies. Our direction calls, "
-            f"logged and scored in public, sit at {acc:.0f} percent across {rc:,} resolved "
+            f"backtested point-in-time, come in at {acc:.0f} percent across {rc:,} "
             f"calls" + (f" ({', '.join(parts)})" if parts else "") + ", almost exactly a "
             f"coin flip, and we publish that number rather than hide it. The knowable this "
             f"week is where the volatility is and where bitcoin sits on a long-horizon "
@@ -347,13 +347,13 @@ def teaser(meta):
     T.append("")
     if ou is not None:
         T.append(f"On the longer view, bitcoin is trading around {abs(ou):.0f} percent "
-                 f"{'below' if ou < 0 else 'above'} its adoption-trend fair value.")
+                 f"{'below' if ou < 0 else 'above'} its network-value (adoption-model) fair value.")
         T.append("")
     T.append("What is not knowable:")
     T.append("")
     if acc is not None and rc:
-        T.append(f"Which way any of it closes on Friday. Our direction calls, logged and "
-                 f"scored in public, sit at {acc:.0f} percent across {rc:,} of them. Almost "
+        T.append(f"Which way any of it closes on Friday. Our direction calls, backtested "
+                 f"point-in-time, come in at {acc:.0f} percent across {rc:,} of them. Almost "
                  f"exactly a coin flip, and we publish that rather than hide it.")
         T.append("")
     T.append("That is the whole idea of Levanter. Forecast what is forecastable, say so "

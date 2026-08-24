@@ -1789,7 +1789,8 @@ def track_record_section() -> str:
     bt = vr.get("backtest", {})
     hs = vr.get("horizons", [])
     intro = ('<div class="cbanner on"><div class="reg">Track record</div>'
-             '<div class="rec">We score every call against reality, in public. The point of '
+             '<div class="rec">We test every call against reality and show the results in full, '
+             'the misses included. The point of '
              'Levanter is honesty, so here is the evidence, updated as the data resolves.</div></div>')
 
     volcards = ""
@@ -1815,14 +1816,15 @@ def track_record_section() -> str:
               [("crypto", "Crypto"), ("fx", "FX"), ("commodity", "Commodities")]
               if byc.get(k) is not None]
     dirscore = ('<div class="subh">Direction calls, the honest scoreboard</div>'
-                '<div class="trk-note">We also log directional up and down calls and score them '
-                'against what actually happened. As theory predicts in efficient markets, this '
-                'sits near a coin flip. We publish it anyway, because pretending otherwise is how '
-                'the rest of the industry loses your money.</div>')
+                '<div class="trk-note">We backtest directional up and down calls against what '
+                'actually happened, and log new ones as they are made. As theory predicts in '
+                'efficient markets, this sits near a coin flip. We publish it anyway, because '
+                'pretending otherwise is how the rest of the industry loses your money.</div>')
     if rc and acc is not None:
-        dirscore += (f'<div class="trk-line"><b>{acc:.0f}% correct</b> across <b>{rc:,}</b> scored '
+        dirscore += (f'<div class="trk-line"><b>{acc:.0f}% correct</b> across <b>{rc:,}</b> backtested '
                      f'calls' + (f' ({" · ".join(dparts)})' if dparts else '') + '. Near the 50% '
-                     f'baseline, exactly where an honest model should sit.</div>')
+                     f'baseline, exactly where an honest model should sit. The live scoreboard, '
+                     f'logged as calls are made, is filling up now.</div>')
     else:
         dirscore += ('<div class="trk-line">The live scoreboard is filling up now. '
                      'Calls are logged the day they are made and scored when they mature.</div>')
