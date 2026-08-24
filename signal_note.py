@@ -52,7 +52,7 @@ def _read_root(p):
         return {}
 
 
-SIGNAL_STATE = "signal_state.json"
+SIGNAL_STATE = "signal_history.json"   # not *_state.json, which .gitignore excludes
 
 
 def _load_signal_state():
