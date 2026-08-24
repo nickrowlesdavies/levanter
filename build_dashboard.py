@@ -1691,13 +1691,37 @@ def update_review_archive() -> dict:
     return arch
 
 
-def _arch_list(title, items) -> str:
+def _review_slug(cadence, entry):
+    """Permalink slug matching build_reviews.py: daily/monthly by key, weekly by
+    its ISO-week Monday."""
+    try:
+        if cadence == "weekly":
+            mon = datetime.strptime(entry["key"] + "-1", "%G-W%V-%u").date()
+            return f"{mon.isoformat()}-weekly"
+        if cadence == "daily":
+            return f"{entry['date']}-daily"
+        if cadence == "monthly":
+            return f"{entry['key']}-monthly"
+    except Exception:
+        return None
+    return None
+
+
+def _perma_row(cadence, entry):
+    sl = _review_slug(cadence, entry)
+    if not sl:
+        return ""
+    return (f'<div class="rev-perma-row"><a href="/reviews/{sl}/">'
+            f'Open this review as its own page &#8599;</a></div>')
+
+
+def _arch_list(title, items, cadence) -> str:
     if not items:
         return ""
     rows = "".join(
         f'<details class="rev-arch-item"><summary>{it["label"]}'
         + (f' <span class="rev-arch-t">{it["title"]}</span>' if it.get("title") else "")
-        + f'</summary><div class="rev-arch-b">{it["html"]}</div></details>'
+        + f'</summary><div class="rev-arch-b">{_perma_row(cadence, it)}{it["html"]}</div></details>'
         for it in items)
     return f'<div class="rev-arch"><div class="rev-arch-h">{title}</div>{rows}</div>'
 
@@ -1725,20 +1749,20 @@ def reviews_section() -> str:
     for i, d in enumerate(dl[:60]):
         op = " open" if i == 0 else ""
         day_items += (f'<details class="rev-day"{op}><summary>{d["label"]}</summary>'
-                      f'<div class="rev-day-b">{d["html"]}</div></details>')
+                      f'<div class="rev-day-b">{_perma_row("daily", d)}{d["html"]}</div></details>')
     daily_html = (f'<div class="rev-daily-list">{day_items}</div>'
                   f'<div class="mnote">Daily notes are mechanical (1-day recap plus a volatility '
                   f'watch-list), one entry per day. Not a direction forecast or advice.</div>')
 
     # Archive: one place with every review we have kept, grouped and dated.
-    archive_body = (_arch_list("Monthly", ml[:24]) + _arch_list("Weekly", wl[:26])
-                    + _arch_list("Daily", dl[:45]))
+    archive_body = (_arch_list("Monthly", ml[:24], "monthly") + _arch_list("Weekly", wl[:26], "weekly")
+                    + _arch_list("Daily", dl[:45], "daily"))
     if not archive_body:
         archive_body = ('<div class="mnote">The archive is filling up. Past daily, weekly and '
                         'monthly reviews collect here as they publish.</div>')
-    archive_html = ('<div class="rev-arch-intro">Every review we publish is kept. The latest sits on '
-                    'the Weekly, Monthly and Daily tabs; the full run is below, newest first. One '
-                    'daily entry per day, a weekly each weekend, a monthly once a month.</div>'
+    archive_html = ('<div class="rev-arch-intro">Every review we publish is kept, and each has its own '
+                    'page. The latest sits on the Weekly, Monthly and Daily tabs; the full run is below, '
+                    'newest first, and the complete index lives at <a href="/reviews/">levantermarkets.com/reviews</a>.</div>'
                     + archive_body)
 
     nav = ('<div class="rev-tabs">'
@@ -2076,6 +2100,7 @@ def main():
 
     html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="canonical" href="https://levantermarkets.com/app/">
 <meta http-equiv="refresh" content="300">
 <title>Levanter · Markets, Signals, Insight</title>
 <link rel="icon" href="data:image/svg+xml;base64,{icon_b64}">
@@ -2297,6 +2322,9 @@ def main():
   .rev-arch-t{{color:var(--muted);font-weight:600}}
   .rev-daily-list details.rev-day:first-child{{border-color:var(--brand)}}
   .rev-arch-intro{{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:20px;max-width:640px}}
+  .rev-perma-row{{margin:2px 0 12px}}
+  .rev-perma-row a{{font-size:12.5px;font-weight:700;color:var(--brand);text-decoration:none}}
+  .rev-perma-row a:hover{{text-decoration:underline}}
   #rev-archive .rev-arch:first-of-type{{margin-top:0;border-top:0;padding-top:0}}
   .piece{{max-width:720px;background:var(--panel);border:1px solid var(--line);border-radius:16px;
     padding:26px 28px;box-shadow:var(--shadow)}}

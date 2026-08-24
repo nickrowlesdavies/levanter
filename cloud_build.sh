@@ -56,6 +56,10 @@ if [ -d static ]; then cp -R static/. public/; fi
 mkdir -p public/assets
 cp -f brand/levanter-logo-square.png public/assets/levanter-logo-square.png 2>/dev/null || true
 
+# Per-review indexable pages under /reviews/ + the generated sitemap.xml
+# (replaces any static sitemap). Reads the committed review_archive.json.
+python build_reviews.py public
+
 # Keep GitHub Pages from running the output through Jekyll.
 touch public/.nojekyll
 
