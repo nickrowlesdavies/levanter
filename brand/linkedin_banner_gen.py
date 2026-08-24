@@ -1,28 +1,83 @@
-import matplotlib; matplotlib.use("Agg")
+"""Levanter LinkedIn banners, both standard sizes, flat RGB, rendered at 2x.
+
+  * company-page cover  : 1128 x 191
+  * personal-profile bg : 1584 x 396
+
+LinkedIn rejects/crops the wrong aspect ratio, which is why a single size
+"doesn't work" when uploaded to the other slot. This makes both.
+"""
+import os
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.patches as patches
 from matplotlib.colors import LinearSegmentedColormap
-import numpy as np, os
+import numpy as np
+from PIL import Image
 
-W,H=1128,191
-fig=plt.figure(figsize=(W/100,H/100),dpi=100)
-ax=fig.add_axes([0,0,1,1]); ax.set_xlim(0,W); ax.set_ylim(H,0); ax.axis("off")
-X,Y=np.meshgrid(np.linspace(0,1,80),np.linspace(0,1,40))
-cmap=LinearSegmentedColormap.from_list("lev",["#0ea5e9","#3b82f6","#6366f1"])
-ax.imshow(X*0.7+Y*0.3,extent=[0,W,H,0],cmap=cmap,aspect="auto",interpolation="bilinear",zorder=0)
-s,ox,oy=1.35,300,20
-T=lambda x,y:(ox+x*s,oy+y*s)
-def gust(p0,c1,c2,p3,sw,a):
-    pth=Path([T(*p0),T(*c1),T(*c2),T(*p3)],[Path.MOVETO,Path.CURVE4,Path.CURVE4,Path.CURVE4])
-    ax.add_patch(patches.PathPatch(pth,fill=False,edgecolor="white",lw=sw*s*0.72,alpha=a,capstyle="round",zorder=2))
-gust((26,80),(50,70),(68,70),(90,76),8.5,0.5)
-gust((26,60),(54,47),(76,47),(100,55),9,1.0)
-gust((26,40),(46,32),(62,32),(80,37),8.5,0.82)
-ax.add_patch(patches.PathPatch(Path([T(90,48),T(105,42),T(101,57)],[Path.MOVETO,Path.LINETO,Path.LINETO]),
-             fill=False,edgecolor="white",lw=9*s*0.72,capstyle="round",joinstyle="round",zorder=2))
-ax.text(470,118,"LEVANTER",color="white",fontsize=58,fontweight="heavy",va="baseline",ha="left")
-ax.text(474,150,"M A R K E T S   ·   S I G N A L S   ·   I N S I G H T",color="#e8f1ff",fontsize=14.5,fontweight="semibold",va="baseline",ha="left")
-os.makedirs("reports/linkedin",exist_ok=True)
-fig.savefig("reports/linkedin/levanter-linkedin-banner.png",dpi=100)
-print("banner 1128x191 saved")
+CMAP = LinearSegmentedColormap.from_list("lev", ["#0ea5e9", "#3b82f6", "#6366f1"])
+
+
+def make(W, H, out, word_frac):
+    fig = plt.figure(figsize=(W / 100, H / 100), dpi=200)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.set_xlim(0, W)
+    ax.set_ylim(H, 0)
+    ax.axis("off")
+    # gradient background
+    X, Y = np.meshgrid(np.linspace(0, 1, 160), np.linspace(0, 1, 80))
+    ax.imshow(X * 0.7 + Y * 0.3, extent=[0, W, H, 0], cmap=CMAP,
+              aspect="auto", interpolation="bilinear", zorder=0)
+
+    ms = H / 120.0                 # wind-mark scale
+    fs = H * word_frac             # wordmark font size
+    tag = "M A R K E T S   ·   S I G N A L S   ·   I N S I G H T"
+    tag_fs = fs * 0.235
+    word_w = fs * 0.60 * 8         # "LEVANTER" ~= 8 chars
+    tag_w = tag_fs * 0.46 * len(tag)   # spaced tagline is the wider element
+    content_w = max(word_w, tag_w)
+    mark_w = 80 * ms
+    gap = fs * 0.30
+    total = mark_w + gap + content_w
+    gx = (W - total) / 2           # centre the logo + wordmark group
+    mox, moy = gx - 26 * ms, H / 2 - 56 * ms
+
+    def T(x, y):
+        return (mox + x * ms, moy + y * ms)
+
+    def gust(p0, c1, c2, p3, sw, a):
+        pth = Path([T(*p0), T(*c1), T(*c2), T(*p3)],
+                   [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4])
+        ax.add_patch(patches.PathPatch(pth, fill=False, edgecolor="white",
+                     lw=sw * ms * 0.9, alpha=a, capstyle="round", zorder=2))
+
+    gust((26, 80), (50, 70), (68, 70), (90, 76), 8.5, 0.5)
+    gust((26, 60), (54, 47), (76, 47), (100, 55), 9, 1.0)
+    gust((26, 40), (46, 32), (62, 32), (80, 37), 8.5, 0.82)
+    ax.add_patch(patches.PathPatch(
+        Path([T(90, 48), T(105, 42), T(101, 57)],
+             [Path.MOVETO, Path.LINETO, Path.LINETO]),
+        fill=False, edgecolor="white", lw=9 * ms * 0.9,
+        capstyle="round", joinstyle="round", zorder=2))
+
+    tx = gx + mark_w + gap
+    base = H / 2 + fs * 0.34
+    ax.text(tx, base, "LEVANTER", color="white", fontsize=fs,
+            fontweight="heavy", va="baseline", ha="left")
+    ax.text(tx + fs * 0.05, base + fs * 0.42, tag,
+            color="#e8f1ff", fontsize=tag_fs, fontweight="semibold",
+            va="baseline", ha="left")
+
+    os.makedirs("reports/linkedin", exist_ok=True)
+    tmp = out + ".tmp.png"
+    fig.savefig(tmp, dpi=200)
+    plt.close(fig)
+    Image.open(tmp).convert("RGB").save(out)      # flatten to RGB (no alpha)
+    os.remove(tmp)
+    print(f"saved {out} ({W}x{H}, rendered 2x)")
+
+
+if __name__ == "__main__":
+    make(1128, 191, "reports/linkedin/levanter-linkedin-banner.png", 0.40)
+    make(1584, 396, "reports/linkedin/levanter-linkedin-profile-banner.png", 0.26)
