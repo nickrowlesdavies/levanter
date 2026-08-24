@@ -195,11 +195,11 @@ def compose(launch=False, monday=None):
     if g["crypto"][0]:
         loud.append("big-cap crypto")
     if len(g["fx"][1]) >= 4:
-        quiet.append("foreign exchange")
+        quiet.append("most foreign exchange markets")
     if any(x in g["commodity"][1] for x in ("oil", "copper", "natural gas")):
         quiet.append("energy")
     loud_txt = _join(loud) or "a couple of pockets of the market"
-    quiet_txt = _join(quiet) or "the rest"
+    quiet_txt = " and across ".join(quiet) or "the rest of the board"
     # Direction backtest (committed fact) for the one honesty line and the teaser meta.
     dbt = _read_root("direction_backtest.json")
     n, dacc, period, cls = dbt.get("n"), dbt.get("accuracy"), dbt.get("period", ""), dbt.get("by_class", []) or []
@@ -257,10 +257,10 @@ def compose(launch=False, monday=None):
     # ===== Limits of the model =====
     P += ["## What the model can and cannot do", ""]
     P.append(
-        "The power law is a fit of price to time. It has no economic mechanism behind it, it cannot "
-        "call tops, and a line that holds in the historical sample can break out of it. It is a "
-        "valuation anchor, not a timing tool. Treat the fair value and the floor as distant reference "
-        "points, never as targets and never as a reason to size up.")
+        "It is a statistical fit of price to time. It has no hard economic mechanism behind it, cannot "
+        "call tops, and may fail outside the historical sample. It is a valuation anchor, not a timing "
+        "tool. Treat the fair value and the floor as distant reference points, never as targets and "
+        "never as a reason to size up.")
     P.append("")
 
     # ===== Seven-day volatility map =====
@@ -270,30 +270,29 @@ def compose(launch=False, monday=None):
             f"This is the part with measurable skill. The model tags each market turbulent or calm for "
             f"the week ahead. In the five-year point-in-time backtest it classified the seven-day "
             f"regime correctly about {acc7} percent of the time, {edge7} percentage points above its "
-            f"naive baseline, and {acc30} percent at thirty days, {edge30} points above baseline. That "
+            f"naïve baseline, and {acc30} percent at thirty days, {edge30} points above baseline. That "
             f"is a backtest, not a live forward record: the live scoreboard is only now starting to "
             f"fill.")
         P.append("")
-    calm_bits = f"{_num(fx_low)} of the {_num(fx_total)} displayed FX pairs"
+    calm_names = list(g["crypto"][1])   # calm crypto, e.g. solana
+    calm_names.append(f"{_num(fx_low)} of the {_num(fx_total)} FX pairs")
     if spx and spx.get("regime") == "LOW":
-        calm_bits += ", the S&P"
-    if calm_energy:
-        calm_bits += f", and {_join(calm_energy)} in energy"
+        calm_names.append("the S&P 500")
+    calm_names += [x for x in g["commodity"][1] if x in ("oil", "copper", "natural gas")]
     P.append(
         f"For the coming week the model reads {_num(len(all_high))} markets turbulent: {_join(all_high)}. "
-        f"The rest is calm, including {calm_bits}. So the average market is contained while the "
-        f"turbulence is concentrated, which settles the apparent tension in the free weekly between a "
-        f"mostly-calm board and loud pockets.")
+        f"The rest of the displayed set is calm, including {_join(calm_names)}. The average market is "
+        f"therefore contained even though a few names are carrying wide ranges.")
     P.append("")
     if vb and ve:
         P.append(
             f"The loudest reads are in big crypto. Bitcoin's one-week volatility is near {vb['now']} "
             f"percent against a {vb['med']} median, and ether near {ve['now']} against {ve['med']}, "
             f"close to double its normal. Both are turbulent at seven days while their thirty-day "
-            f"classifications remain calm. The disagreement between the horizons identifies a near-term "
-            f"disturbance. It does not yet establish whether that disturbance will persist. The metals "
-            f"read turbulent on both the one-week and one-month horizons, so their wider ranges are more "
-            f"persistent.")
+            f"classifications remain calm. The two horizons disagree, which flags a near-term "
+            f"disturbance without telling us whether it will last. The metals read turbulent at both "
+            f"seven and thirty days, indicating that their elevated-volatility classification extends "
+            f"beyond the coming week.")
         P.append("")
     if cr.get("n") and cr.get("acc") is not None:
         P.append(
@@ -347,14 +346,15 @@ def compose(launch=False, monday=None):
     metals_hi = [m for m in g["commodity"][0] if m in ("gold", "silver", "platinum")]
     if metals_hi and g["crypto"][0] and len(g["fx"][1]) > len(g["fx"][0]):
         P.append(
-            "Read across the three markets, the shape is concentration, not breadth: the range sits in "
-            "the metals and the largest coins while the dollar stays quiet. A safety bid in metals "
-            "beside a speculative bid in crypto reads as hedging, not conviction.")
+            "Read across the three asset classes, the unusual combination is strength in both precious "
+            "metals and speculative crypto while the dollar remains comparatively quiet. That is "
+            "consistent with abundant liquidity or a debasement trade, but the tape alone cannot tell "
+            "us which explanation is driving it.")
     else:
         P.append(
-            f"Read across the three markets, the turbulence is concentrated in {_join(all_high)} while "
-            f"the rest stays quiet. That is specific pockets of risk, not a broad regime shift, so "
-            f"weigh the loud names on their own terms and treat the calm majority as the backdrop.")
+            f"Read across the three asset classes, the turbulence is concentrated in {_join(all_high)} "
+            f"while the rest stays quiet. That is specific pockets of risk rather than a broad regime "
+            f"shift, and the tape alone does not tell us why they are the loud ones this week.")
     P.append("")
 
     # ===== Watchlist + review =====
@@ -376,15 +376,16 @@ def compose(launch=False, monday=None):
     P.append("")
     P.append(
         f"To score next week: the model calls {_join(all_high)} turbulent and the rest calm. In the "
-        f"next issue we mark whether those turbulent markets realised a wider-than-median weekly range "
-        f"and whether the calm ones stayed contained. That is the claim you can hold this Signal to.")
+        f"next issue we score each call the way the model does, whether realised volatility over the "
+        f"week came in above or below the asset's running-median volatility, and show the hits and "
+        f"misses. That is the claim you can hold this Signal to.")
     P.append("")
 
     if launch:
-        footer = ("*This is the Levanter Signal, our new weekly newsletter, free this week and next. "
-                  "After that it moves to subscribers, so subscribe now at read.levantermarkets.com to "
-                  "keep getting it. The daily, weekly and monthly reviews stay free at "
-                  "levantermarkets.com. Educational market analysis, not financial advice.*")
+        footer = ("*This is the Levanter Signal, our new weekly newsletter. Subscribe at "
+                  "read.levantermarkets.com to keep receiving it once the free launch ends. The daily, "
+                  "weekly and monthly reviews stay free at levantermarkets.com. Educational market "
+                  "analysis, not financial advice.*")
     else:
         footer = ("*This is a Levanter Signal, the weekly subscriber note. Subscribe at "
                   "read.levantermarkets.com. The daily, weekly and monthly reviews stay free at "
@@ -399,7 +400,7 @@ def compose(launch=False, monday=None):
     return "\n".join(P), (loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, launch)
 
 
-def teaser(meta):
+def teaser(meta, hashtags=True):
     loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, launch = meta
     byc = {c.get("cls"): c for c in cls}
     cr, co = byc.get("crypto", {}), byc.get("commodity", {})
@@ -417,7 +418,7 @@ def teaser(meta):
               "Here is this week's Signal in one minute."]
     T += ["", "What is knowable:", "",
           f"Volatility clusters, so a turbulent-or-calm classification can carry measurable skill. This "
-          f"week the model expects wider ranges in {loud_txt}, with calmer conditions across most of "
+          f"week the model expects wider ranges in {loud_txt}, with calmer conditions across "
           f"{quiet_txt}.", ""]
     if ou is not None:
         T += [f"On the longer view, bitcoin is trading about {abs(ou):.0f} percent "
@@ -425,7 +426,7 @@ def teaser(meta):
               f"model. That is valuation context, not a price target or a prediction for Friday.", ""]
     T += ["What is not knowable:", "", "Direction.", ""]
     if cr.get("n") and cr.get("acc") is not None and co.get("n") and co.get("acc") is not None:
-        T += [f"The current scorecard says crypto {cr['acc']:.0f} percent, commodities {co['acc']:.0f} "
+        T += [f"The current direction scorecard says crypto {cr['acc']:.0f} percent, commodities {co['acc']:.0f} "
               f"percent and FX not yet scored. Crypto provides the largest sample, with {cr['n']:,} "
               f"calls, and its result sits almost exactly at chance.", "",
               f"The commodities figure looks better, but {co['acc']:.0f} percent from {co['n']} calls in "
@@ -438,8 +439,9 @@ def teaser(meta):
               "continue receiving it afterwards:", "", "read.levantermarkets.com", ""]
     else:
         T += ["Subscribe to read the full Signal:", "", "read.levantermarkets.com", ""]
-    T += ["#markets #bitcoin #crypto #investing #volatility"]
-    return "\n".join(T)
+    if hashtags:   # LinkedIn wants them; the Substack teaser does not
+        T += ["#markets #bitcoin #crypto #investing #volatility"]
+    return "\n".join(T).rstrip() + "\n"
 
 
 def main():
@@ -471,12 +473,16 @@ def main():
     body, meta = compose(launch, monday.isoformat())
     title = f"# Levanter Signal · week of {monday.strftime('%-d %B %Y')}"
     body = body.replace("# Levanter Signal\n", title + "\n", 1)
+    teaser_sub_path = os.path.join(OUT, f"levanter-signal-teaser-substack-{monday}.md")
     open(note_path, "w").write(body)
-    open(teaser_path, "w").write(teaser(meta))
+    open(teaser_path, "w").write(teaser(meta, hashtags=True))          # LinkedIn: keep hashtags
+    open(teaser_sub_path, "w").write(teaser(meta, hashtags=False))     # Substack: no hashtags
     try:
         import md2docx
         md2docx.convert(note_path, os.path.join(OUT, "docx", f"levanter-signal-{monday}.docx"))
         md2docx.convert(teaser_path, os.path.join(OUT, "docx", f"levanter-signal-teaser-{monday}.docx"))
+        md2docx.convert(teaser_sub_path,
+                        os.path.join(OUT, "docx", f"levanter-signal-teaser-substack-{monday}.docx"))
     except Exception as e:
         print("signal_note: docx skipped:", e)
     print(f"signal_note: prepared week-of-{monday} Signal + teaser in {OUT}/")

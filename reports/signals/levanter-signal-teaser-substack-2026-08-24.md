@@ -27,5 +27,3 @@ That is Levanter's approach: model what can be modelled, identify what cannot, a
 The Signal is free this week and next. Subscribe now to read the first issue and continue receiving it afterwards:
 
 read.levantermarkets.com
-
-#markets #bitcoin #crypto #investing #volatility
