@@ -20,7 +20,8 @@ CMAP = LinearSegmentedColormap.from_list("lev", ["#0ea5e9", "#3b82f6", "#6366f1"
 
 
 def make(W, H, out, word_frac):
-    fig = plt.figure(figsize=(W / 100, H / 100), dpi=200)
+    # W, H are the OUTPUT pixel dimensions; rendered natively at dpi=100.
+    fig = plt.figure(figsize=(W / 100, H / 100), dpi=100)
     ax = fig.add_axes([0, 0, 1, 1])
     ax.set_xlim(0, W)
     ax.set_ylim(H, 0)
@@ -71,13 +72,15 @@ def make(W, H, out, word_frac):
 
     os.makedirs("reports/linkedin", exist_ok=True)
     tmp = out + ".tmp.png"
-    fig.savefig(tmp, dpi=200)
+    fig.savefig(tmp, dpi=100)
     plt.close(fig)
     Image.open(tmp).convert("RGB").save(out)      # flatten to RGB (no alpha)
     os.remove(tmp)
-    print(f"saved {out} ({W}x{H}, rendered 2x)")
+    print(f"saved {out} ({W}x{H})")
 
 
 if __name__ == "__main__":
-    make(1128, 191, "reports/linkedin/levanter-linkedin-banner.png", 0.40)
-    make(1584, 396, "reports/linkedin/levanter-linkedin-profile-banner.png", 0.26)
+    # Company page cover: LinkedIn recommends uploading at 4200x700 (renders to 1128x191).
+    make(4200, 700, "reports/linkedin/levanter-linkedin-banner.png", 0.40)
+    # Personal profile background: 1584x396, rendered at 2x for sharpness.
+    make(3168, 792, "reports/linkedin/levanter-linkedin-profile-banner.png", 0.26)
