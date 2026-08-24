@@ -21,6 +21,10 @@ import os
 import sys
 
 OUT = "reports/signals"
+# Launch window: the Signal is a new weekly newsletter, free this week and next,
+# then subscription. Any Signal whose Monday is on or before this date carries the
+# launch framing; after that it reverts to the normal subscriber wording.
+LAUNCH_UNTIL = "2026-08-31"
 NAMES = {
     "BTC": "bitcoin", "ETH": "ether", "SOL": "solana", "XRP": "XRP",
     "GOLD": "gold", "SILVER": "silver", "PLATINUM": "platinum",
@@ -111,7 +115,7 @@ def _vol_groups(vr):
     return out
 
 
-def compose():
+def compose(launch=False):
     cm = _read("crypto_map.json")
     vr = _read("vol_regime.json")
     fx = _read("fx_map.json")
@@ -183,8 +187,13 @@ def compose():
          "*The weekly premium read. What actually happened across crypto, foreign "
          "exchange and commodities, where the volatility is heading, the one valuation "
          "that matters, and the specific things to watch. The deeper read behind the "
-         "free weekly.*", "", "---", "",
-         f"**The one line:** {one_line}", ""]
+         "free weekly.*", ""]
+    if launch:
+        P += ["> **New: the Levanter Signal, a weekly newsletter.** This is the first issue. It reads "
+              "volatility, valuation and the week ahead across the three markets, and it is honest "
+              "about what a model can and cannot forecast. It is **free this week and next**, then it "
+              "moves to subscribers. Subscribe at read.levantermarkets.com to keep it.", ""]
+    P += ["---", "", f"**The one line:** {one_line}", ""]
 
     # ===== The week behind us =====
     P += ["## The week behind us", ""]
@@ -353,22 +362,35 @@ def compose():
             "will not sell you the second one dressed as the first.")
         P.append("")
 
-    P += ["---", "",
-          "*This is a Levanter Signal, the weekly premium note. The daily, weekly and "
-          "monthly reviews stay free at levantermarkets.com. The Signal and the alerts, a "
-          "volatility-regime flip, a stablecoin starting to wobble, bitcoin touching its "
-          "floor, are for subscribers. Educational market analysis, not financial advice.*",
-          "", "*Subscribe: read.levantermarkets.com*"]
-    return "\n".join(P), (loud_txt, quiet_txt, ou, nv, n, dacc, period, cls)
+    if launch:
+        footer = ("*This is the Levanter Signal, our new weekly newsletter, free this week and next. "
+                  "After that it moves to subscribers, so subscribe now at read.levantermarkets.com to "
+                  "keep getting it. The daily, weekly and monthly reviews stay free at "
+                  "levantermarkets.com. Educational market analysis, not financial advice.*")
+    else:
+        footer = ("*This is a Levanter Signal, the weekly premium note. The daily, weekly and monthly "
+                  "reviews stay free at levantermarkets.com. The Signal and the alerts, a "
+                  "volatility-regime flip, a stablecoin starting to wobble, bitcoin touching its floor, "
+                  "are for subscribers. Educational market analysis, not financial advice.*")
+    P += ["---", "", footer, "", "*Subscribe: read.levantermarkets.com*"]
+    return "\n".join(P), (loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, launch)
 
 
 def teaser(meta):
-    loud_txt, quiet_txt, ou, nv, n, dacc, period, cls = meta
+    loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, launch = meta
     T = []
-    T.append("Most market commentary this week will tell you where prices are going. "
-             "Here is what a model can actually tell you, and what it cannot.")
-    T.append("")
-    T.append("The week's Levanter Signal is out. The honest version:")
+    if launch:
+        T.append("Introducing the Levanter Signal, a new weekly newsletter. Honest market intelligence "
+                 "across crypto, foreign exchange and commodities, from the site that forecasts "
+                 "volatility and refuses to forecast direction. Free this week and next, then it moves "
+                 "to subscribers.")
+        T.append("")
+        T.append("Here is the first one, the honest version:")
+    else:
+        T.append("Most market commentary this week will tell you where prices are going. "
+                 "Here is what a model can actually tell you, and what it cannot.")
+        T.append("")
+        T.append("The week's Levanter Signal is out. The honest version:")
     T.append("")
     T.append("What is knowable:")
     T.append("")
@@ -404,10 +426,14 @@ def teaser(meta):
     T.append("That is the whole idea of Levanter. Forecast what is forecastable, say so "
              "plainly about the rest, and show the scorecard.")
     T.append("")
-    T.append("The daily, weekly and monthly reviews are free at levantermarkets.com. "
-             "The Signal and the alerts are for subscribers.")
-    T.append("")
-    T.append("Read the full Signal: read.levantermarkets.com")
+    if launch:
+        T.append("The Signal is free this week and next, then it moves to subscribers. Subscribe now "
+                 "to get it while it is free, and to keep it after: read.levantermarkets.com")
+    else:
+        T.append("The daily, weekly and monthly reviews are free at levantermarkets.com. "
+                 "The Signal and the alerts are for subscribers.")
+        T.append("")
+        T.append("Read the full Signal: read.levantermarkets.com")
     T.append("")
     T.append("#markets #bitcoin #crypto #investing #volatility")
     return "\n".join(T)
@@ -438,7 +464,8 @@ def main():
             print(f"signal_note: not due yet (prepares {monday} 06:00 GST).")
             return
 
-    body, meta = compose()
+    launch = monday.isoformat() <= LAUNCH_UNTIL
+    body, meta = compose(launch)
     title = f"# Levanter Signal · week of {monday.strftime('%-d %B %Y')}"
     body = body.replace("# Levanter Signal\n", title + "\n", 1)
     open(note_path, "w").write(body)
