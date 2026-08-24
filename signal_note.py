@@ -52,6 +52,20 @@ def _read_root(p):
         return {}
 
 
+SIGNAL_STATE = "signal_state.json"
+
+
+def _load_signal_state():
+    try:
+        return json.load(open(SIGNAL_STATE))
+    except Exception:
+        return {}
+
+
+def _save_signal_state(d):
+    json.dump(d, open(SIGNAL_STATE, "w"), indent=2)
+
+
 def _now_gst():
     return dt.datetime.utcnow() + dt.timedelta(hours=4)
 
@@ -71,6 +85,14 @@ def _join(names):
 
 def _cap(s):
     return s[:1].upper() + s[1:] if s else s
+
+
+_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+          "nine", "ten", "eleven", "twelve"]
+
+
+def _num(n):
+    return _WORDS[n] if 0 <= n <= 12 else str(n)
 
 
 def _sentences(bits):
@@ -115,7 +137,7 @@ def _vol_groups(vr):
     return out
 
 
-def compose(launch=False):
+def compose(launch=False, monday=None):
     cm = _read("crypto_map.json")
     vr = _read("vol_regime.json")
     fx = _read("fx_map.json")
@@ -175,192 +197,169 @@ def compose(launch=False):
         quiet.append("energy")
     loud_txt = _join(loud) or "a couple of pockets of the market"
     quiet_txt = _join(quiet) or "the rest"
-    btc_line = ("looks cheap on a decade view and a coin flip on a weekly one"
-                if (ou is not None and ou < -15) else
-                "looks stretched on a decade view and a coin flip on a weekly one"
-                if (ou is not None and ou > 40) else
-                "sits near its long-term trend and remains a coin flip week to week")
-    one_line = (f"expect the wider ranges in {loud_txt}, calmer trade in {quiet_txt}, "
-                f"and remember that bitcoin {btc_line}.")
+    # Direction backtest (committed fact) for the one honesty line and the teaser meta.
+    dbt = _read_root("direction_backtest.json")
+    n, dacc, period, cls = dbt.get("n"), dbt.get("accuracy"), dbt.get("period", ""), dbt.get("by_class", []) or []
+    cr = next((c for c in cls if c.get("cls") == "crypto"), {})
 
-    P = ["# Levanter Signal", "",
-         "*The weekly premium read. What actually happened across crypto, foreign "
-         "exchange and commodities, where the volatility is heading, the one valuation "
-         "that matters, and the specific things to watch. The deeper read behind the "
-         "free weekly.*", ""]
+    now = _now_gst()
+    stamp = now.strftime("%H:%M GST on %-d %B %Y")
+    capw30 = cm.get("cap_weighted_ret")
+    all_high = list(g["crypto"][0]) + list(g["commodity"][0]) + list(g["fx"][0])
+    fx_low, fx_total = len(g["fx"][1]), len(g["fx"][0]) + len(g["fx"][1])
+    calm_energy = [x for x in g["commodity"][1] if x in ("oil", "copper", "natural gas")]
+    spx = _voldetail(vr, "SPX")
+
+    # Week-on-week snapshot for the "what changed" section.
+    mon = monday or (now - dt.timedelta(days=now.weekday())).date().isoformat()
+    cur_state = {"high": sorted(all_high),
+                 "btc_ou": round(ou) if ou is not None else None,
+                 "btc_price": round(price) if price else None, "capw7": round(w_capw)}
+    hist = _load_signal_state()
+    prior = [k for k in hist if k < mon]
+    prev = hist.get(max(prior)) if prior else None
+
+    P = ["# Levanter Signal", ""]
     if launch:
         P += ["> **New: the Levanter Signal, a weekly newsletter.** This is the first issue. It reads "
-              "volatility, valuation and the week ahead across the three markets, and it is honest "
-              "about what a model can and cannot forecast. It is **free this week and next**, then it "
-              "moves to subscribers. Subscribe at read.levantermarkets.com to keep it.", ""]
-    P += ["---", "", f"**The one line:** {one_line}", ""]
+              "volatility, valuation and the week ahead across crypto, foreign exchange and commodities, "
+              "and it is honest about what a model can and cannot forecast. It is **free this week and "
+              "next**, then it moves to subscribers. Subscribe at read.levantermarkets.com to keep it.",
+              ""]
+    P += [f"*Data captured at {stamp}. Every figure below is stamped to a period, because they move. "
+          f"This is the accountable read behind the free weekly: the changes since last week, the "
+          f"levels to watch, and a claim we will score in the next issue.*", "", "---", ""]
 
-    # ===== The week behind us =====
-    P += ["## The week behind us", ""]
-    if wk_s:
-        lead = ""
-        if len(mv7) >= 3:
-            lead = (f" The leaders were the speculative end of the board, {mv7[0]['coin']} "
-                    f"{mv7[0]['ret']:+.0f} percent, {mv7[1]['coin']} {mv7[1]['ret']:+.0f} "
-                    f"percent and {mv7[2]['coin']} {mv7[2]['ret']:+.0f} percent, while the "
-                    f"laggard, {wk_s[0][0]}, barely moved at {wk_s[0][1]:+.0f} percent.")
-        concentration = ("close together" if abs(w_capw - w_eqw) < 3 else
-                         "far apart")
-        conc_read = ("so this was breadth plus a hot tail rather than the majors carrying "
-                     "the index" if abs(w_capw - w_eqw) < 3 else
-                     "so a handful of names did most of the heavy lifting")
-        corr_txt = (f" average pairwise correlation sat near {corr:.2f}, so names are "
-                    f"still moving somewhat on their own rather than in lockstep," if corr is not None else "")
-        peg_txt = ("and every stablecoin we monitor held its peg"
-                   if not watch else f"and the peg monitor is flagging {_join(watch)}")
-        P.append(
-            f"Crypto had a broad week: {w_up} of the {w_n} coins we track finished "
-            f"higher and the tape stayed risk-on.{lead} The spread from best to worst was "
-            f"about {abs(w_disp):.0f} points in a single week, a lot of dispersion, and "
-            f"cap-weighted and equal-weighted returns came out {concentration} (around "
-            f"{w_capw:+.0f} and {w_eqw:+.0f} percent), {conc_read}. Bitcoin dominance held "
-            f"near {dom:.0f} percent,{corr_txt} {peg_txt}. The honest reading is that risk "
-            f"appetite is running, and running hardest in the most speculative corners, "
-            f"which is a late-cycle tell rather than a reason to chase.")
-        P.append("")
-    if fp:
-        P.append(
-            f"Foreign exchange was quiet, which is itself information. The biggest move "
-            f"among the crosses we track was {fp[-1][0]} at {fp[-1][1]:+.1f} percent, the "
-            f"weakest {fp[0][0]} at {fp[0][1]:+.1f} percent, and one-week volatility across "
-            f"the majors is sitting in the mid single digits. A drifting dollar and tight "
-            f"ranges mean the action, and the risk, is elsewhere this week.")
-        P.append("")
-    if metals and com_best:
-        top3 = _join([f"{_name(n)} {v:+.0f} percent" for n, v in metals[-3:][::-1]])
-        P.append(
-            f"Commodities told a clearer story, and it was the metals: {top3} led, while "
-            f"copper went nowhere and the softs lagged. When precious metals bid as the "
-            f"dollar drifts, it usually says something about how the market is thinking "
-            f"about real rates and safety. The question for the week is whether that bid "
-            f"broadens across the complex or fades.")
-        P.append("")
-
-    # ===== The one chart =====
+    # ===== One chart: bitcoin valuation =====
     if fair:
-        P += ["## The one chart that matters: bitcoin network value", ""]
+        P += ["## The one chart: bitcoin against its adoption model", ""]
         P.append(
-            f"Bitcoin is trading around {_kfmt(price)} dollars. Against its long-term "
-            f"adoption trend, the network-value model that actually holds for bitcoin, "
-            f"fair value sits near {_kfmt(fair)}, roughly {abs(ou):.0f} percent "
-            f"{'below' if ou < 0 else 'above'} trend, with the adoption floor around "
-            f"{_kfmt(floor)}, a level that has held about 95 percent of the time in "
-            f"bitcoin's history. In plain terms, on a multi-year view bitcoin is sitting "
-            f"in the lower third of its own band.")
+            f"Bitcoin is near {_kfmt(price)} dollars, captured {stamp}. We value it against network "
+            f"age with a power-law fit. Fair value on that fit lands near {_kfmt(fair)}, about "
+            f"{abs(ou):.0f} percent {'below' if ou < 0 else 'above'} the line, and the fitted floor "
+            f"sits near {_kfmt(floor)}. Bitcoin has closed above that floor line for roughly 95 percent "
+            f"of the historical sample. That is an in-sample observation, not a tested probability and "
+            f"not a guaranteed level of support.")
+        P.append("")
         if cyc_b is not None:
-            P.append("")
             P.append(
-                f"The cycle clock agrees: bitcoin is about {abs(cyc_b):.0f} percent "
-                f"{'below' if cyc_b < 0 else 'above'} its power-law trend and reads as "
-                f"{phase.lower()}, not a blow-off top. Read it correctly though. This is a "
-                f"statement about long-horizon value, not a price target and not a buy "
-                f"signal, and it tells you nothing about next week. Cheap on a decade view "
-                f"and a coin flip on a weekly one are both true at once.")
-        P += ["", "*(Chart: bitcoin price against its adoption fair value and floor.)*", ""]
+                f"A separate cycle model classifies bitcoin as {phase.lower()}, about {abs(cyc_b):.0f} "
+                f"percent below its own power-law trend. Both are long-horizon context. Where price "
+                f"sits against a multi-year fit says nothing about the next five days, so read it as "
+                f"valuation, not a reason to act on the week.")
+            P.append("")
+        P += ["*(Chart: bitcoin price against its adoption fair value and floor.)*", ""]
 
-    # ===== The volatility map, week ahead =====
-    P += ["## The volatility map for the week ahead", ""]
-    if acc7 and acc30:
-        P.append(
-            f"This is where the model earns its keep. It does not call direction, it "
-            f"calls turbulence, and turbulence clusters, which is why the read is "
-            f"backtested at {acc7} percent over a week and {acc30} percent over a month"
-            + (f", {acc90} over a quarter" if acc90 else "") + ".")
-        P.append("")
-    if vb and ve:
-        spike = (vb.get("reg30") == "LOW" and ve.get("reg30") == "LOW")
-        P.append(
-            f"The loudest signal this week is a short-term volatility spike in big crypto. "
-            f"Bitcoin's one-week volatility is running around {vb['now']} percent against a "
-            f"{vb['med']} percent median, and ether is the standout at {ve['now']} against "
-            f"{ve['med']}, close to double its normal."
-            + (" Both read turbulent on the week even though their one-month regime is "
-               "still calm, so treat this as a near-term spike, wider ranges for a few "
-               "sessions rather than a change of character." if spike else "")
-            + (f" Solana, unusually, is the quiet one of the three." if vs and vs.get("regime") == "LOW" else ""))
-        P.append("")
-    if g["commodity"][0]:
-        P.append(
-            f"The metals are loud too, and more persistently: {_join(g['commodity'][0])} "
-            f"read high on both the one-week and one-month horizons, so their elevated "
-            f"ranges are not a blip. Against that, foreign exchange is asleep, the S&P "
-            f"reads calm, and energy is cooling. Where the model reads high, plan for wider "
-            f"ranges and size down; where it reads low, expect a tighter week.")
-        P += ["", "*(Charts: the crypto market map and the return-correlation grid.)*", ""]
-
-    # ===== What to watch =====
-    P += ["## What to watch this week", ""]
-    watch_pts = []
-    if fair:
-        watch_pts.append(
-            f"**Bitcoin's band.** Fair value near {_kfmt(fair)}, the adoption floor near "
-            f"{_kfmt(floor)}. At {_kfmt(price)} it is in the lower third of that band, "
-            f"cheap on the decade view and a coin flip on the week.")
-    if ve:
-        watch_pts.append(
-            f"**The ether volatility spike.** {ve['now']} percent against a {ve['med']} "
-            f"median. When ether's ranges blow out it tends to pull the majors around with "
-            f"it, so watch whether it normalises or is the start of something.")
-    if metals:
-        watch_pts.append(
-            f"**The metals bid.** {_cap(_name(metals[-1][0]))} leadership. Whether it broadens "
-            f"to the rest of the complex or fades tells you how serious the safety trade is.")
-    watch_pts.append(
-        f"**Under the hood.** {'Every stablecoin peg is holding' if not watch else 'Peg watch on ' + _join(watch)} "
-        f"and dominance is steady near {dom:.0f} percent. "
-        + ("No stress signals there, which is the reassuring counterweight to a hot tape."
-           if not watch else "Worth keeping an eye on."))
-    for w in watch_pts:
-        P += ["- " + w]
+    # ===== Limits of the model =====
+    P += ["## What the model can and cannot do", ""]
+    P.append(
+        "The limits matter more than the headline. The power law is a fit of price to time. It has no "
+        "economic mechanism behind it, it cannot call tops, and a line that holds in the historical "
+        "sample can break out of it. It is a valuation anchor, not a timing tool. Treat the fair value "
+        "and the floor as distant reference points, never as targets and never as a reason to size up.")
     P.append("")
 
-    # ===== Scoreboard (committed backtest fact, matches the track-record page) =====
-    bt = _read_root("direction_backtest.json")
-    n, dacc, period = bt.get("n"), bt.get("accuracy"), bt.get("period", "")
-    cls = bt.get("by_class", []) or []
-    P += ["## The honest scoreboard", ""]
-    byc = {c.get("cls"): c for c in cls}
-    cr, co = byc.get("crypto", {}), byc.get("commodity", {})
-    if n and dacc is not None:
-        cbits = []
-        for c in cls:
-            lab = c.get("label", c.get("cls", ""))
-            lab = lab if lab == "FX" else lab.lower()
-            cbits.append(f"{lab} {c['acc']:.0f} percent over {c['n']:,} calls"
-                         if c.get("n") and c.get("acc") is not None else f"{lab} not yet scored")
+    # ===== Seven-day volatility map =====
+    P += ["## The seven-day volatility map", ""]
+    if acc7 and acc30:
         P.append(
-            f"Because it is the reason to trust the rest. Our volatility calls carry measurable "
-            f"skill, in the high sixties to mid seventies. On direction we backtest every class and "
-            f"show them all: {_join(cbits)}.")
+            f"This is the part with measurable skill. The model tags each market turbulent or calm for "
+            f"the week ahead. Against a 50 percent coin-flip baseline it is right about {acc7} percent "
+            f"of the time at seven days and {acc30} percent at thirty, backtested point-in-time over "
+            f"five years on non-overlapping samples. That is a backtest, not a live forward record: the "
+            f"live scoreboard is only now starting to fill.")
         P.append("")
-        if cr.get("n"):
-            P.append(
-                f"The crypto row is the one that means something. At {cr['n']:,} calls it is a real "
-                f"sample, and at {cr['acc']:.0f} percent it lands right on the coin-flip baseline. That "
-                f"is the thesis working, on the class we have the most data for.")
-            P.append("")
-        if co.get("n"):
-            P.append(
-                f"Commodities looks stronger at {co['acc']:.0f} percent and is not an edge. It is "
-                f"{co['n']} calls across a dozen commodities in a strongly trending window, so the "
-                f"calls overlap and are not independent trials. Allow even a little serial correlation "
-                f"and it stops being significant. Treat it as noise, not skill.")
-            P.append("")
+    calm_bits = f"{_num(fx_low)} of the {_num(fx_total)} displayed FX pairs"
+    if spx and spx.get("regime") == "LOW":
+        calm_bits += ", the S&P"
+    if calm_energy:
+        calm_bits += f", and {_join(calm_energy)} in energy"
+    P.append(
+        f"For the coming week the model reads {_num(len(all_high))} markets turbulent: {_join(all_high)}. "
+        f"The rest is calm, including {calm_bits}. So the average market is contained while the "
+        f"turbulence is concentrated, which settles the apparent tension in the free weekly between a "
+        f"mostly-calm board and loud pockets. Both are true, because only the metals and big crypto are "
+        f"carrying the range.")
+    P.append("")
+    if vb and ve:
         P.append(
-            f"Taken together the classes average {dacc:.0f} percent, but that is a weighted blend "
-            f"pulling opposite ways, not a finding. Read the rows, not the blend, and you can check "
-            f"all of it on the track record on the site.")
+            f"The loudest reads are in big crypto. Bitcoin's one-week volatility is near {vb['now']} "
+            f"percent against a {vb['med']} median, and ether near {ve['now']} against {ve['med']}, "
+            f"close to double its normal. Both are turbulent on the week while their one-month regime "
+            f"is still calm, so this is a near-term spike rather than a change of character. The metals "
+            f"read turbulent on both the one-week and one-month horizons, so their wider ranges are more "
+            f"persistent.")
         P.append("")
+    if cr.get("n") and cr.get("acc") is not None:
         P.append(
-            "The knowable this week is where the volatility is and where bitcoin sits on a "
-            "long-horizon valuation. The unknowable is which way any of it closes on Friday, and we "
-            "will not sell you the second one dressed as the first.")
+            f"On direction the model is close to a coin flip, which is the thesis rather than a "
+            f"shortfall: {cr['acc']:.0f} percent over {cr['n']:,} backtested crypto calls, the class "
+            f"with the most data. The full per-class breakdown, and why the commodities figure is not "
+            f"an edge, sit on the track record. We forecast volatility, not direction.")
         P.append("")
+
+    # ===== What changed =====
+    P += ["## What changed since the last Signal", ""]
+    if prev:
+        prev_high = set(prev.get("high", []))
+        flips = [h for h in all_high if h not in prev_high]
+        calmed = [h for h in prev_high if h not in all_high]
+        d_ou = (round(ou) - prev["btc_ou"]) if (ou is not None and prev.get("btc_ou") is not None) else None
+        bits = []
+        if flips:
+            bits.append(f"newly turbulent, {_join(flips)}")
+        if calmed:
+            bits.append(f"calmed back to normal, {_join(calmed)}")
+        if not flips and not calmed:
+            bits.append("the volatility roster is unchanged from last week")
+        if d_ou:
+            bits.append(f"bitcoin is about {abs(d_ou)} points "
+                        f"{'cheaper' if d_ou < 0 else 'richer'} against its fitted value")
+        P.append("Week on week: " + _sentences([_cap(b) for b in bits]) + ".")
+    else:
+        P.append(
+            "This is the first issue, so there is no prior Signal to compare against. From next week "
+            "this section flags which markets newly flipped turbulent or calm and how far bitcoin moved "
+            "against its fitted value, so you see the model changing its mind, not just its latest state.")
+    P.append("")
+
+    # ===== The week behind =====
+    P += ["## The week behind, and what it rhymes with", ""]
+    wk_lead = ""
+    if len(mv7) >= 2:
+        wk_lead = (f", led by the speculative end, {mv7[0]['coin']} {mv7[0]['ret']:+.0f} percent and "
+                   f"{mv7[1]['coin']} {mv7[1]['ret']:+.0f} percent")
+    P.append(
+        f"Over the past seven days crypto was broad and speculative-led: {w_up} of {w_n} coins higher, "
+        f"cap-weighted about {w_capw:+.0f} percent on the week"
+        + (f" and {capw30:+.0f} percent over thirty days" if capw30 is not None else "")
+        + f"{wk_lead}, with a best-to-worst spread near {abs(w_disp):.0f} points. Dominance held near "
+        f"{dom:.0f} percent and the stablecoins we track kept their pegs. In foreign exchange the "
+        f"biggest seven-day move was {fp[-1][0]} at {fp[-1][1]:+.1f} percent, ranges otherwise tight. "
+        f"In commodities the metals led the week, "
+        + _join([f"{_name(nn)} {vv:+.0f} percent" for nn, vv in metals[-3:][::-1]])
+        + ". Risk appetite is running in the tail while the majors and the dollar sit quiet.")
+    P.append("")
+
+    # ===== Watchlist + review =====
+    P += ["## Subscriber watchlist, with levels", ""]
+    bullets = [
+        (f"- **Bitcoin.** Fitted floor near {_kfmt(floor)}, fair value near {_kfmt(fair)}. A weekly "
+         f"close below the floor line would be the first in most of the sample.") if fair else "",
+        (f"- **Ether volatility.** Watch it fall back toward its {ve['med']} median. Holding near "
+         f"{ve['now']} would turn the spike into a regime.") if ve else "",
+        (f"- **The metals.** Whether the turbulent bid broadens beyond {_join(g['commodity'][0])} or "
+         f"fades back to calm.") if g["commodity"][0] else "",
+        (f"- **Pegs and dominance.** Stablecoins holding, dominance near {dom:.0f} percent. A peg "
+         f"under 0.995 or a sharp dominance move is the early risk-off tell."),
+    ]
+    P += [b for b in bullets if b]
+    P.append("")
+    P.append(
+        f"To score next week: the model calls {_join(all_high)} turbulent and the rest calm. In the "
+        f"next issue we mark whether those turbulent markets realised a wider-than-median weekly range "
+        f"and whether the calm ones stayed contained. That is the claim you can hold this Signal to.")
+    P.append("")
 
     if launch:
         footer = ("*This is the Levanter Signal, our new weekly newsletter, free this week and next. "
@@ -368,11 +367,16 @@ def compose(launch=False):
                   "keep getting it. The daily, weekly and monthly reviews stay free at "
                   "levantermarkets.com. Educational market analysis, not financial advice.*")
     else:
-        footer = ("*This is a Levanter Signal, the weekly premium note. The daily, weekly and monthly "
-                  "reviews stay free at levantermarkets.com. The Signal and the alerts, a "
-                  "volatility-regime flip, a stablecoin starting to wobble, bitcoin touching its floor, "
-                  "are for subscribers. Educational market analysis, not financial advice.*")
+        footer = ("*This is a Levanter Signal, the weekly subscriber note. The daily, weekly and "
+                  "monthly reviews stay free at levantermarkets.com. Educational market analysis, not "
+                  "financial advice.*")
     P += ["---", "", footer, "", "*Subscribe: read.levantermarkets.com*"]
+
+    hist[mon] = cur_state
+    for k in sorted(hist)[:-8]:
+        hist.pop(k, None)
+    _save_signal_state(hist)
+
     return "\n".join(P), (loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, launch)
 
 
@@ -465,7 +469,7 @@ def main():
             return
 
     launch = monday.isoformat() <= LAUNCH_UNTIL
-    body, meta = compose(launch)
+    body, meta = compose(launch, monday.isoformat())
     title = f"# Levanter Signal · week of {monday.strftime('%-d %B %Y')}"
     body = body.replace("# Levanter Signal\n", title + "\n", 1)
     open(note_path, "w").write(body)
