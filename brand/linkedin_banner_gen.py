@@ -81,6 +81,6 @@ def make(W, H, out, word_frac):
 
 if __name__ == "__main__":
     # Company page cover: LinkedIn recommends uploading at 4200x700 (renders to 1128x191).
-    make(4200, 700, "reports/linkedin/levanter-linkedin-banner.png", 0.40)
+    make(4200, 700, "reports/linkedin/levanter-linkedin-cover-image.png", 0.40)
     # Personal profile background: 1584x396, rendered at 2x for sharpness.
     make(3168, 792, "reports/linkedin/levanter-linkedin-profile-banner.png", 0.26)
