@@ -229,6 +229,9 @@ def compose(launch=False, monday=None):
     P += [f"*Data captured at {stamp}. Every figure below is stamped to a period, because they move. "
           f"This is the accountable read behind the free weekly: the changes since last week, the "
           f"levels to watch, and a claim we will score in the next issue.*", "", "---", ""]
+    P += ["> **Editor's line (add before publishing, then delete this prompt):** one sentence of your "
+          "own read of the week. Two minutes. What it means for how you are positioned, or the single "
+          "thing you would tell a friend who asked. This is the line the model cannot write.", ""]
 
     # ===== One chart: bitcoin valuation =====
     if fair:
