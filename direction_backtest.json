@@ -23,5 +23,7 @@
     }
   ],
   "as_of": "2026-08-22",
-  "note": "Backfilled point-in-time direction calls scored against known outcomes. Not a live public record. The 62% commodity figure is not an edge; see the caveat on the track-record page (serial correlation, a trending window, three asset classes tested)."
+  "note": "Backfilled point-in-time direction calls scored against known outcomes over a FIXED window ending 15 August 2026. Not a live public record. After review_after, the live-forward calls will have matured and this should be refreshed or superseded by the live scoreboard. The 62% commodity figure is not an edge (serial correlation, trending window, three classes tested); see the track-record page.",
+  "window_close": "15 August 2026",
+  "review_after": "2026-10-01"
 }

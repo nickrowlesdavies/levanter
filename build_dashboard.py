@@ -1883,8 +1883,17 @@ def track_record_section() -> str:
                      f'<b>{bt["accuracy"]:.0f}%</b>, but that is a weighted blend of {cr.get("n", 0):,} '
                      f'crypto calls and {co.get("n", 0)} commodity calls pulling opposite ways, not a '
                      f'finding in itself. Read the rows, not the blend.</div>')
-    dirscore += ('<div class="trk-line">The live scoreboard, logged as calls are made, is filling '
-                 'up now, and each new call is scored as it matures.</div>')
+    # Make staleness visible: state the fixed window, and self-flag if the backtest
+    # is past its review date (the live-forward calls will have matured by then).
+    close_txt = (f'That backtest is a fixed window, closed on {bt.get("window_close")}. '
+                 if bt.get("window_close") else '')
+    stale = ""
+    ra = bt.get("review_after")
+    if ra and _now_gst().date().isoformat() > ra:
+        stale = (' <b>This backtest window is now past its review date, so the live calls have '
+                 'since matured and should be folded in.</b>')
+    dirscore += (f'<div class="trk-line">{close_txt}The live scoreboard, logged as calls are made, '
+                 f'takes over from here and is filling up now, scored as each call matures.{stale}</div>')
 
     method = ('<div class="mnote">Everything is tested point-in-time with no look-ahead, from '
               'public data. Volatility forecasting has real, measurable skill. Price-direction '
