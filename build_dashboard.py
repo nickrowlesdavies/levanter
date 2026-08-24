@@ -1507,6 +1507,8 @@ def daily_note():
     """Short, punchy daily for Substack Notes (does not email). Links to the dashboard."""
     cm = _read("crypto_map.json") or {}
     vr = _read("vol_regime.json") or {}
+    fxm = _read("fx_map.json") or {}
+    com = _read("commodities_map.json") or {}
     cross = _cross_movers("chg1")
     if not cross:
         return ""
@@ -1519,17 +1521,32 @@ def daily_note():
     turb = "turbulent" if (hic + hif + hid) >= max(1, nc + nf + nd) / 2 else "calmer"
     reg = "risk-on" if cm.get("regime_on", True) else "risk-off"
     date = datetime.now().strftime("%A %-d %B")
-    return "\n".join([
+
+    # Explicit FX and commodity leaders so the note visibly covers all three
+    # markets, not just the crypto names that top the cross-market board.
+    def _top1(rows, key):
+        vv = sorted(((r[key], r.get("chg1")) for r in rows if r.get("chg1") is not None),
+                    key=lambda x: x[1])
+        return vv[-1] if vv else None
+    fx_top = _top1(fxm.get("pairs", []), "pair")
+    com_top = _top1(com.get("items", []), "name")
+    lines = [
         f"Levanter daily · {date}",
         "",
         f"{top[1]} led the board yesterday ({top[2]:+.1f}%), {bot[1]} lagged "
         f"({bot[2]:+.1f}%). {up} of {n} markets higher. Tape {reg}.",
+    ]
+    if fx_top and com_top:
+        lines.append(f"Beyond crypto, {fx_top[0]} led FX ({fx_top[1]:+.1f}%) and "
+                     f"{com_top[0]} led commodities ({com_top[1]:+.1f}%).")
+    lines += [
         f"The volatility model leans {turb} across crypto, FX and commodities looking a week out.",
         "",
         "Full board, charts and forecasts: levantermarkets.com",
         "Subscribe for the weekly and monthly: read.levantermarkets.com",
         "Educational, not advice.",
-    ])
+    ]
+    return "\n".join(lines)
 
 
 def _teaser(kind, field):
