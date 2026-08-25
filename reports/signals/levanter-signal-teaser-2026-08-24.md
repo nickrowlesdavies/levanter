@@ -1,16 +1,16 @@
-Introducing the Levanter Signal, our new weekly newsletter.
+The Levanter Signal, our weekly subscriber note.
 
 Market intelligence across crypto, foreign exchange and commodities, from a site that models volatility and refuses to pretend it can forecast direction.
 
-It is free this week and next. After that, it moves to subscribers.
+It is free while we build the list, and we will say so before that changes.
 
-Here is the first Signal in one minute.
+Here is this week's Signal in one minute.
 
 What is knowable:
 
 Volatility clusters, so a turbulent-or-calm classification can carry measurable skill. This week the model expects wider ranges in the metals and big-cap crypto, with calmer conditions across most foreign exchange markets and across energy.
 
-On the longer view, bitcoin is trading about 42 percent below the fitted fair value produced by Levanter's adoption model. That is valuation context, not a price target or a prediction for Friday.
+On the longer view, bitcoin is trading about 42 percent below the fair value produced by Levanter's long-run valuation fit, which models price against how long the network has existed. That is valuation context, not a price target or a prediction for Friday.
 
 What is not knowable:
 
@@ -24,7 +24,7 @@ Read the individual rows, not a flattering blended number.
 
 That is Levanter's approach: model what can be modelled, identify what cannot, and publish the scorecard.
 
-The Signal is free this week and next. Subscribe now to read the first issue and continue receiving it afterwards:
+The Signal is free while we build the list. Subscribe now and you keep receiving it:
 
 read.levantermarkets.com
 
