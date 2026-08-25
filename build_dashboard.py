@@ -1722,6 +1722,12 @@ def _teaser(kind, field):
             f"Read it: read.levantermarkets.com\nLive market dashboard: levantermarkets.com")
 
 
+def _week_key(now):
+    """The Sunday that ends the week `now` falls in. The site anchors the weekly
+    review to this date, so the writeups key off the same one."""
+    return (now - timedelta(days=(now.weekday() + 1) % 7)).date()
+
+
 def write_writeups():
     """Write Substack-ready Markdown for the daily, weekly and monthly pieces."""
     out_dir = os.path.join(R, "substack")
@@ -1739,16 +1745,28 @@ def write_writeups():
     force = os.environ.get("LEVANTER_FORCE_WRITEUPS") == "1"
     weekly_day = force or now.weekday() == 6          # Sunday
     monthly_day = force or now.day == 28
-    wk = weekly_content() if weekly_day else None
-    mo = monthly_content() if monthly_day else None
-    if wk:
-        p = os.path.join(out_dir, f"levanter-weekly-{today}.md")
-        open(p, "w").write(render_piece_md(wk))
-        files["weekly"] = p
-    if mo:
-        p = os.path.join(out_dir, f"levanter-monthly-{month}.md")
-        open(p, "w").write(render_piece_md(mo))
-        files["monthly"] = p
+    # Anchor to what the site actually shows. update_review_archive() runs first
+    # and freezes the week's piece; reading it back here means the Markdown, the
+    # docx and the LinkedIn post are the same snapshot as the published article,
+    # not a fresher one generated minutes later. Falls back to live content for
+    # archive entries written before this was stored.
+    arch = _load_archive()
+    wentry = (arch.get("weekly", {}) or {}).get(_week_key(now).isoformat(), {})
+    mentry = (arch.get("monthly", {}) or {}).get(month, {})
+    if weekly_day:
+        wmd = wentry.get("md") or (render_piece_md(weekly_content() or {}) if weekly_content() else "")
+        if wmd:
+            # Named for the week it covers, not the day it was drafted, so a
+            # catch-up run cannot produce a file labelled with the wrong week.
+            p = os.path.join(out_dir, f"levanter-weekly-{_week_key(now).isoformat()}.md")
+            open(p, "w").write(wmd)
+            files["weekly"] = p
+    if monthly_day:
+        mmd = mentry.get("md") or (render_piece_md(monthly_content() or {}) if monthly_content() else "")
+        if mmd:
+            p = os.path.join(out_dir, f"levanter-monthly-{month}.md")
+            open(p, "w").write(mmd)
+            files["monthly"] = p
     # daily digest (compact, from the quick per-class notes)
     cm = _read("crypto_map.json") or {}
     fxm = _read("fx_map.json") or {}
@@ -1778,12 +1796,12 @@ def write_writeups():
         p = os.path.join(out_dir, f"levanter-note-daily-{today}.md")
         open(p, "w").write(note)
         files["note"] = p
-    wp = weekly_post() if weekly_day else None
+    wp = (wentry.get("li") or weekly_post()) if weekly_day else None
     if wp:
-        p = os.path.join(out_dir, f"levanter-li-weekly-{today}.md")
+        p = os.path.join(out_dir, f"levanter-li-weekly-{_week_key(now).isoformat()}.md")
         open(p, "w").write(wp)
         files["li_weekly"] = p
-    mp = monthly_post() if monthly_day else None
+    mp = (mentry.get("li") or monthly_post()) if monthly_day else None
     if mp:
         p = os.path.join(out_dir, f"levanter-li-monthly-{month}.md")
         open(p, "w").write(mp)
@@ -1852,18 +1870,23 @@ def update_review_archive() -> dict:
         # Sunday that ends the current week; weekly is "The Week in Review", so the
         # slug date is the week's END. Freeze once (do not overwrite) so the number
         # of weekly entries is exactly one per week.
-        sunday = (now - timedelta(days=(now.weekday() + 1) % 7)).date()
+        sunday = _week_key(now)
         wkey = sunday.isoformat()
         if wkey not in weekly:
+            # Freeze the Markdown and the LinkedIn post in the same instant as the
+            # HTML. The site shows this entry for the rest of the week, so anything
+            # regenerated later from fresher data would no longer match it.
             weekly[wkey] = {"key": wkey, "date": wkey,
                             "label": "Week ending " + sunday.strftime("%-d %B %Y"),
-                            "title": wk.get("title", ""), "html": render_piece_html(wk)}
+                            "title": wk.get("title", ""), "html": render_piece_html(wk),
+                            "md": render_piece_md(wk), "li": weekly_post()}
 
     mo = monthly_content()
     if mo:
         mkey = now.strftime("%Y-%m")
         monthly[mkey] = {"key": mkey, "label": now.strftime("%B %Y"),
-                         "title": mo.get("title", ""), "html": render_piece_html(mo)}
+                         "title": mo.get("title", ""), "html": render_piece_html(mo),
+                         "md": render_piece_md(mo), "li": monthly_post()}
 
     def _cap(d, n):
         return {k: d[k] for k in sorted(d.keys(), reverse=True)[:n]}
@@ -2279,18 +2302,20 @@ def main():
 
     modal_data = build_modal_data()
 
-    try:
-        wfiles = write_writeups()
-        print("Substack writeups:", ", ".join(sorted(wfiles.values())))
-    except Exception as e:
-        print("writeups skipped:", e)
-
+    # Archive first: it freezes the week's piece, and write_writeups() reads that
+    # frozen copy so the deliverables match the published article exactly.
     try:
         a = update_review_archive()
         print("review archive: %d daily, %d weekly, %d monthly kept"
               % (len(a.get("daily", {})), len(a.get("weekly", {})), len(a.get("monthly", {}))))
     except Exception as e:
         print("review archive skipped:", e)
+
+    try:
+        wfiles = write_writeups()
+        print("Substack writeups:", ", ".join(sorted(wfiles.values())))
+    except Exception as e:
+        print("writeups skipped:", e)
 
     if market_only:
         strat_btn = strat_pane = ""
