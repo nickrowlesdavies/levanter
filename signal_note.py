@@ -21,10 +21,13 @@ import os
 import sys
 
 OUT = "reports/signals"
-# Launch window: the Signal is a new weekly newsletter, free this week and next,
-# then subscription. Any Signal whose Monday is on or before this date carries the
-# launch framing; after that it reverts to the normal subscriber wording.
-LAUNCH_UNTIL = "2026-08-31"
+# The Signal is the PAID tier, currently free while the list is built. There is no
+# end date: the plan is to tell readers before that changes, so this is a flag a
+# human flips deliberately, not a date that flips itself. It used to be
+# LAUNCH_UNTIL = "2026-08-31", which would have silently dropped the free framing
+# on 7 September and, worse, promised "free this week and next" in the meantime.
+# Set to False on the week the Signal actually goes subscriber-only.
+SIGNAL_FREE = True
 NAMES = {
     "BTC": "bitcoin", "ETH": "ether", "SOL": "solana", "XRP": "XRP",
     "GOLD": "gold", "SILVER": "silver", "PLATINUM": "platinum",
@@ -224,9 +227,10 @@ def compose(launch=False, monday=None):
 
     P = ["# Levanter Signal", ""]
     if launch:
-        P += ["> **New: the Levanter Signal.** A weekly read of volatility, valuation and the week "
-              "ahead across crypto, FX and commodities. It is free this week and next, then moves to "
-              "subscribers. Subscribe at read.levantermarkets.com.", ""]
+        P += ["> **The Levanter Signal.** A weekly read of volatility, valuation and the week "
+              "ahead across crypto, FX and commodities. This is the subscriber tier, and it is free "
+              "while we build the list. We will tell you before that changes. Subscribe at "
+              "read.levantermarkets.com.", ""]
     P += [f"*Data captured at {stamp}. Every figure below is stamped to a period. This is the "
           f"accountable read behind the free weekly: the changes since last week, the levels to watch, "
           f"and a claim we will score in the next issue.*", "", "---", ""]
@@ -382,10 +386,10 @@ def compose(launch=False, monday=None):
     P.append("")
 
     if launch:
-        footer = ("*This is the Levanter Signal, our new weekly newsletter. Subscribe at "
-                  "read.levantermarkets.com to keep receiving it once the free launch ends. The daily, "
-                  "weekly and monthly reviews stay free at levantermarkets.com. Educational market "
-                  "analysis, not financial advice.*")
+        footer = ("*This is the Levanter Signal, the weekly subscriber note, free for now while we "
+                  "build the list. We will tell you before that changes. Subscribe at "
+                  "read.levantermarkets.com. The daily, weekly and monthly reviews stay free at "
+                  "levantermarkets.com. Educational market analysis, not financial advice.*")
     else:
         footer = ("*This is a Levanter Signal, the weekly subscriber note. Subscribe at "
                   "read.levantermarkets.com. The daily, weekly and monthly reviews stay free at "
@@ -406,11 +410,11 @@ def teaser(meta, hashtags=True):
     cr, co = byc.get("crypto", {}), byc.get("commodity", {})
     T = []
     if launch:
-        T += ["Introducing the Levanter Signal, our new weekly newsletter.", "",
+        T += ["The Levanter Signal, our weekly subscriber note.", "",
               "Market intelligence across crypto, foreign exchange and commodities, from a site that "
               "models volatility and refuses to pretend it can forecast direction.", "",
-              "It is free this week and next. After that, it moves to subscribers.", "",
-              "Here is the first Signal in one minute."]
+              "It is free while we build the list, and we will say so before that changes.", "",
+              "Here is this week's Signal in one minute."]
     else:
         T += ["This week's Levanter Signal is out.", "",
               "Market intelligence across crypto, foreign exchange and commodities, from a site that "
@@ -435,8 +439,8 @@ def teaser(meta, hashtags=True):
     T += ["That is Levanter's approach: model what can be modelled, identify what cannot, and publish "
           "the scorecard.", ""]
     if launch:
-        T += ["The Signal is free this week and next. Subscribe now to read the first issue and "
-              "continue receiving it afterwards:", "", "read.levantermarkets.com", ""]
+        T += ["The Signal is free while we build the list. Subscribe now and you keep receiving it:",
+              "", "read.levantermarkets.com", ""]
     else:
         T += ["Subscribe to read the full Signal:", "", "read.levantermarkets.com", ""]
     if hashtags:   # LinkedIn wants them; the Substack teaser does not
@@ -469,7 +473,7 @@ def main():
             print(f"signal_note: not due yet (prepares {monday} 06:00 GST).")
             return
 
-    launch = monday.isoformat() <= LAUNCH_UNTIL
+    launch = SIGNAL_FREE
     body, meta = compose(launch, monday.isoformat())
     title = f"# Levanter Signal · week of {monday.strftime('%-d %B %Y')}"
     body = body.replace("# Levanter Signal\n", title + "\n", 1)

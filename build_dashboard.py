@@ -12,6 +12,7 @@ import base64
 import io
 import json
 import os
+import traceback
 from datetime import datetime, timedelta
 
 import matplotlib
@@ -2396,18 +2397,27 @@ def main():
 
     # Archive first: it freezes the week's piece, and write_writeups() reads that
     # frozen copy so the deliverables match the published article exactly.
+    #
+    # These two used to swallow the exception and print a one-line "skipped",
+    # which looked close enough to success that a broken build quietly shipped
+    # the previous run's files. Print the full traceback and remember the
+    # failure; main() exits non-zero at the end. The dashboard HTML is still
+    # written first, so a writeup bug cannot take the site down with it.
+    failed = []
     try:
         a = update_review_archive()
         print("review archive: %d daily, %d weekly, %d monthly kept"
               % (len(a.get("daily", {})), len(a.get("weekly", {})), len(a.get("monthly", {}))))
-    except Exception as e:
-        print("review archive skipped:", e)
+    except Exception:
+        traceback.print_exc()
+        failed.append("review archive")
 
     try:
         wfiles = write_writeups()
         print("Substack writeups:", ", ".join(sorted(wfiles.values())))
-    except Exception as e:
-        print("writeups skipped:", e)
+    except Exception:
+        traceback.print_exc()
+        failed.append("Substack writeups")
 
     if market_only:
         strat_btn = strat_pane = ""
@@ -2791,6 +2801,12 @@ def main():
     with open(out_path, "w") as f:
         f.write(html)
     print(f"Dashboard written: {out_path}")
+
+    if failed:
+        raise SystemExit(
+            "\nBUILD FAILED: " + " and ".join(failed) + " did not complete (traceback above).\n"
+            "The dashboard HTML was written, but the pieces above are STALE or MISSING. "
+            "Do not post anything from reports/substack until this is fixed.")
 
 
 if __name__ == "__main__":
