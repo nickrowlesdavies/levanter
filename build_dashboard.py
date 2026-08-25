@@ -1511,71 +1511,131 @@ def render_piece_md(c):
     return "\n".join(out)
 
 
-def daily_note():
-    """Short, punchy daily for Substack Notes (does not email). Links to the dashboard."""
+def _plain(s):
+    """Strip the light HTML the on-site paragraphs carry, for plain-text Notes."""
+    return s.replace("<b>", "").replace("</b>", "").strip()
+
+
+_NOTE_FIELD = {"daily": "chg1", "weekly": "chg7", "monthly": "chg30"}
+_CLS_NAME = {"crypto": "crypto", "fx": "FX", "commodity": "commodities"}
+
+
+def _note_blocks(kind):
+    """Per-market paragraphs for a Note, mirroring what the site review says.
+
+    The daily case reuses the exact paragraphs the site renders, so the Note and
+    the daily review cannot drift. Weekly and monthly restate the same facts over
+    their own window."""
     cm = _read("crypto_map.json") or {}
-    vr = _read("vol_regime.json") or {}
     fxm = _read("fx_map.json") or {}
     com = _read("commodities_map.json") or {}
-    cross = _cross_movers("chg1")
+    vr = _read("vol_regime.json") or {}
+    field = _NOTE_FIELD[kind]
+    out = []
+    for title, rows, kf, label, vrc in [
+            ("Crypto", cm.get("coins", []), "coin", "Coins", "crypto"),
+            ("FX", fxm.get("pairs", []), "pair", "Pairs", "fx"),
+            ("Commodities", com.get("items", []), "name", "Markets", "commodity")]:
+        if not rows:
+            continue
+        hi7, n7 = _vol_outlook(vr, vrc)
+        lean = "turbulent" if (n7 and hi7 >= n7 / 2) else "calmer"
+        if kind == "daily":
+            para = _daily_para(rows, kf, label, hi7, n7)
+            if not para:
+                continue
+            review = _review_for(rows, kf, label)
+            if review:
+                para += " " + review
+            # The site repeats the no-forecast caveat under each market heading,
+            # which reads as boilerplate three times over in one plain-text Note.
+            # Drop it here; _build_note states it once up top. Same for the
+            # window label, which the block title already carries.
+            para = para.replace("The model does not call direction (that is a "
+                                "coin-flip); it flags what to watch. ", "")
+            para = para.replace(f"This week ({label}).", "This week.")
+        else:
+            st = _cstats(rows, kf, field)
+            if not st:
+                continue
+            window = "over the week" if kind == "weekly" else "over the month"
+            para = (f"{st['up']} of {st['n']} {label.lower()} rose {window}, an average move of "
+                    f"{st['avg']:+.1f}%. {st['bn']} led at {st['bv']:+.1f}%, {st['wn']} lagged at "
+                    f"{st['wv']:+.1f}%.")
+            if st.get("hv") is not None:
+                para += (f" Most volatile: {st['hv'][kf]} "
+                         f"(~{st['hv'].get('vol', 0):.0f}% annualised).")
+            if n7:
+                para += (f" Volatility regime points to {lean} conditions near-term "
+                         f"({hi7}/{n7} flagged high-vol at 7d).")
+        out.append((title, _plain(para)))
+    return out
+
+
+def _note_narrative(kind, top, bot, up, n):
+    """One line of read on top of the numbers. Varies with the tape, so the Note
+    does not open the same way every day."""
+    span = {"daily": "session", "weekly": "week", "monthly": "month"}[kind]
+    if n and up >= n * 0.75:
+        return ("Breadth that wide is usually liquidity doing the work rather than any single "
+                "story, so treat the leaderboard as a ranking, not a reason.")
+    if n and up <= n * 0.3:
+        return (f"A narrow {span}. When only a handful of names hold up, the move belongs to those "
+                f"names and not to the market.")
+    if top[0] != bot[0]:
+        return (f"The leaders and the laggards sit in different corners of the board, "
+                f"{_CLS_NAME.get(top[0], top[0])} on top and {_CLS_NAME.get(bot[0], bot[0])} at the "
+                f"bottom. That is money rotating, not a rising tide.")
+    return (f"A split {span}, with the strongest and weakest names in the same asset class. "
+            f"Worth seeing where the money settles before reading much into it.")
+
+
+def _build_note(kind):
+    """Short plain-text Note for Substack Notes and LinkedIn. Mirrors the matching
+    review on the site and adds a line of narrative. Does not email."""
+    cm = _read("crypto_map.json") or {}
+    cross = _cross_movers(_NOTE_FIELD[kind])
     if not cross:
         return ""
     top, bot = cross[0], cross[-1]
     up = sum(1 for _, _, v in cross if v > 0)
     n = len(cross)
-    hic, nc = _vol_outlook(vr, "crypto")
-    hif, nf = _vol_outlook(vr, "fx")
-    hid, nd = _vol_outlook(vr, "commodity")
-    # Judge each market on its own counts. Pooling them let FX, which carries the
-    # most instruments, decide the verdict for all three and contradict the daily
-    # review on the site.
-    def _lean(hi, tot):
-        return "turbulent" if hi >= max(1, tot) / 2 else "calmer"
-    leans = [("crypto", _lean(hic, nc)), ("FX", _lean(hif, nf)),
-             ("commodities", _lean(hid, nd))]
-
-    # Group markets by verdict rather than listing all three, so the line stays
-    # short when they agree and only splits out the ones that differ.
-    def _join(names):
-        return names[0] if len(names) == 1 else f"{', '.join(names[:-1])} and {names[-1]}"
-    turbs = [nm for nm, lv in leans if lv == "turbulent"]
-    calms = [nm for nm, lv in leans if lv == "calmer"]
-    if not turbs:
-        vol_line = f"The volatility model leans calmer across {_join(calms)}"
-    elif not calms:
-        vol_line = f"The volatility model leans turbulent across {_join(turbs)}"
-    else:
-        vol_line = (f"The volatility model leans turbulent on {_join(turbs)}, "
-                    f"calmer on {_join(calms)}")
-    vol_line += " looking a week out."
     reg = "risk-on" if cm.get("regime_on", True) else "risk-off"
-    date = datetime.now().strftime("%A %-d %B")
-
-    # Explicit FX and commodity leaders so the note visibly covers all three
-    # markets, not just the crypto names that top the cross-market board.
-    def _top1(rows, key):
-        vv = sorted(((r[key], r.get("chg1")) for r in rows if r.get("chg1") is not None),
-                    key=lambda x: x[1])
-        return vv[-1] if vv else None
-    fx_top = _top1(fxm.get("pairs", []), "pair")
-    com_top = _top1(com.get("items", []), "name")
-    lines = [
-        f"Levanter daily · {date}",
-        "",
-        f"{top[1]} led the board yesterday ({top[2]:+.1f}%), {bot[1]} lagged "
-        f"({bot[2]:+.1f}%). {up} of {n} markets higher. Tape {reg}.",
-    ]
-    if fx_top and com_top:
-        lines.append(f"Beyond crypto, {fx_top[0]} led FX ({fx_top[1]:+.1f}%) and "
-                     f"{com_top[0]} led commodities ({com_top[1]:+.1f}%).")
-    lines += [
-        vol_line,
-        "",
-        "Full board, charts and forecasts: levantermarkets.com",
-        "Subscribe for the weekly and monthly: read.levantermarkets.com",
-        "Educational, not advice.",
-    ]
+    now = _now_gst()
+    if kind == "daily":
+        head = f"Levanter daily · {now:%A %-d %B}"
+        opener = (f"{top[1]} led the whole board yesterday ({top[2]:+.1f}%), {bot[1]} lagged "
+                  f"({bot[2]:+.1f}%). {up} of {n} markets closed higher. Tape {reg}.")
+    elif kind == "weekly":
+        head = f"Levanter weekly · week to {now:%A %-d %B}"
+        opener = (f"A {reg} week. {top[1]} led the whole board ({top[2]:+.1f}%), {bot[1]} lagged "
+                  f"({bot[2]:+.1f}%). {up} of {n} markets finished the week higher.")
+    else:
+        head = f"Levanter monthly · {now:%B %Y}"
+        opener = (f"A {reg} month. {top[1]} led the whole board ({top[2]:+.1f}%), {bot[1]} lagged "
+                  f"({bot[2]:+.1f}%). {up} of {n} markets are higher over 30 days.")
+    lines = [head, "", opener, _note_narrative(kind, top, bot, up, n), ""]
+    if kind == "daily":
+        lines += ["We do not call direction, because over one session that is a coin-flip. "
+                  "What the model does call is where the turbulence is likely to sit.", ""]
+    for title, text in _note_blocks(kind):
+        lines += [f"{title}. {text}", ""]
+    lines += ["Full board, charts and forecasts: levantermarkets.com",
+              "Subscribe for the weekly and monthly: read.levantermarkets.com",
+              "Educational, not advice."]
     return "\n".join(lines)
+
+
+def daily_note():
+    return _build_note("daily")
+
+
+def weekly_note():
+    return _build_note("weekly")
+
+
+def monthly_note():
+    return _build_note("monthly")
 
 
 def _teaser(kind, field):
@@ -1641,6 +1701,16 @@ def write_writeups():
         p = os.path.join(out_dir, f"levanter-note-daily-{today}.md")
         open(p, "w").write(note)
         files["note"] = p
+    wn = weekly_note()
+    if wn:
+        p = os.path.join(out_dir, f"levanter-note-weekly-{today}.md")
+        open(p, "w").write(wn)
+        files["note_weekly"] = p
+    mn = monthly_note()
+    if mn:
+        p = os.path.join(out_dir, f"levanter-note-monthly-{month}.md")
+        open(p, "w").write(mn)
+        files["note_monthly"] = p
     wt = _teaser("weekly", "chg7")
     if wt:
         p = os.path.join(out_dir, f"levanter-teaser-weekly-{today}.md")
