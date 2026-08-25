@@ -796,7 +796,7 @@ def _daily_para(rows, keyfield, label, hi7, n7):
     active = sorted((c for c in rows if c.get("vol") is not None),
                     key=lambda c: c["vol"], reverse=True)[:2]
     names = ", ".join(c[keyfield] for c in active) if active else "none"
-    turb = "elevated" if (n7 and hi7 >= n7 / 2) else "calmer"
+    turb = "turbulent" if (n7 and hi7 >= n7 / 2) else "calmer"
     vrbit = (f' Volatility regime points to <b>{turb}</b> conditions near-term '
              f'({hi7}/{n7} flagged high-vol at 7d).') if n7 else ""
     yesterday = (f'<b>Yesterday.</b> {up1} of {len(have)} {label.lower()} closed higher. '
@@ -1418,7 +1418,7 @@ def monthly_content():
         bear_bits.append(f"the cycle reads {phase.lower()}")
     bear_bits.append("the halving math points to diminishing returns")
     if elevated:
-        bear_bits.append("the volatility model leans elevated")
+        bear_bits.append("the volatility model leans turbulent")
     if corr and corr > 0.5:
         bear_bits.append(f"correlations are high near {corr:.2f}, so diversification is thin")
     risks.append("No honest monthly skips the other side of the argument, so here is ours, plainly.")
@@ -1444,7 +1444,7 @@ def monthly_content():
         "where turbulence is likely to sit, where each market stands against its own history, and "
         "what would change the picture.",
         f"As it stands, the volatility model frames the coming weeks as "
-        f"**{'elevated' if elevated else 'mixed to calmer'}** across the board and the cross-market "
+        f"**{'turbulent' if elevated else 'mixed to calmer'}** across the board and the cross-market "
         f"backdrop remains **{reg}**. If the dollar or gold breaks its recent character, or "
         f"correlations spike, that is the signal to revisit the whole read. We will, as the data "
         f"does."]
@@ -1526,7 +1526,28 @@ def daily_note():
     hic, nc = _vol_outlook(vr, "crypto")
     hif, nf = _vol_outlook(vr, "fx")
     hid, nd = _vol_outlook(vr, "commodity")
-    turb = "turbulent" if (hic + hif + hid) >= max(1, nc + nf + nd) / 2 else "calmer"
+    # Judge each market on its own counts. Pooling them let FX, which carries the
+    # most instruments, decide the verdict for all three and contradict the daily
+    # review on the site.
+    def _lean(hi, tot):
+        return "turbulent" if hi >= max(1, tot) / 2 else "calmer"
+    leans = [("crypto", _lean(hic, nc)), ("FX", _lean(hif, nf)),
+             ("commodities", _lean(hid, nd))]
+
+    # Group markets by verdict rather than listing all three, so the line stays
+    # short when they agree and only splits out the ones that differ.
+    def _join(names):
+        return names[0] if len(names) == 1 else f"{', '.join(names[:-1])} and {names[-1]}"
+    turbs = [nm for nm, lv in leans if lv == "turbulent"]
+    calms = [nm for nm, lv in leans if lv == "calmer"]
+    if not turbs:
+        vol_line = f"The volatility model leans calmer across {_join(calms)}"
+    elif not calms:
+        vol_line = f"The volatility model leans turbulent across {_join(turbs)}"
+    else:
+        vol_line = (f"The volatility model leans turbulent on {_join(turbs)}, "
+                    f"calmer on {_join(calms)}")
+    vol_line += " looking a week out."
     reg = "risk-on" if cm.get("regime_on", True) else "risk-off"
     date = datetime.now().strftime("%A %-d %B")
 
@@ -1548,7 +1569,7 @@ def daily_note():
         lines.append(f"Beyond crypto, {fx_top[0]} led FX ({fx_top[1]:+.1f}%) and "
                      f"{com_top[0]} led commodities ({com_top[1]:+.1f}%).")
     lines += [
-        f"The volatility model leans {turb} across crypto, FX and commodities looking a week out.",
+        vol_line,
         "",
         "Full board, charts and forecasts: levantermarkets.com",
         "Subscribe for the weekly and monthly: read.levantermarkets.com",
