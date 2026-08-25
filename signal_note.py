@@ -240,23 +240,27 @@ def compose(launch=False, monday=None):
 
     # ===== One chart: bitcoin valuation =====
     if fair:
-        P += ["## The one chart: bitcoin against its adoption model", ""]
+        P += ["## The one chart: bitcoin against the network-adoption fit", ""]
         P.append(
-            f"Bitcoin is near {_kfmt(price)} dollars. We value it against network "
-            f"age with a power-law fit. Fair value on that fit lands near {_kfmt(fair)}, about "
-            f"{abs(ou):.0f} percent {'below' if ou < 0 else 'above'} the line, and the fitted floor "
+            f"Bitcoin is near {_kfmt(price)} dollars. The **network-adoption fit** values it against "
+            f"the size of its network, not against the calendar. Fair value on that fit lands near "
+            f"{_kfmt(fair)}, about {abs(ou):.0f} percent "
+            f"{'below' if ou < 0 else 'above'} the line, and the fitted floor "
             f"sits near {_kfmt(floor)}. Bitcoin has closed above that floor line for roughly 95 percent "
             f"of the historical sample. That is an in-sample observation, not a tested probability and "
             f"not a guaranteed level of support.")
         P.append("")
         if cyc_b is not None:
             P.append(
-                f"A separate cycle model classifies bitcoin as {phase.lower()}, about {abs(cyc_b):.0f} "
-                f"percent below its own power-law trend. Both are long-horizon context. Where price "
-                f"sits against a multi-year fit says nothing about the next five days, so read it as "
-                f"valuation, not a reason to act on the week.")
+                f"A second and quite separate model, the **time-based cycle fit**, plots price against "
+                f"time rather than network size. It reads bitcoin as {phase.lower()}, about "
+                f"{abs(cyc_b):.0f} percent below that trend. The two percentages land close together "
+                f"at the moment, which is coincidence rather than confirmation: one measures price "
+                f"against adoption, the other against the calendar, and they can and do diverge. Both "
+                f"are long-horizon context. Where price sits against a multi-year fit says nothing "
+                f"about the next five days, so read it as valuation, not a reason to act on the week.")
             P.append("")
-        P += ["*(Chart: bitcoin price against its adoption fair value and floor.)*", ""]
+        P += ["*(Chart: bitcoin price against the network-adoption fair value and floor.)*", ""]
 
     # ===== Limits of the model =====
     P += ["## What the model can and cannot do", ""]
@@ -426,8 +430,10 @@ def teaser(meta, hashtags=True):
           f"{quiet_txt}.", ""]
     if ou is not None:
         T += [f"On the longer view, bitcoin is trading about {abs(ou):.0f} percent "
-              f"{'below' if ou < 0 else 'above'} the fitted fair value produced by Levanter's adoption "
-              f"model. That is valuation context, not a price target or a prediction for Friday.", ""]
+              f"{'below' if ou < 0 else 'above'} the fair value produced by Levanter's "
+              f"network-adoption fit, which values it against the size of its network rather than "
+              f"against time. That is valuation context, not a price target or a prediction for "
+              f"Friday.", ""]
     T += ["What is not knowable:", "", "Direction.", ""]
     if cr.get("n") and cr.get("acc") is not None and co.get("n") and co.get("acc") is not None:
         T += [f"The current direction scorecard says crypto {cr['acc']:.0f} percent, commodities {co['acc']:.0f} "
