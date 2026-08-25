@@ -36,7 +36,13 @@ run signal_note.py           # weekly premium Signal note (prepares Mondays 06:0
 
 # Marketing landing page at the root; the live dashboard app under /app.
 mkdir -p public/app
+# build_dashboard exits non-zero if the review archive or the Substack writeups
+# failed, even though it still wrote the dashboard HTML. Capture that, finish
+# assembling public/ so nothing is half-built, and fail the job at the very end.
+# A red run skips the upload and deploy steps, so the site keeps serving the last
+# good version rather than shipping stale or missing pieces.
 python build_dashboard.py --market-only --out public/app/index.html
+dashboard_rc=$?
 cp -f landing.html public/index.html
 
 # Ship the Substack-ready writeups alongside the site so they can be pulled
@@ -67,3 +73,8 @@ touch public/.nojekyll
 [ -f CNAME ] && cp -f CNAME public/CNAME
 
 echo "Built public/index.html ($(wc -c < public/index.html) bytes)"
+
+if [ "$dashboard_rc" -ne 0 ]; then
+  echo "::error title=Levanter build::build_dashboard.py exited ${dashboard_rc}. The review archive or the Substack writeups failed (traceback earlier in this log). Deploy skipped; the live site keeps its previous version." >&2
+  exit "$dashboard_rc"
+fi
