@@ -1636,6 +1636,22 @@ def _market_line(kind, tier, title, rows, kf, label, vr):
                                   "Commodities": "commodity"}[title])
     if tier == "compact":
         return f"{title} {st['up']}/{st['n']} higher, {st['bn']} {st['bv']:+.1f}%, {st['wn']} {st['wv']:+.1f}%."
+    if tier == "mirror":
+        # The exact paragraphs the site renders for this market, so the Note and
+        # the daily review carry the same words. Two things the site can do that a
+        # plain-text Note cannot: it repeats the no-forecast caveat under every
+        # heading (stated once up top here instead), and it labels the window
+        # "This week (Coins)" where the block title already says Crypto.
+        para = _daily_para(rows, kf, label, hi, n7)
+        if not para:
+            return ""
+        review = _review_for(rows, kf, label)
+        if review:
+            para += " " + review
+        para = para.replace("The model does not call direction (that is a "
+                            "coin-flip); it flags what to watch. ", "")
+        para = para.replace(f"This week ({label}).", "This week.")
+        return f"{title}. {_plain(para)}"
     line = (f"{title}. {st['up']} of {st['n']} {label.lower()} higher. {st['bn']} led "
             f"{st['bv']:+.1f}%, {st['wn']} lagged {st['wv']:+.1f}%.")
     if tier in ("full", "deep"):
@@ -1659,7 +1675,7 @@ def _market_line(kind, tier, title, rows, kf, label, vr):
 
 # kind -> channel -> tier. The daily is a Substack Note only and stays tight.
 # LinkedIn carries the weekly and monthly, which run fuller in that order.
-_TIERS = {"daily": {"substack": "compact"},
+_TIERS = {"daily": {"substack": "mirror"},
           "weekly": {"linkedin": "full"},
           "monthly": {"linkedin": "deep"}}
 
@@ -1694,6 +1710,9 @@ def _build_note(kind, channel):
     lines = [head, "", opener, ""]
     if tier != "compact":
         lines += [_note_narrative(kind, top, bot, up, n), ""]
+    if tier == "mirror":
+        lines += ["We do not call direction, because over one session that is a coin-flip. "
+                  "What the model does call is where the turbulence is likely to sit.", ""]
 
     leans = {}
     mkt_lines = []
@@ -1715,8 +1734,9 @@ def _build_note(kind, channel):
         if cyc:
             lines += [cyc, ""]
     if kind == "daily":
-        lines += ["We do not call direction, because over one session that is a coin-flip. "
-                  "What the model does call is where the turbulence is likely to sit.", ""]
+        if tier == "compact":
+            lines += ["We do not call direction, because over one session that is a coin-flip. "
+                      "What the model does call is where the turbulence is likely to sit.", ""]
     else:
         lines += [f"The full {kind} review, with the charts and the opinion piece, is on "
                   f"Substack: read.levantermarkets.com", ""]
