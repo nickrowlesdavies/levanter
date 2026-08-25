@@ -1,0 +1,17 @@
+I have built a market note that talks down its own numbers.
+
+It is called the Levanter Signal, weekly, covering crypto, foreign exchange and commodities. Here is this week's example of what I mean.
+
+We run a model that says where bitcoin's price sits against its own long history. It puts bitcoin about 42 percent below fair value. We run a second model. That one says 43 percent.
+
+Two models, near enough the same answer. Most analysis would present that as confirmation, and it would feel like confirmation to read.
+
+It is not. Both models are doing the same thing. Both fit a curve to price against how long the network has existed. Same idea, same shape, same maths. What differs is which price feed they draw on and how they draw their bands. So the second model is the first model run again with slightly different plumbing. Of course it agreed. Had it disagreed, that would have told us something was broken.
+
+Think of measuring a room with two tape measures made in the same factory, getting 4.02 and 4.03 metres, and calling the match proof of the room's length. It proves the tapes agree with each other. It says nothing about whether either one is right.
+
+Real corroboration needs a model that could have landed somewhere else, built on something other than a curve fitted to time. Ours could not.
+
+So we published both numbers, and then told readers the second one adds nothing.
+
+That is the entire point of the thing.
