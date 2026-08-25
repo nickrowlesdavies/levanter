@@ -341,17 +341,29 @@ def compose(launch=False, monday=None):
     if len(mv7) >= 2:
         wk_lead = (f", led by the speculative end, {mv7[0]['coin']} {mv7[0]['ret']:+.0f} percent and "
                    f"{mv7[1]['coin']} {mv7[1]['ret']:+.0f} percent")
-    P.append(
-        f"Over the past seven days crypto was broad and speculative-led: {w_up} of {w_n} coins higher, "
-        f"cap-weighted about {w_capw:+.0f} percent on the week"
-        + (f" and {capw30:+.0f} percent over thirty days" if capw30 is not None else "")
-        + f"{wk_lead}, with a best-to-worst spread near {abs(w_disp):.0f} points. Dominance held near "
-        f"{dom:.0f} percent and the stablecoins we track kept their pegs. In foreign exchange the "
-        f"biggest seven-day move was {fp[-1][0]} at {fp[-1][1]:+.1f} percent, ranges otherwise tight. "
-        f"In commodities the metals led the week, "
-        + _join([f"{_name(nn)} {vv:+.0f} percent" for nn, vv in metals[-3:][::-1]])
-        + ". The gains were broad, but the largest moves stayed further out on the risk curve, and the "
-        "dollar and most FX ranges were comparatively quiet.")
+    # All three asset classes are always addressed here, even if a feed did not
+    # return, so crypto, FX and commodities never silently drop out of the Signal.
+    if w_n:
+        crypto_clause = (
+            f"Over the past seven days crypto was broad and speculative-led: {w_up} of {w_n} coins "
+            f"higher, cap-weighted about {w_capw:+.0f} percent on the week"
+            + (f" and {capw30:+.0f} percent over thirty days" if capw30 is not None else "")
+            + f"{wk_lead}, with a best-to-worst spread near {abs(w_disp):.0f} points. Dominance held "
+            f"near {dom:.0f} percent and the stablecoins we track kept their pegs.")
+    else:
+        crypto_clause = ("Crypto data did not return from the feed this week, so the crypto read is "
+                         "limited here; full coverage resumes in the next issue.")
+    fx_clause = (
+        f" In foreign exchange the biggest seven-day move was {fp[-1][0]} at {fp[-1][1]:+.1f} percent, "
+        f"ranges otherwise tight." if fp else
+        " In foreign exchange the feed was quiet or unavailable this week, with nothing notable to flag.")
+    comm_clause = (
+        " In commodities the metals led the week, "
+        + _join([f"{_name(nn)} {vv:+.0f} percent" for nn, vv in metals[-3:][::-1]]) + "." if metals else
+        " In commodities the feed was quiet or unavailable this week, with nothing notable to flag.")
+    tail = (" The gains were broad, but the largest moves stayed further out on the risk curve, and "
+            "the dollar and most FX ranges were comparatively quiet." if (w_n and metals) else "")
+    P.append(crypto_clause + fx_clause + comm_clause + tail)
     P.append("")
     metals_hi = [m for m in g["commodity"][0] if m in ("gold", "silver", "platinum")]
     if metals_hi and g["crypto"][0] and len(g["fx"][1]) > len(g["fx"][0]):

@@ -1053,6 +1053,9 @@ def weekly_content():
                   "The structural picture is little changed from last week.")
         crypto.append(struct + " None of that forecasts next week, but it frames how much room "
                       "the move has before it is fighting its own history.")
+    else:
+        crypto.append("Crypto data did not return from the feed for this issue, so this section is "
+                      "brief; full coverage resumes on the next update.")
 
     fx = []
     if fs:
@@ -1071,6 +1074,9 @@ def weekly_content():
                 "traditional havens, " + (_fmt_moves(haven_fx) or "the yen and franc") + ", tend "
                 "to pull in opposite directions, and which side won this week is a cleaner read on "
                 "global risk appetite than any single equity index.")
+    else:
+        fx.append("Foreign-exchange data did not return from the feed for this issue, so this "
+                  "section is brief; the majors are covered again on the next update.")
 
     comd = []
     if ds:
@@ -1094,6 +1100,9 @@ def weekly_content():
             comd.append("Split the complex apart and it tells a fuller story. " + _sentences(parts)
                         + " Copper firm alongside oil points to a growth impulse. Copper soft while "
                         "gold runs points the other way, toward caution and a hunt for safety.")
+    else:
+        comd.append("Commodities data did not return from the feed for this issue, so this section "
+                    "is brief; metals, energy and copper are covered again on the next update.")
 
     cross_read = []
     both = mac.get("gold") is not None and mac.get("capw") is not None
@@ -1278,14 +1287,23 @@ def monthly_content():
             f"Crypto carried the risk appetite, with {cs['up']} of {cs['n']} coins higher on the "
             f"month ({maj}) and **{cs['wn']}** the notable faller at {cs['wv']:+.0f}%"
             + (f". Bitcoin dominance is near {dom:.0f}%." if dom else "."))
+    else:
+        review.append("Crypto data did not return from the feed for this issue; coverage resumes "
+                      "on the next update.")
     if fs:
         review.append(
             f"In currencies the dollar was **{mac['dxi']}**. **{fs['bn']}** was the standout pair "
             f"({fs['bv']:+.1f}%) and **{fs['wn']}** the weakest ({fs['wv']:+.1f}%).")
+    else:
+        review.append("Foreign-exchange data did not return from the feed for this issue; the "
+                      "majors are covered again on the next update.")
     if ds:
         review.append(
             f"Commodities averaged {ds['avg']:+.1f}%, led by **{ds['bn']}** ({ds['bv']:+.0f}%) with "
             f"**{ds['wn']}** the laggard ({ds['wv']:+.0f}%).")
+    else:
+        review.append("Commodities data did not return from the feed for this issue; metals, energy "
+                      "and copper are covered again on the next update.")
     if review:
         review.append("That is the month in four lines.")
 
@@ -1760,11 +1778,14 @@ def _build_note(kind, channel):
     mkt_lines = []
     for title, rows, kf, label, vrc in _note_markets():
         if not rows:
+            # Never drop an asset class: if its feed did not return, say so
+            # rather than silently omitting crypto, FX or commodities.
+            mkt_lines.append(f"{title}: data feed did not return for this issue; "
+                             f"coverage resumes on the next update.")
             continue
         leans[title] = _vol_lean(vr, vrc)[0]
         ln = _market_line(kind, tier, title, rows, kf, label, vr)
-        if ln:
-            mkt_lines.append(ln)
+        mkt_lines.append(ln or f"{title}: quiet this issue, nothing notable to flag.")
     if tier == "compact":
         lines += mkt_lines + ["", _vol_summary(leans), ""]
     else:

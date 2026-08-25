@@ -2,7 +2,7 @@
 
 > **The Levanter Signal.** A weekly read of volatility, valuation and the week ahead across crypto, FX and commodities. This is the subscriber tier, and it is free while we build the list. We will tell you before that changes. Subscribe at read.levantermarkets.com.
 
-*Data captured at 10:16 GST on 25 August 2026. Every figure below is stamped to a period. This is the accountable read behind the free weekly: the changes since last week, the levels to watch, and a claim we will score in the next issue.*
+*Data captured at 12:03 GST on 25 August 2026. Every figure below is stamped to a period. This is the accountable read behind the free weekly: the changes since last week, the levels to watch, and a claim we will score in the next issue.*
 
 ---
 
@@ -36,7 +36,7 @@ From next week this section flags which markets newly flipped turbulent or calm 
 
 ## The week behind, and what it rhymes with
 
-Over the past seven days crypto was broad and speculative-led: 32 of 35 coins higher, cap-weighted about +27 percent on the week and +26 percent over thirty days, led by the speculative end, PUMP +77 percent and ZEC +67 percent, with a best-to-worst spread near 80 points. Dominance held near 68 percent and the stablecoins we track kept their pegs. In foreign exchange the biggest seven-day move was AUDJPY at +1.0 percent, ranges otherwise tight. In commodities the metals led the week, platinum +8 percent, gold +7 percent and silver +6 percent. The gains were broad, but the largest moves stayed further out on the risk curve, and the dollar and most FX ranges were comparatively quiet.
+Over the past seven days crypto was broad and speculative-led: 32 of 35 coins higher, cap-weighted about +27 percent on the week and +26 percent over thirty days, led by the speculative end, PUMP +71 percent and ZEC +68 percent, with a best-to-worst spread near 76 points. Dominance held near 68 percent and the stablecoins we track kept their pegs. In foreign exchange the biggest seven-day move was AUDJPY at +1.0 percent, ranges otherwise tight. In commodities the metals led the week, platinum +8 percent, gold +7 percent and silver +6 percent. The gains were broad, but the largest moves stayed further out on the risk curve, and the dollar and most FX ranges were comparatively quiet.
 
 Read across the three asset classes, the unusual combination is strength in both precious metals and speculative crypto while the dollar remains comparatively quiet. That is consistent with abundant liquidity or a debasement trade, but the tape alone cannot tell us which explanation is driving it.
 
