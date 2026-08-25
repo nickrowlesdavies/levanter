@@ -1652,24 +1652,52 @@ def _market_line(kind, tier, title, rows, kf, label, vr):
                             "coin-flip); it flags what to watch. ", "")
         para = para.replace(f"This week ({label}).", "This week.")
         return f"{title}. {_plain(para)}"
-    line = (f"{title}. {st['up']} of {st['n']} {label.lower()} higher. {st['bn']} led "
-            f"{st['bv']:+.1f}%, {st['wn']} lagged {st['wv']:+.1f}%.")
+    line = f"{title}. {st['up']} of {st['n']} {label.lower()} higher."
     if tier in ("full", "deep"):
+        # Top and weakest three supersede a single leader-and-laggard clause, so
+        # the longer tiers print those instead of both.
         line += f" Average move {st['avg']:+.1f}%."
+        top3 = _topn(rows, kf, field, 3)      # list of (name, value) tuples
+        if len(top3) >= 3:
+            line += " Top three: " + _fmt_moves(top3) + "."
+        bot3 = _topn(rows, kf, field, 3, rev=False)
+        if len(bot3) >= 3:
+            line += " Weakest three: " + _fmt_moves(bot3) + "."
         if st.get("hv") is not None:
             line += (f" Most volatile: {st['hv'][kf]} "
                      f"(~{st['hv'].get('vol', 0):.0f}% annualised).")
+    else:
+        line += (f" {st['bn']} led {st['bv']:+.1f}%, {st['wn']} lagged "
+                 f"{st['wv']:+.1f}%.")
     if n7:
         line += f" Volatility {lean} near-term ({hi}/{n7} flagged high-vol at 7d)."
-    if tier in ("standard", "deep"):
+    if tier in ("standard", "full", "deep"):
         active = sorted((c for c in rows if c.get("vol") is not None),
                         key=lambda c: c["vol"], reverse=True)[:2]
         if active:
             line += " Most active: " + ", ".join(c[kf] for c in active) + "."
+    # Each of the longer tiers carries the neighbouring window for context: the
+    # weekly says where the month sits, the monthly says where the week sits.
+    if tier == "full":
+        mo = _cstats(rows, kf, "chg30")
+        if mo:
+            line += (f" Zooming out, over 30 days {mo['up']} of {mo['n']} are higher, "
+                     f"{mo['bn']} best at {mo['bv']:+.1f}% and {mo['wn']} worst at "
+                     f"{mo['wv']:+.1f}%.")
+    if title == "Crypto" and tier in ("full", "deep"):
+        stables = (_read("crypto_map.json") or {}).get("stables", []) or []
+        if stables:
+            off = [s["coin"] for s in stables if s.get("status") != "ok"]
+            line += (f" Stablecoin pegs: {', '.join(off)} off peg."
+                     if off else " Stablecoin pegs all holding, which is one less thing to watch.")
     if tier == "deep":
         wk = _cstats(rows, kf, "chg7")
         if wk:
-            line += f" Over the last 7 days {wk['up']} of {wk['n']} rose, {wk['bn']} best at {wk['bv']:+.1f}%."
+            line += (f" Over the last 7 days {wk['up']} of {wk['n']} rose, {wk['bn']} best at "
+                     f"{wk['bv']:+.1f}% and {wk['wn']} worst at {wk['wv']:+.1f}%.")
+        dy = _cstats(rows, kf, "chg1")
+        if dy:
+            line += f" Yesterday {dy['up']} of {dy['n']} closed higher."
     return line
 
 
@@ -1678,6 +1706,16 @@ def _market_line(kind, tier, title, rows, kf, label, vr):
 _TIERS = {"daily": {"substack": "mirror"},
           "weekly": {"linkedin": "full"},
           "monthly": {"linkedin": "deep"}}
+
+
+def _closing_read(kind, leans):
+    """Sign-off for the weekly and monthly: the one forward-looking call the model
+    is willing to make, stated plainly."""
+    span = "week" if kind == "weekly" else "month"
+    return (f"{_vol_summary(leans)} That is where the ranges should be widest, and it is the only "
+            f"part of the {span} ahead we will commit to. Direction we leave alone, because over "
+            f"these horizons it is close to a coin-flip and anyone telling you otherwise is "
+            f"selling something.")
 
 
 def _build_note(kind, channel):
@@ -1738,7 +1776,8 @@ def _build_note(kind, channel):
             lines += ["We do not call direction, because over one session that is a coin-flip. "
                       "What the model does call is where the turbulence is likely to sit.", ""]
     else:
-        lines += [f"The full {kind} review, with the charts and the opinion piece, is on "
+        lines += [_closing_read(kind, leans), "",
+                  f"The full {kind} review, with the charts and the opinion piece, is on "
                   f"Substack: read.levantermarkets.com", ""]
     lines += ["Full board, charts and forecasts: levantermarkets.com",
               "Educational, not advice."]
