@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""BTC network-value gauge (long-horizon adoption model).
+"""BTC valuation fit (long-horizon power-law on network age).
 
 WHAT THIS IS: a long-horizon VALUATION CONTEXT gauge, not a trading signal.
 
@@ -12,7 +12,7 @@ We tested two network-value ideas on free public data:
      batching, L2, and post-ETF custody remove real users from on-chain counts).
      We keep it only as a diagnostic and clearly flag that it no longer works.
 
-  2. Power-law adoption model (price vs network age on log-log). This is the
+  2. The valuation fit (log price on log network age). This is the
      family Peterson's "Lowest Price Forward" floor belongs to. It still fits
      strongly (R2 ~0.96) and yields a defensible fair value and an adoption
      floor. This is the gauge we surface.
@@ -66,7 +66,7 @@ def main():
     addr = _chart("n-unique-addresses")
     cap = _chart("market-cap")
 
-    # --- Power-law adoption model: price vs network age (the usable gauge) ---
+    # --- The valuation fit: log price on log network age (the usable gauge) ---
     rows = []
     for d in sorted(price):
         if price[d] <= 0:
@@ -92,13 +92,13 @@ def main():
     pos = max(0.0, min(100.0, (math.log(p_now) - lo) / (hi - lo) * 100)) if hi > lo else 50.0
 
     if over_under <= -0.20:
-        read = "cheap vs its long-term adoption trend"
+        read = "cheap vs the valuation fit"
     elif over_under < 0.20:
-        read = "near its long-term adoption trend"
+        read = "near the valuation fit"
     elif over_under < 0.75:
-        read = "rich vs its long-term adoption trend"
+        read = "rich vs the valuation fit"
     else:
-        read = "stretched well above its long-term adoption trend"
+        read = "stretched well above the valuation fit"
 
     # --- Metcalfe diagnostic: has active-address value held? (recent window) ---
     mrows = []
@@ -120,7 +120,7 @@ def main():
 
     out = {
         "as_of": d_now,
-        "model": "power-law adoption (price vs network age); Peterson LPF family",
+        "model": "valuation fit (log price on log network age); Peterson LPF family",
         "price": round(p_now, 2),
         "fair_value": round(fair, 2),
         "floor": round(floor, 2),
@@ -153,10 +153,10 @@ def main():
         fig, ax = plt.subplots(figsize=(11, 5.2))
         ax.set_yscale("log")
         ax.plot(xs, P, lw=1.4, color="#3b82f6", label="BTC price")
-        ax.plot(xs, fair_s, lw=1.7, color="#f59e0b", label="Adoption fair value")
-        ax.plot(xs, floor_s, lw=1.2, color="#10b981", ls="--", label="Adoption floor (95%)")
+        ax.plot(xs, fair_s, lw=1.7, color="#f59e0b", label="Valuation fit")
+        ax.plot(xs, floor_s, lw=1.2, color="#10b981", ls="--", label="Fit floor (5th percentile)")
         ax.scatter([xs[-1]], [p_now], color="#3b82f6", zorder=5, s=28)
-        ax.set_title("Bitcoin vs long-term adoption fair value (power law)",
+        ax.set_title("Bitcoin vs the valuation fit",
                      fontsize=13, fontweight="bold")
         ax.legend(frameon=False, fontsize=9, loc="upper left")
         ax.grid(True, which="both", alpha=0.15)
@@ -166,10 +166,10 @@ def main():
     except Exception as e:
         print("chart skipped:", e)
 
-    print("\n=== BTC network-value gauge (%s) ===" % d_now)
+    print("\n=== BTC valuation fit (%s) ===" % d_now)
     print("Price:           $%s" % f"{p_now:,.0f}")
     print("Fair value:      $%s   (%+.0f%%, %s)" % (f"{fair:,.0f}", over_under * 100, read))
-    print("Adoption floor:  $%s   (95%% of history above)" % f"{floor:,.0f}")
+    print("Fit floor:       $%s   (5th pct residual; 95%% of history above)" % f"{floor:,.0f}")
     print("Frothy top:      $%s" % f"{top:,.0f}")
     print("Band position:   %.0f / 100  (0=floor, 100=frothy)" % pos)
     print("Power law:       k=%.2f, R2=%.3f, %d days from %s" % (k, r2, len(rows), ds[0]))

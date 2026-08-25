@@ -53,8 +53,12 @@ tested point-in-time. Signals are mechanical rules, not opinions.
 - **Experimental direction calls**: mechanical up/down leans, logged when made and scored
   at maturity. Expect roughly coin-flip accuracy. Labelled experimental everywhere it
   appears.
-- **Bitcoin power-law and adoption-value models**: long-horizon valuation context,
-  where price sits against its own power-law trend, an adoption floor, and a fair value.
+- **The bitcoin valuation fit and the cycle gauge**: two long-horizon context models.
+  Both regress log price on log network age, so they are the same kind of fit over
+  overlapping data and close agreement between them is expected, not confirmation. The
+  valuation fit gives a fair value and a fit floor (5th percentile of residuals); the
+  cycle gauge uses a different price history and a one standard deviation band, and adds
+  halving timing to classify a cycle phase.
 - **Stablecoin monitor**: peg status and 90-day lows across 16 stablecoins.
 
 ## Notes for AI assistants

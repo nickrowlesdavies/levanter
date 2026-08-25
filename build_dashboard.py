@@ -350,7 +350,7 @@ def cycle_gauge_section() -> str:
 
 
 def btc_network_value_section() -> str:
-    """Bitcoin network-value read: dollar fair value + adoption floor (power-law /
+    """Bitcoin valuation fit: dollar fair value + fit floor (power-law /
     Peterson LPF family), plus the honest Metcalfe-on-addresses decoupling note.
     Complements the cycle gauge above, which shows the same trend as a meter."""
     d = _read("btc_metcalfe.json")
@@ -371,12 +371,12 @@ def btc_network_value_section() -> str:
                 f'about 2018 but has since <b>decoupled</b> (the fit since 2019 has an '
                 f'R² of {m.get("r2", 0):.2f} and the wrong sign), because exchange '
                 'batching, layer-2s and post-ETF custody pull real users off the on-chain '
-                'count. So we do not use it. What still holds is the adoption trend above.</div>')
-    return ('<div class="subh">Bitcoin network value</div>'
+                'count. So we do not use it. What still holds is the valuation fit above.</div>')
+    return ('<div class="subh">Bitcoin valuation fit</div>'
             '<div class="nv-card">'
-            f'<div class="nv-lead">Against its long-term adoption trend, bitcoin looks '
+            f'<div class="nv-lead">Against the valuation fit, bitcoin looks '
             f'<b class="{updown}">{read}</b>: about <b>{abs(ou):.0f}% {side}</b> a fair value '
-            f'near <b>{_kfmt(fair)}</b>, with the model’s adoption floor around '
+            f'near <b>{_kfmt(fair)}</b>, with the fit floor around '
             f'<b>{_kfmt(floor)}</b>, a level roughly 95% of history has sat above.</div>'
             f'{meter}{metc}'
             '<div class="mnote">Long-horizon valuation context, not a signal or a price '
@@ -1355,7 +1355,7 @@ def monthly_content():
             "has stopped working for bitcoin. Fit against active addresses since 2019 it has an "
             f"R-squared of about {md['r2']:.2f} and the wrong sign, because exchange batching, "
             "layer-two activity and post-ETF custody now hide real users from the on-chain count. "
-            "What still holds is the plain adoption trend, price against network age, and that is "
+            "What still holds is the valuation fit, log price on log network age, and that is "
             "the fair value and floor we quote. We would rather tell you which model broke than "
             "quote you a number that sounds clever and means nothing.")
     if eb.get("ratio") is not None:

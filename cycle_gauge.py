@@ -82,11 +82,11 @@ def proj_chart(name, s, gen, a, n, sd, color, path):
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.semilogy(s.index, s.values, color=color, lw=1.2, label=f"{name} price")
     ax.semilogy(s.index, 10 ** (a + n * np.log10(age)), color="#111", lw=1.1,
-                ls="--", label="power-law trend")
+                ls="--", label="cycle-gauge trend")
     ax.semilogy(futd, trend, color="#111", lw=1.1, ls=":")
     ax.fill_between(futd, trend / band, trend * band, color=color, alpha=0.13,
                     label="scenario band (+/-1 sd)")
-    ax.set_title(f"{name}: power-law scenario projection (log scale, ~2yr ahead)")
+    ax.set_title(f"{name}: cycle-gauge scenario projection (log scale, ~2yr ahead)")
     ax.legend(fontsize=8, frameon=False)
     fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
 

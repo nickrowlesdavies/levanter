@@ -80,7 +80,9 @@ def build_html(md, editor_line=None):
         low = s.lower()
         if s.startswith("*(chart") or ("chart:" in low and s.startswith("*(")):
             imgs = ""
-            if "adoption fair value" in low or "adoption" in low:
+            # Match on what the chart IS, not on one adjective. Keying this to
+            # "adoption" silently dropped the chart when that word was renamed.
+            if "fair value" in low or "valuation fit" in low or "floor" in low:
                 imgs = _img("reports/btc_metcalfe.png")
             elif "market map" in low or "correlation" in low:
                 imgs = _img("reports/crypto_map_treemap.png") + _img("reports/crypto_map_correlation.png")

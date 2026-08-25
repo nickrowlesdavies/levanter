@@ -2,7 +2,7 @@
 """Levanter Signal generator (weekly premium note).
 
 Drafts the midweek/Monday premium "Levanter Signal" from the same live data the
-dashboard uses: one chart that matters (bitcoin network value), the week-ahead
+dashboard uses: one chart that matters (the bitcoin valuation fit), the week-ahead
 volatility read across crypto, foreign exchange and commodities, and an honest
 line on what is and is not knowable. Also drafts a LinkedIn teaser.
 
