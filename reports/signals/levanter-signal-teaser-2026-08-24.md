@@ -1,10 +1,10 @@
-The Levanter Signal, our weekly subscriber note.
+Introducing the Levanter Signal, our new weekly newsletter.
 
 Market intelligence across crypto, foreign exchange and commodities, from a site that models volatility and refuses to pretend it can forecast direction.
 
 It is free while we build the list, and we will say so before that changes.
 
-Here is this week's Signal in one minute.
+Here is the first Signal in one minute.
 
 What is knowable:
 

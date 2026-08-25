@@ -416,11 +416,11 @@ def teaser(meta, hashtags=True):
     cr, co = byc.get("crypto", {}), byc.get("commodity", {})
     T = []
     if launch:
-        T += ["The Levanter Signal, our weekly subscriber note.", "",
+        T += ["Introducing the Levanter Signal, our new weekly newsletter.", "",
               "Market intelligence across crypto, foreign exchange and commodities, from a site that "
               "models volatility and refuses to pretend it can forecast direction.", "",
               "It is free while we build the list, and we will say so before that changes.", "",
-              "Here is this week's Signal in one minute."]
+              "Here is the first Signal in one minute."]
     else:
         T += ["This week's Levanter Signal is out.", "",
               "Market intelligence across crypto, foreign exchange and commodities, from a site that "
