@@ -1729,7 +1729,18 @@ def write_writeups():
     today = _now_gst().strftime("%Y-%m-%d")
     month = _now_gst().strftime("%Y-%m")
     files = {}
-    wk, mo = weekly_content(), monthly_content()
+    # Only draft a piece on the day it is published, so there is never a stale
+    # weekly or monthly sitting around to be posted by mistake. Sunday matches the
+    # site, which anchors the weekly to the Sunday that ends the week and freezes
+    # it. The site's own review pages come from review_archive.json and are not
+    # affected by this gate. Set LEVANTER_FORCE_WRITEUPS=1 to draft out of turn,
+    # for a catch-up run after a missed day.
+    now = _now_gst()
+    force = os.environ.get("LEVANTER_FORCE_WRITEUPS") == "1"
+    weekly_day = force or now.weekday() == 6          # Sunday
+    monthly_day = force or now.day == 28
+    wk = weekly_content() if weekly_day else None
+    mo = monthly_content() if monthly_day else None
     if wk:
         p = os.path.join(out_dir, f"levanter-weekly-{today}.md")
         open(p, "w").write(render_piece_md(wk))
@@ -1767,22 +1778,22 @@ def write_writeups():
         p = os.path.join(out_dir, f"levanter-note-daily-{today}.md")
         open(p, "w").write(note)
         files["note"] = p
-    wp = weekly_post()
+    wp = weekly_post() if weekly_day else None
     if wp:
         p = os.path.join(out_dir, f"levanter-li-weekly-{today}.md")
         open(p, "w").write(wp)
         files["li_weekly"] = p
-    mp = monthly_post()
+    mp = monthly_post() if monthly_day else None
     if mp:
         p = os.path.join(out_dir, f"levanter-li-monthly-{month}.md")
         open(p, "w").write(mp)
         files["li_monthly"] = p
-    wt = _teaser("weekly", "chg7")
+    wt = _teaser("weekly", "chg7") if weekly_day else None
     if wt:
         p = os.path.join(out_dir, f"levanter-teaser-weekly-{today}.md")
         open(p, "w").write(wt)
         files["teaser_weekly"] = p
-    mt = _teaser("monthly", "chg30")
+    mt = _teaser("monthly", "chg30") if monthly_day else None
     if mt:
         p = os.path.join(out_dir, f"levanter-teaser-monthly-{month}.md")
         open(p, "w").write(mt)
