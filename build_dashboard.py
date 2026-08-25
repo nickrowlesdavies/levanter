@@ -1550,6 +1550,39 @@ def _vol_summary(leans):
             f"looking a week out.")
 
 
+def _moved(v):
+    return f"added {v:.1f}%" if v >= 0 else f"lost {abs(v):.1f}%"
+
+
+def _majors_opener(kind, field, reg, up, n):
+    """Lead the weekly and monthly on the majors and the macro read rather than on
+    whatever topped the board. The board leader is often a small, fast-moving name,
+    and fronting a substantial piece with it misreads the week. It still gets its
+    due inside its own market block."""
+    cm = _read("crypto_map.json") or {}
+    fxm = _read("fx_map.json") or {}
+    com = _read("commodities_map.json") or {}
+    mac = _macro_read(cm, fxm, com, field)
+    cd = {c["coin"]: c for c in cm.get("coins", [])}
+    btc, eth = cd.get("BTC", {}).get(field), cd.get("ETH", {}).get(field)
+    bits = []
+    if btc is not None and eth is not None:
+        bits.append(f"bitcoin {_moved(btc)} and ether {_moved(eth)}")
+    elif btc is not None:
+        bits.append(f"bitcoin {_moved(btc)}")
+    bits.append(f"the dollar finished {mac['dxi']}")
+    if mac.get("gold") is not None:
+        bits.append(f"gold {_moved(mac['gold'])}")
+    if mac.get("brent") is not None:
+        bits.append(f"Brent {_moved(mac['brent'])}")
+    body = (", ".join(bits[:-1]) + " and " + bits[-1]) if len(bits) > 1 else bits[0]
+    body = body[0].upper() + body[1:]
+    span = "week" if kind == "weekly" else "month"
+    tail = (f"{up} of {n} markets finished the week higher." if kind == "weekly"
+            else f"{up} of {n} markets are higher over 30 days.")
+    return f"A {reg} {span}. {body}. {tail}"
+
+
 def _note_narrative(kind, top, bot, up, n):
     """One line of read on top of the numbers, so a piece does not open the same
     way every time."""
@@ -1650,13 +1683,13 @@ def _build_note(kind, channel):
         opener = (f"{top[1]} led the whole board yesterday ({top[2]:+.1f}%), {bot[1]} lagged "
                   f"({bot[2]:+.1f}%). {up} of {n} markets closed higher. Tape {reg}.")
     elif kind == "weekly":
-        head = f"Levanter weekly · week to {now:%A %-d %B}"
-        opener = (f"A {reg} week. {top[1]} led the whole board ({top[2]:+.1f}%), {bot[1]} lagged "
-                  f"({bot[2]:+.1f}%). {up} of {n} markets finished the week higher.")
+        # Dated by the week it covers, matching the filename and the site's
+        # "Week ending ..." label, not by the day the build happened to run.
+        head = f"Levanter weekly · week ending {_week_key(now):%-d %B}"
+        opener = _majors_opener(kind, _NOTE_FIELD[kind], reg, up, n)
     else:
         head = f"Levanter monthly · {now:%B %Y}"
-        opener = (f"A {reg} month. {top[1]} led the whole board ({top[2]:+.1f}%), {bot[1]} lagged "
-                  f"({bot[2]:+.1f}%). {up} of {n} markets are higher over 30 days.")
+        opener = _majors_opener(kind, _NOTE_FIELD[kind], reg, up, n)
 
     lines = [head, "", opener, ""]
     if tier != "compact":
