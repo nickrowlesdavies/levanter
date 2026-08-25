@@ -317,13 +317,13 @@ def cycle_gauge_section() -> str:
                              f'{_kfmt(p1["high"])} <span class="mut">(trend {_kfmt(p1["base"])})</span></div>')
             phase_txt = a["phase"] + (" · provisional (short history)" if a.get("provisional") else "")
             cards += (f'<div class="cyc-card">{head}{px}'
-                      f'<div class="cyc-metric {"up" if pv >= 0 else "down"}">{pv:+.0f}% vs power-law trend</div>'
+                      f'<div class="cyc-metric {"up" if pv >= 0 else "down"}">{pv:+.0f}% vs cycle-gauge trend</div>'
                       f'{meter}<div class="cyc-phase">{phase_txt}</div>{proj_html}</div>')
         elif a["kind"] == "macro":
             pv = a["pct_from_ath"]
             cards += (f'<div class="cyc-card">{head}{px}'
                       f'<div class="cyc-metric {"up" if pv >= -3 else "down"}">{pv:+.0f}% from all-time high</div>'
-                      f'<div class="cyc-phase">trend {a.get("trend")} · macro asset (no halving/power-law)</div></div>')
+                      f'<div class="cyc-phase">trend {a.get("trend")} · macro asset (no halving cycle)</div></div>')
         else:
             cards += (f'<div class="cyc-card">{head}{px}'
                       f'<div class="cyc-metric mut">too new for cycle analysis</div>'
@@ -342,7 +342,7 @@ def cycle_gauge_section() -> str:
             b = embed_png(a["proj_chart"])
             if b:
                 proj_charts += (f'<figure><img src="data:image/png;base64,{b}">'
-                                f'<figcaption>{a["name"]} power-law scenario projection '
+                                f'<figcaption>{a["name"]} cycle-gauge scenario projection '
                                 f'(~2yr, scenario band)</figcaption></figure>')
     proj_block = f'<div class="gallery">{proj_charts}</div>' if proj_charts else ""
     return (f'<div class="subh">Market cycle gauge</div>{banner}'
@@ -1039,13 +1039,12 @@ def weekly_content():
             cyc.append(f"Bitcoin dominance sits near {dom:.0f}% of total market value")
         if btc_vt is not None:
             cyc.append(f"bitcoin itself trades about {abs(btc_vt):.0f}% "
-                       f"{'above' if btc_vt >= 0 else 'below'} the time-based cycle fit, which "
-                       f"measures price against the calendar")
+                       f"{'above' if btc_vt >= 0 else 'below'} the cycle gauge's trend line")
         nvw = _read("btc_metcalfe.json") or {}
         if nvw.get("floor"):
-            cyc.append(f"the separate network-adoption fit, which measures price against the "
-                       f"size of the network instead, puts the long-term floor, the level roughly "
-                       f"95% of history has sat above, near {_kfmt(nvw['floor'])}")
+            cyc.append(f"our separate valuation fit, run on a different price history, puts "
+                       f"the long-term floor, the level roughly 95% of history has sat above, near "
+                       f"{_kfmt(nvw['floor'])}")
         if phase:
             cyc.append(f"the cycle clock reads {phase.lower()}")
         if eb.get("ratio") is not None:
@@ -1332,12 +1331,12 @@ def monthly_content():
     if cga.get("BTC", {}).get("pct_vs_trend") is not None:
         v = cga["BTC"]["pct_vs_trend"]
         cparts.append(f"bitcoin sits about {abs(v):.0f}% {'above' if v >= 0 else 'below'} the "
-                      f"**time-based cycle fit**, which measures price against the calendar")
+                      f"**cycle gauge's** trend line")
         if nvm.get("floor") and nvm.get("fair_value"):
-            cparts.append(f"the separate **network-adoption fit**, which measures price against "
-                          f"the size of the network, puts fair value near {_kfmt(nvm['fair_value'])} "
-                          f"and its floor around {_kfmt(nvm['floor'])}; the two are different models "
-                          f"and can diverge")
+            cparts.append(f"our separate **valuation fit**, run on a different price history, "
+                          f"puts fair value near {_kfmt(nvm['fair_value'])} and its floor around "
+                          f"{_kfmt(nvm['floor'])}; both fit price against network age, so read their "
+                          f"agreement as overlap rather than confirmation")
     if cga.get("ETH", {}).get("pct_vs_trend") is not None:
         v = cga["ETH"]["pct_vs_trend"]
         cparts.append(f"ether trades about {abs(v):.0f}% {'above' if v >= 0 else 'below'} its own "
@@ -1617,7 +1616,7 @@ def _cycle_context():
     vt = {a.get("sym"): a for a in cg.get("assets", [])}.get("BTC", {}).get("pct_vs_trend")
     if vt is not None:
         bits.append(f"bitcoin trades about {abs(vt):.0f}% "
-                    f"{'above' if vt >= 0 else 'below'} the time-based cycle fit")
+                    f"{'above' if vt >= 0 else 'below'} the cycle gauge's trend line")
     if cg.get("phase"):
         bits.append(f"the cycle clock reads {cg['phase'].lower()}")
     corr = cm.get("avg_corr")

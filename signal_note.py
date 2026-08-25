@@ -240,10 +240,10 @@ def compose(launch=False, monday=None):
 
     # ===== One chart: bitcoin valuation =====
     if fair:
-        P += ["## The one chart: bitcoin against the network-adoption fit", ""]
+        P += ["## The one chart: bitcoin against its long-run trend", ""]
         P.append(
-            f"Bitcoin is near {_kfmt(price)} dollars. The **network-adoption fit** values it against "
-            f"the size of its network, not against the calendar. Fair value on that fit lands near "
+            f"Bitcoin is near {_kfmt(price)} dollars. The **valuation fit** models price against how "
+            f"long the network has existed, on a log-log scale. Fair value on that fit lands near "
             f"{_kfmt(fair)}, about {abs(ou):.0f} percent "
             f"{'below' if ou < 0 else 'above'} the line, and the fitted floor "
             f"sits near {_kfmt(floor)}. Bitcoin has closed above that floor line for roughly 95 percent "
@@ -252,15 +252,17 @@ def compose(launch=False, monday=None):
         P.append("")
         if cyc_b is not None:
             P.append(
-                f"A second and quite separate model, the **time-based cycle fit**, plots price against "
-                f"time rather than network size. It reads bitcoin as {phase.lower()}, about "
-                f"{abs(cyc_b):.0f} percent below that trend. The two percentages land close together "
-                f"at the moment, which is coincidence rather than confirmation: one measures price "
-                f"against adoption, the other against the calendar, and they can and do diverge. Both "
-                f"are long-horizon context. Where price sits against a multi-year fit says nothing "
-                f"about the next five days, so read it as valuation, not a reason to act on the week.")
+                f"Our **cycle gauge** reports a second number, and it is worth being precise about "
+                f"what it is. It fits the same shape of curve, price against network age, but on a "
+                f"different price history and with a different band, then adds halving timing to "
+                f"classify the phase. It reads bitcoin as {phase.lower()}, about {abs(cyc_b):.0f} "
+                f"percent below its own trend line. Do not read the two figures as confirming each "
+                f"other. They are the same kind of fit run over overlapping data, so close agreement "
+                f"is close to guaranteed and tells you nothing the first number did not. Both are "
+                f"long-horizon context. Where price sits against a multi-year fit says nothing about "
+                f"the next five days, so read it as valuation, not a reason to act on the week.")
             P.append("")
-        P += ["*(Chart: bitcoin price against the network-adoption fair value and floor.)*", ""]
+        P += ["*(Chart: bitcoin price against its fitted fair value and floor.)*", ""]
 
     # ===== Limits of the model =====
     P += ["## What the model can and cannot do", ""]
@@ -430,10 +432,9 @@ def teaser(meta, hashtags=True):
           f"{quiet_txt}.", ""]
     if ou is not None:
         T += [f"On the longer view, bitcoin is trading about {abs(ou):.0f} percent "
-              f"{'below' if ou < 0 else 'above'} the fair value produced by Levanter's "
-              f"network-adoption fit, which values it against the size of its network rather than "
-              f"against time. That is valuation context, not a price target or a prediction for "
-              f"Friday.", ""]
+              f"{'below' if ou < 0 else 'above'} the fair value produced by Levanter's long-run "
+              f"valuation fit, which models price against how long the network has existed. That is "
+              f"valuation context, not a price target or a prediction for Friday.", ""]
     T += ["What is not knowable:", "", "Direction.", ""]
     if cr.get("n") and cr.get("acc") is not None and co.get("n") and co.get("acc") is not None:
         T += [f"The current direction scorecard says crypto {cr['acc']:.0f} percent, commodities {co['acc']:.0f} "
