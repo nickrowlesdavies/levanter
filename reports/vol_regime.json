@@ -1,0 +1,805 @@
+{
+  "assets": {
+    "BTC": {
+      "7d": {
+        "regime": "HIGH",
+        "vol_now": 49.6,
+        "vol_median": 39.1
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 34.9,
+        "vol_median": 45.1
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 30.9,
+        "vol_median": 49.4
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 33.6,
+        "vol_median": 49.5
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 32.9,
+        "vol_median": 51.2
+      },
+      "12mo": {
+        "regime": "LOW",
+        "vol_now": 36.8,
+        "vol_median": 53.4
+      }
+    },
+    "ETH": {
+      "7d": {
+        "regime": "HIGH",
+        "vol_now": 57.9,
+        "vol_median": 53.4
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 56.0,
+        "vol_median": 60.5
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 47.4,
+        "vol_median": 62.7
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 50.5,
+        "vol_median": 64.4
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 46.3,
+        "vol_median": 66.1
+      },
+      "12mo": {
+        "regime": "LOW",
+        "vol_now": 53.2,
+        "vol_median": 70.1
+      }
+    },
+    "SOL": {
+      "7d": {
+        "regime": "LOW",
+        "vol_now": 43.1,
+        "vol_median": 70.1
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 40.4,
+        "vol_median": 78.2
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 39.2,
+        "vol_median": 78.2
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 46.9,
+        "vol_median": 80.3
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 44.0,
+        "vol_median": 80.8
+      },
+      "12mo": {
+        "regime": "LOW",
+        "vol_now": 56.4,
+        "vol_median": 77.6
+      }
+    },
+    "GOLD": {
+      "7d": {
+        "regime": "HIGH",
+        "vol_now": 21.8,
+        "vol_median": 14.0
+      },
+      "30d": {
+        "regime": "HIGH",
+        "vol_now": 21.3,
+        "vol_median": 14.9
+      },
+      "60d": {
+        "regime": "HIGH",
+        "vol_now": 25.5,
+        "vol_median": 15.2
+      },
+      "90d": {
+        "regime": "HIGH",
+        "vol_now": 23.8,
+        "vol_median": 15.6
+      },
+      "6mo": {
+        "regime": "HIGH",
+        "vol_now": 31.1,
+        "vol_median": 15.7
+      },
+      "12mo": {
+        "regime": "HIGH",
+        "vol_now": 26.7,
+        "vol_median": 16.2
+      }
+    },
+    "SILVER": {
+      "7d": {
+        "regime": "HIGH",
+        "vol_now": 38.2,
+        "vol_median": 24.0
+      },
+      "30d": {
+        "regime": "HIGH",
+        "vol_now": 33.4,
+        "vol_median": 26.6
+      },
+      "60d": {
+        "regime": "HIGH",
+        "vol_now": 44.6,
+        "vol_median": 27.5
+      },
+      "90d": {
+        "regime": "HIGH",
+        "vol_now": 46.9,
+        "vol_median": 27.6
+      },
+      "6mo": {
+        "regime": "HIGH",
+        "vol_now": 77.6,
+        "vol_median": 28.9
+      },
+      "12mo": {
+        "regime": "HIGH",
+        "vol_now": 59.4,
+        "vol_median": 30.0
+      }
+    },
+    "OIL": {
+      "7d": {
+        "regime": "HIGH",
+        "vol_now": 34.0,
+        "vol_median": 29.8
+      },
+      "30d": {
+        "regime": "HIGH",
+        "vol_now": 54.4,
+        "vol_median": 31.9
+      },
+      "60d": {
+        "regime": "HIGH",
+        "vol_now": 51.8,
+        "vol_median": 33.4
+      },
+      "90d": {
+        "regime": "HIGH",
+        "vol_now": 55.1,
+        "vol_median": 33.5
+      },
+      "6mo": {
+        "regime": "HIGH",
+        "vol_now": 62.6,
+        "vol_median": 33.6
+      },
+      "12mo": {
+        "regime": "HIGH",
+        "vol_now": 50.0,
+        "vol_median": 34.0
+      }
+    },
+    "COPPER": {
+      "7d": {
+        "regime": "HIGH",
+        "vol_now": 21.7,
+        "vol_median": 21.0
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 20.4,
+        "vol_median": 22.5
+      },
+      "60d": {
+        "regime": "HIGH",
+        "vol_now": 24.0,
+        "vol_median": 23.4
+      },
+      "90d": {
+        "regime": "HIGH",
+        "vol_now": 25.4,
+        "vol_median": 23.5
+      },
+      "6mo": {
+        "regime": "HIGH",
+        "vol_now": 29.2,
+        "vol_median": 23.5
+      },
+      "12mo": {
+        "regime": "HIGH",
+        "vol_now": 36.7,
+        "vol_median": 24.6
+      }
+    },
+    "NAT GAS": {
+      "7d": {
+        "regime": "LOW",
+        "vol_now": 33.7,
+        "vol_median": 45.2
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 35.0,
+        "vol_median": 50.7
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 37.2,
+        "vol_median": 53.2
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 40.8,
+        "vol_median": 54.0
+      },
+      "6mo": {
+        "regime": "HIGH",
+        "vol_now": 112.6,
+        "vol_median": 54.3
+      },
+      "12mo": {
+        "regime": "HIGH",
+        "vol_now": 90.9,
+        "vol_median": 55.1
+      }
+    },
+    "PLATINUM": {
+      "7d": {
+        "regime": "HIGH",
+        "vol_now": 41.1,
+        "vol_median": 20.6
+      },
+      "30d": {
+        "regime": "HIGH",
+        "vol_now": 36.1,
+        "vol_median": 22.3
+      },
+      "60d": {
+        "regime": "HIGH",
+        "vol_now": 39.3,
+        "vol_median": 23.0
+      },
+      "90d": {
+        "regime": "HIGH",
+        "vol_now": 38.7,
+        "vol_median": 23.1
+      },
+      "6mo": {
+        "regime": "HIGH",
+        "vol_now": 62.0,
+        "vol_median": 23.0
+      },
+      "12mo": {
+        "regime": "HIGH",
+        "vol_now": 50.5,
+        "vol_median": 23.1
+      }
+    },
+    "SOYBEANS": {
+      "7d": {
+        "regime": "LOW",
+        "vol_now": 13.4,
+        "vol_median": 18.4
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 18.9,
+        "vol_median": 19.6
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 19.0,
+        "vol_median": 19.9
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 18.6,
+        "vol_median": 20.6
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 16.9,
+        "vol_median": 21.4
+      },
+      "12mo": {
+        "regime": "LOW",
+        "vol_now": 16.6,
+        "vol_median": 22.4
+      }
+    },
+    "COFFEE": {
+      "7d": {
+        "regime": "HIGH",
+        "vol_now": 46.8,
+        "vol_median": 29.8
+      },
+      "30d": {
+        "regime": "HIGH",
+        "vol_now": 43.9,
+        "vol_median": 32.2
+      },
+      "60d": {
+        "regime": "HIGH",
+        "vol_now": 56.9,
+        "vol_median": 33.0
+      },
+      "90d": {
+        "regime": "HIGH",
+        "vol_now": 50.5,
+        "vol_median": 33.2
+      },
+      "6mo": {
+        "regime": "HIGH",
+        "vol_now": 43.0,
+        "vol_median": 33.3
+      },
+      "12mo": {
+        "regime": "HIGH",
+        "vol_now": 40.5,
+        "vol_median": 34.6
+      }
+    },
+    "SUGAR": {
+      "7d": {
+        "regime": "LOW",
+        "vol_now": 26.4,
+        "vol_median": 26.6
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 28.1,
+        "vol_median": 29.4
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 25.5,
+        "vol_median": 29.2
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 26.9,
+        "vol_median": 29.1
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 26.2,
+        "vol_median": 30.2
+      },
+      "12mo": {
+        "regime": "LOW",
+        "vol_now": 24.7,
+        "vol_median": 30.1
+      }
+    },
+    "COTTON": {
+      "7d": {
+        "regime": "LOW",
+        "vol_now": 20.7,
+        "vol_median": 23.5
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 20.8,
+        "vol_median": 25.9
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 25.4,
+        "vol_median": 26.4
+      },
+      "90d": {
+        "regime": "HIGH",
+        "vol_now": 28.3,
+        "vol_median": 26.6
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 22.6,
+        "vol_median": 25.7
+      },
+      "12mo": {
+        "regime": "LOW",
+        "vol_now": 21.3,
+        "vol_median": 27.5
+      }
+    },
+    "GASOLINE": {
+      "7d": {
+        "regime": "HIGH",
+        "vol_now": 75.8,
+        "vol_median": 31.9
+      },
+      "30d": {
+        "regime": "HIGH",
+        "vol_now": 53.9,
+        "vol_median": 35.4
+      },
+      "60d": {
+        "regime": "HIGH",
+        "vol_now": 48.0,
+        "vol_median": 36.9
+      },
+      "90d": {
+        "regime": "HIGH",
+        "vol_now": 48.6,
+        "vol_median": 37.1
+      },
+      "6mo": {
+        "regime": "HIGH",
+        "vol_now": 50.4,
+        "vol_median": 37.0
+      },
+      "12mo": {
+        "regime": "HIGH",
+        "vol_now": 41.1,
+        "vol_median": 38.9
+      }
+    },
+    "HEATING OIL": {
+      "7d": {
+        "regime": "HIGH",
+        "vol_now": 45.0,
+        "vol_median": 28.4
+      },
+      "30d": {
+        "regime": "HIGH",
+        "vol_now": 48.8,
+        "vol_median": 31.1
+      },
+      "60d": {
+        "regime": "HIGH",
+        "vol_now": 51.9,
+        "vol_median": 32.0
+      },
+      "90d": {
+        "regime": "HIGH",
+        "vol_now": 52.6,
+        "vol_median": 32.1
+      },
+      "6mo": {
+        "regime": "HIGH",
+        "vol_now": 64.4,
+        "vol_median": 32.4
+      },
+      "12mo": {
+        "regime": "HIGH",
+        "vol_now": 50.9,
+        "vol_median": 36.2
+      }
+    },
+    "EURUSD": {
+      "7d": {
+        "regime": "LOW",
+        "vol_now": 5.0,
+        "vol_median": 7.4
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 4.4,
+        "vol_median": 7.9
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 4.8,
+        "vol_median": 8.1
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 4.5,
+        "vol_median": 8.3
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 5.9,
+        "vol_median": 8.2
+      },
+      "12mo": {
+        "regime": "LOW",
+        "vol_now": 7.0,
+        "vol_median": 8.3
+      }
+    },
+    "GBPUSD": {
+      "7d": {
+        "regime": "LOW",
+        "vol_now": 3.5,
+        "vol_median": 7.5
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 5.8,
+        "vol_median": 8.0
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 5.7,
+        "vol_median": 8.1
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 5.9,
+        "vol_median": 8.1
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 6.8,
+        "vol_median": 8.1
+      },
+      "12mo": {
+        "regime": "LOW",
+        "vol_now": 7.0,
+        "vol_median": 8.1
+      }
+    },
+    "USDJPY": {
+      "7d": {
+        "regime": "LOW",
+        "vol_now": 5.9,
+        "vol_median": 8.2
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 8.7,
+        "vol_median": 9.1
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 6.7,
+        "vol_median": 9.2
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 6.7,
+        "vol_median": 9.2
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 7.7,
+        "vol_median": 9.3
+      },
+      "12mo": {
+        "regime": "LOW",
+        "vol_now": 9.0,
+        "vol_median": 9.5
+      }
+    },
+    "AUDUSD": {
+      "7d": {
+        "regime": "LOW",
+        "vol_now": 6.8,
+        "vol_median": 9.1
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 6.1,
+        "vol_median": 9.6
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 6.8,
+        "vol_median": 9.8
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 7.2,
+        "vol_median": 9.8
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 9.1,
+        "vol_median": 10.4
+      },
+      "12mo": {
+        "regime": "LOW",
+        "vol_now": 9.9,
+        "vol_median": 10.5
+      }
+    },
+    "USDCHF": {
+      "7d": {
+        "regime": "HIGH",
+        "vol_now": 11.5,
+        "vol_median": 7.7
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 8.1,
+        "vol_median": 8.1
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 7.1,
+        "vol_median": 8.1
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 6.8,
+        "vol_median": 8.3
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 7.6,
+        "vol_median": 8.5
+      },
+      "12mo": {
+        "regime": "HIGH",
+        "vol_now": 8.7,
+        "vol_median": 8.7
+      }
+    },
+    "USDCAD": {
+      "7d": {
+        "regime": "LOW",
+        "vol_now": 5.1,
+        "vol_median": 6.7
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 4.0,
+        "vol_median": 7.1
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 4.0,
+        "vol_median": 7.3
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 3.9,
+        "vol_median": 7.4
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 4.4,
+        "vol_median": 7.4
+      },
+      "12mo": {
+        "regime": "LOW",
+        "vol_now": 4.8,
+        "vol_median": 7.5
+      }
+    },
+    "NZDUSD": {
+      "7d": {
+        "regime": "LOW",
+        "vol_now": 8.2,
+        "vol_median": 9.9
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 7.3,
+        "vol_median": 10.4
+      },
+      "60d": {
+        "regime": "LOW",
+        "vol_now": 7.8,
+        "vol_median": 10.7
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 8.4,
+        "vol_median": 10.8
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 9.3,
+        "vol_median": 10.9
+      },
+      "12mo": {
+        "regime": "LOW",
+        "vol_now": 9.8,
+        "vol_median": 10.8
+      }
+    },
+    "SPX": {
+      "7d": {
+        "regime": "LOW",
+        "vol_now": 8.0,
+        "vol_median": 12.6
+      },
+      "30d": {
+        "regime": "LOW",
+        "vol_now": 12.3,
+        "vol_median": 13.3
+      },
+      "60d": {
+        "regime": "HIGH",
+        "vol_now": 14.0,
+        "vol_median": 13.7
+      },
+      "90d": {
+        "regime": "LOW",
+        "vol_now": 12.8,
+        "vol_median": 13.8
+      },
+      "6mo": {
+        "regime": "LOW",
+        "vol_now": 13.2,
+        "vol_median": 14.6
+      },
+      "12mo": {
+        "regime": "HIGH",
+        "vol_now": 17.5,
+        "vol_median": 16.3
+      }
+    }
+  },
+  "backtest": {
+    "7d": {
+      "acc": 64,
+      "edge": 10,
+      "n": 4402
+    },
+    "30d": {
+      "acc": 71,
+      "edge": 16,
+      "n": 1014
+    },
+    "60d": {
+      "acc": 72,
+      "edge": 17,
+      "n": 497
+    },
+    "90d": {
+      "acc": 72,
+      "edge": 15,
+      "n": 327
+    },
+    "6mo": {
+      "acc": 72,
+      "edge": 7,
+      "n": 157
+    },
+    "12mo": {
+      "acc": 59,
+      "edge": 0,
+      "n": 74
+    }
+  },
+  "classes": {
+    "BTC": "crypto",
+    "ETH": "crypto",
+    "SOL": "crypto",
+    "GOLD": "commodity",
+    "SILVER": "commodity",
+    "OIL": "commodity",
+    "COPPER": "commodity",
+    "NAT GAS": "commodity",
+    "PLATINUM": "commodity",
+    "SOYBEANS": "commodity",
+    "COFFEE": "commodity",
+    "SUGAR": "commodity",
+    "COTTON": "commodity",
+    "GASOLINE": "commodity",
+    "HEATING OIL": "commodity",
+    "EURUSD": "fx",
+    "GBPUSD": "fx",
+    "USDJPY": "fx",
+    "AUDUSD": "fx",
+    "USDCHF": "fx",
+    "USDCAD": "fx",
+    "NZDUSD": "fx",
+    "SPX": "equity"
+  },
+  "horizons": [
+    "7d",
+    "30d",
+    "60d",
+    "90d",
+    "6mo",
+    "12mo"
+  ]
+}

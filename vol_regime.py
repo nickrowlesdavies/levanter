@@ -33,7 +33,9 @@ warnings.filterwarnings("ignore")
 UNIVERSE = {
     "crypto": {"BTC": "BTC-USD", "ETH": "ETH-USD", "SOL": "SOL-USD"},
     "commodity": {"GOLD": "GC=F", "SILVER": "SI=F", "OIL": "CL=F",
-                  "COPPER": "HG=F", "NAT GAS": "NG=F", "PLATINUM": "PL=F"},
+                  "COPPER": "HG=F", "NAT GAS": "NG=F", "PLATINUM": "PL=F",
+                  "SOYBEANS": "ZS=F", "COFFEE": "KC=F", "SUGAR": "SB=F",
+                  "COTTON": "CT=F", "GASOLINE": "RB=F", "HEATING OIL": "HO=F"},
     "fx": {"EURUSD": "EURUSD=X", "GBPUSD": "GBPUSD=X", "USDJPY": "USDJPY=X",
            "AUDUSD": "AUDUSD=X", "USDCHF": "USDCHF=X", "USDCAD": "USDCAD=X",
            "NZDUSD": "NZDUSD=X"},
