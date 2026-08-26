@@ -1723,11 +1723,111 @@ def _market_line(kind, tier, title, rows, kf, label, vr):
     return line
 
 
-# kind -> channel -> tier. The daily is a Substack Note only and stays tight.
-# LinkedIn carries the weekly and monthly, which run fuller in that order.
-_TIERS = {"daily": {"substack": "mirror"},
+# kind -> channel -> tier. The daily runs on Substack in full and on X as a
+# thread. LinkedIn carries the weekly and monthly, which run fuller in that order.
+_TIERS = {"daily": {"substack": "mirror", "x": "thread"},
           "weekly": {"linkedin": "full"},
           "monthly": {"linkedin": "deep"}}
+
+_X_LIMIT = 280                    # characters in a single post
+
+
+def _DAILY_HEAD(now):
+    return f"Levanter daily · {now:%A %-d %B}"
+
+
+def _breadth_read(up, n):
+    """How wide the session was, read straight off the count. Deliberately not the
+    crypto regime flag: that is a BTC trend read, and taking the whole cross-market
+    tape from it contradicted the count on days when only crypto was trending."""
+    share = up / n if n else 0.0
+    return ("Breadth positive across the board." if share >= 0.65 else
+            "Breadth negative, most of the board lower." if share <= 0.35 else
+            "Breadth mixed.")
+
+
+def _daily_opener(top, bot, up, n):
+    return (f"{top[1]} led the whole board yesterday ({top[2]:+.1f}%), {bot[1]} lagged "
+            f"({bot[2]:+.1f}%). {up} of {n} markets closed higher. {_breadth_read(up, n)}")
+
+
+def _fit(blocks, drop_order, limit=_X_LIMIT):
+    """One post, built from blocks in reading order. X hard-limits a post, so the
+    lowest-value blocks come off until it fits: drop_order lists block indices
+    first-to-drop. The trailing truncation is a guard that should never fire."""
+    keep = list(range(len(blocks)))
+    for i in list(drop_order) + [None]:
+        text = "\n\n".join(blocks[j] for j in keep)
+        if len(text) <= limit:
+            return text
+        if i is not None:
+            keep = [j for j in keep if j != i]
+    return text[:limit].rsplit(" ", 1)[0].rstrip()
+
+
+def _x_market_post(title, rows, kf, vr, vrc):
+    """One market's post: yesterday, then the week and month for context, then the
+    only forward-looking call the model makes."""
+    st = _cstats(rows, kf, "chg1")
+    if not st:
+        return ""
+    blocks = [f"{title}: {st['up']} of {st['n']} higher. "
+              f"{st['bn']} {st['bv']:+.1f}%, {st['wn']} {st['wv']:+.1f}%."]
+    wk_i = mo_i = None
+    wk = _cstats(rows, kf, "chg7")
+    if wk:
+        wk_i = len(blocks)
+        blocks.append(f"Week: {wk['up']} of {wk['n']} up, {wk['bn']} best at {wk['bv']:+.1f}%.")
+    mo = _cstats(rows, kf, "chg30")
+    if mo:
+        mo_i = len(blocks)
+        blocks.append(f"Month: {mo['bn']} leads {mo['bv']:+.1f}%, {mo['wn']} lags {mo['wv']:+.1f}%.")
+    lean, hi, n7 = _vol_lean(vr, vrc)
+    if n7:
+        blocks.append(f"Volatility leans {lean} near-term ({hi}/{n7} high-vol at 7d).")
+    # Month comes off first, then the week. The vol read is the product's actual
+    # claim, so it is never the block that gets dropped.
+    return _fit(blocks, [i for i in (mo_i, wk_i) if i is not None])
+
+
+def _x_thread(kind):
+    """The daily as a numbered X thread. Every post is inside the character limit,
+    so it can be posted as written with no trimming by hand. Returns the file text:
+    the separators carry the numbering and are not part of any post."""
+    if kind != "daily":
+        return ""
+    vr = _read("vol_regime.json") or {}
+    cross = _cross_movers(_NOTE_FIELD[kind])
+    if not cross:
+        return ""
+    top, bot, n = cross[0], cross[-1], len(cross)
+    up = sum(1 for _, _, v in cross if v > 0)
+    now = _now_gst()
+    posts = [_fit([_DAILY_HEAD(now), _daily_opener(top, bot, up, n),
+                   "Crypto, FX and commodities below."], [2])]
+    leans = {}
+    for title, rows, kf, label, vrc in _note_markets():
+        if not rows:
+            # Never drop an asset class silently; say the feed did not return.
+            posts.append(f"{title}: data feed did not return for this issue. "
+                         f"Coverage resumes on the next update.")
+            continue
+        leans[title] = _vol_lean(vr, vrc)[0]
+        p = _x_market_post(title, rows, kf, vr, vrc)
+        posts.append(p or f"{title}: quiet this session, nothing notable to flag.")
+    posts.append(_fit([_vol_summary(leans),
+                       "We do not forecast direction. Over one session it is a coin-flip "
+                       "and the scorecard is public.",
+                       "Full board, charts and forecasts: levantermarkets.com",
+                       "Educational, not advice."], [0, 1]))
+    posts = [p for p in posts if p]
+    out = [f"# Levanter daily thread · {now:%A %-d %B}",
+           f"X. {len(posts)} posts, each inside the {_X_LIMIT}-character limit. "
+           f"Post in order as a thread. The separator lines are not part of any post.",
+           ""]
+    for i, p in enumerate(posts, 1):
+        out += [f"--- {i}/{len(posts)} ({len(p)} chars) ---", "", p, ""]
+    return "\n".join(out).strip() + "\n"
 
 
 def _closing_read(kind, leans):
@@ -1744,6 +1844,8 @@ def _build_note(kind, channel):
     """Plain-text short-form piece. Mirrors the matching review on the site and
     adds a line of narrative. Does not email, does not publish."""
     tier = _TIERS[kind][channel]
+    if tier == "thread":
+        return _x_thread(kind)
     cm = _read("crypto_map.json") or {}
     vr = _read("vol_regime.json") or {}
     cross = _cross_movers(_NOTE_FIELD[kind])
@@ -1755,16 +1857,8 @@ def _build_note(kind, channel):
     reg = "risk-on" if cm.get("regime_on", True) else "risk-off"
     now = _now_gst()
     if kind == "daily":
-        head = f"Levanter daily · {now:%A %-d %B}"
-        # Describe the breadth actually on the board. The crypto regime flag is a
-        # BTC trend read, so calling the whole cross-market tape risk-on off it
-        # contradicted the count on days when only crypto was trending.
-        share = up / n if n else 0.0
-        breadth = ("Breadth positive across the board." if share >= 0.65 else
-                   "Breadth negative, most of the board lower." if share <= 0.35 else
-                   "Breadth mixed.")
-        opener = (f"{top[1]} led the whole board yesterday ({top[2]:+.1f}%), {bot[1]} lagged "
-                  f"({bot[2]:+.1f}%). {up} of {n} markets closed higher. {breadth}")
+        head = _DAILY_HEAD(now)
+        opener = _daily_opener(top, bot, up, n)
     elif kind == "weekly":
         # Dated by the week it covers, matching the filename and the site's
         # "Week ending ..." label, not by the day the build happened to run.
@@ -1818,6 +1912,10 @@ def _build_note(kind, channel):
 
 def daily_note():
     return _build_note("daily", "substack")
+
+
+def daily_x_thread():
+    return _build_note("daily", "x")
 
 
 def weekly_post():
@@ -1947,6 +2045,15 @@ def write_writeups():
         print(f"docx: mirrored {len(files)} pieces to {out_dir}/docx/")
     except Exception as e:
         print("docx skipped (python-docx not installed?):", e)
+    # The daily as an X thread. Its own channel directory, and no docx mirror:
+    # these get pasted post by post, not opened in Word.
+    xt = daily_x_thread()
+    if xt:
+        x_dir = os.path.join(R, "x")
+        os.makedirs(x_dir, exist_ok=True)
+        p = os.path.join(x_dir, f"levanter-x-daily-{today}.md")
+        open(p, "w").write(xt)
+        files["x_daily"] = p
     return files
 
 
@@ -2445,7 +2552,7 @@ def main():
 
     try:
         wfiles = write_writeups()
-        print("Substack writeups:", ", ".join(sorted(wfiles.values())))
+        print("Writeups:", ", ".join(sorted(wfiles.values())))
     except Exception:
         traceback.print_exc()
         failed.append("Substack writeups")
