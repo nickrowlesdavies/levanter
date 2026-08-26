@@ -1756,8 +1756,15 @@ def _build_note(kind, channel):
     now = _now_gst()
     if kind == "daily":
         head = f"Levanter daily · {now:%A %-d %B}"
+        # Describe the breadth actually on the board. The crypto regime flag is a
+        # BTC trend read, so calling the whole cross-market tape risk-on off it
+        # contradicted the count on days when only crypto was trending.
+        share = up / n if n else 0.0
+        breadth = ("Breadth positive across the board." if share >= 0.65 else
+                   "Breadth negative, most of the board lower." if share <= 0.35 else
+                   "Breadth mixed.")
         opener = (f"{top[1]} led the whole board yesterday ({top[2]:+.1f}%), {bot[1]} lagged "
-                  f"({bot[2]:+.1f}%). {up} of {n} markets closed higher. Tape {reg}.")
+                  f"({bot[2]:+.1f}%). {up} of {n} markets closed higher. {breadth}")
     elif kind == "weekly":
         # Dated by the week it covers, matching the filename and the site's
         # "Week ending ..." label, not by the day the build happened to run.
