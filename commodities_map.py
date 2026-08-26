@@ -17,7 +17,11 @@ warnings.filterwarnings("ignore")
 
 ITEMS = {"GOLD": "GC=F", "SILVER": "SI=F", "PLATINUM": "PL=F", "PALLADIUM": "PA=F",
          "WTI OIL": "CL=F", "BRENT OIL": "BZ=F", "NAT GAS": "NG=F", "COPPER": "HG=F",
-         "BROAD": "DBC", "AGRICULTURE": "DBA", "WHEAT": "ZW=F", "CORN": "ZC=F"}
+         "BROAD": "DBC", "AGRICULTURE": "DBA", "WHEAT": "ZW=F", "CORN": "ZC=F",
+         # Expanded coverage: complete the grains trio, add the softs that move on
+         # weather/supply, and the refined-energy leg beyond crude.
+         "SOYBEANS": "ZS=F", "COFFEE": "KC=F", "SUGAR": "SB=F", "COTTON": "CT=F",
+         "GASOLINE": "RB=F", "HEATING OIL": "HO=F"}
 MOVER_HZ = ["7d", "14d", "28d", "60d", "6mo", "12mo"]
 DAYS = 90
 

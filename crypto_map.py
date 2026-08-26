@@ -46,7 +46,8 @@ CG = "https://api.coingecko.com/api/v3"
 # list but aren't momentum plays.
 EXCLUDE = {"PAXG", "XAUT", "USDY", "USYC", "USDS", "USD0", "OUSG", "BUIDL",
            "WBTC", "WETH", "STETH", "WSTETH", "WEETH", "RETH", "WBETH",
-           "CBBTC", "LBTC", "SOLVBTC", "WBT", "BSC-USD", "WBNB", "BGB"}
+           "CBBTC", "LBTC", "SOLVBTC", "WBT", "BSC-USD", "WBNB", "BGB",
+           "FIGR_HELOC"}   # FIGR_HELOC is a tokenised HELOC (RWA credit), not a crypto asset
 COMMODITIES = {"GOLD": ("GC=F", "Gold"), "SILVER": ("SI=F", "Silver"),
                "OIL": ("CL=F", "Crude Oil (WTI)"), "COPPER": ("HG=F", "Copper"),
                "NATGAS": ("NG=F", "Natural Gas"), "PLAT": ("PL=F", "Platinum"),
@@ -58,6 +59,13 @@ MOVER_HZ = [("7d", "chg7"), ("14d", "chg14"), ("30d", "chg30"),
             ("6mo", "chg180"), ("12mo", "chg365")]
 N_COINS = 35             # top non-stable coins by market cap
 N_STABLES = 16           # top stablecoins by market cap
+# Liquidity gate: cut thin, inflated-market-cap names (exchange tokens that barely
+# trade on-market, tokenised RWAs, brand-new low-float listings) whose big market
+# cap is not backed by real trading. Both must clear: a floor on 24h dollar volume
+# and on turnover (24h volume / market cap). Calibrated against the live top-80:
+# real coins turn over >2% of cap daily on >$40M; the cut names sit far below.
+MIN_VOL24_USD = 20e6     # $20M minimum 24h volume
+MIN_TURNOVER = 0.004     # 0.4% of market cap traded in 24h
 CACHE_TTL = 12 * 3600    # seconds
 JSON_PATH = "reports/crypto_map.json"
 
@@ -189,14 +197,14 @@ def _coin_row(x):
         trend=("up" if (trend_ref or 0) >= 0 else "down"),
         spark=[round(float(v), 6) for v in arr[::6].tolist()],   # ~28 pts for inline
         hist=[float(f"{v:.6g}") for v in arr.tolist()],          # full 7d for modal chart
-        vol=vol, dd=dd)
+        vol=vol, dd=dd, vol24=float(x.get("total_volume") or 0))
     row["risk"], row["risk_band"] = risk_score(vol, dd, mcap, row["trend"])
     return row, arr
 
 
 def fetch_all():
     top = cg_get("/coins/markets", {
-        "vs_currency": "usd", "order": "market_cap_desc", "per_page": 80, "page": 1,
+        "vs_currency": "usd", "order": "market_cap_desc", "per_page": 120, "page": 1,
         "sparkline": "true",
         "price_change_percentage": "24h,7d,14d,30d,200d,1y"}) or []
     stab = cg_get("/coins/markets", {
@@ -206,8 +214,11 @@ def fetch_all():
         return {}, [], {}, []
     stable_ids = {x["id"] for x in stab}
 
+    # Filter the whole ranked pool first, then take the top N survivors by market
+    # cap, so cutting a thin name pulls in the next real coin rather than shrinking
+    # the map below N_COINS.
     coin_meta = [x for x in top if x["id"] not in stable_ids
-                 and x["symbol"].upper() not in EXCLUDE][:N_COINS]
+                 and x["symbol"].upper() not in EXCLUDE]
     coins_series, coin_rows = {}, []
     for x in coin_meta:
         row, arr = _coin_row(x)
@@ -217,8 +228,14 @@ def fetch_all():
         # drift fakes momentum). Real coins are far more volatile.
         if row["vol"] < 12:
             continue
+        # Liquidity gate: cut names whose market cap is not backed by real trading.
+        mc, v24 = row["market_cap"], row["vol24"]
+        if mc <= 0 or v24 < MIN_VOL24_USD or (v24 / mc) < MIN_TURNOVER:
+            continue
         coins_series[row["coin"]] = arr
         coin_rows.append(row)
+        if len(coin_rows) >= N_COINS:
+            break
 
     stable_rows, stable_series = [], {}
     for x in stab:
