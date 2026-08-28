@@ -1194,9 +1194,9 @@ def _monthly_opinion(regime_on, phase, mac, bt):
             "The uncomfortable fact the halving math keeps repeating is diminishing returns. Each "
             "era has delivered a smaller multiple than the one before, because a market cannot keep "
             "compounding at the same rate as its base grows without eventually swallowing the entire "
-            "world. That is not bearishness. It is arithmetic. The people who lose the most in this "
-            "phase are the ones who size their expectations to the last cycle rather than the trend "
-            "of cycles.",
+            "world. That is not bearishness. It is arithmetic.",
+            "The people who lose the most in this phase are the ones who size their expectations "
+            "to the last cycle rather than the trend of cycles.",
             "There is a subtler trap in a cooldown. It can last far longer, and feel far more "
             "constructive, than a crash.",
             "A market that grinds within a wide range for months trains people out of their "
@@ -1207,9 +1207,10 @@ def _monthly_opinion(regime_on, phase, mac, bt):
             "What it tells you is how to hold whatever you hold: with position sizes that assume the "
             "drawdowns of this asset class are real and recurring, not theoretical, and with a plan "
             "that survives being wrong.",
-            "The broader point is that structure beats prediction. Where an asset sits against its "
-            "own long history, how its volatility is behaving, and whether the whole board is moving "
-            "as one are all knowable. The next candle is not." + skill]
+            "The broader point is that structure beats prediction.",
+            "Where an asset sits against its own long history, how its volatility is behaving, and "
+            "whether the whole board is moving as one are all knowable. The next candle is not."
+            + skill]
     elif not regime_on:
         body = [
             "The month closed risk-off, and risk-off months are where portfolios are quietly "
@@ -1256,7 +1257,8 @@ def _monthly_opinion(regime_on, phase, mac, bt):
             "industry keeps selling the opposite. Certainty is easy to market and process is not, but "
             "process is the only one of the two that survives contact with reality." + skill]
     closers = [
-        "If that all sounds like a counsel of modesty, it is, and deliberately so. The single most "
+        "If that all sounds like a counsel of modesty, it is, and deliberately so.",
+        "The single most "
         "expensive belief in this business is that someone, somewhere, can tell you what happens "
         "next. The entire architecture of financial media exists to sell you that belief on a "
         "monthly subscription. We are trying to sell you the opposite: a clear-eyed read of what is "
@@ -1335,9 +1337,9 @@ def monthly_content():
         f"important number here.")
     if mac.get("gold") is not None:
         g = mac["gold"]
-        macro.append(f"Gold was {g:+.1f}% on the month.")
         macro.append(
-            f"Gold is the market's quiet barometer of real rates and fear at once. Its strength "
+            f"Gold was {g:+.1f}% on the month, and it is the market's quiet barometer of real "
+            f"rates and fear at once. Its strength "
             f"{'alongside a softer dollar is the textbook signature of falling real-rate expectations or a safety bid' if g > 0 and mac['dollar'] < 0 else 'even as the dollar firmed is a louder signal, usually a hunt for safety that overrides the currency headwind' if g > 0 else 'giving way points to the opposite, a market comfortable enough to leave the safety trade'}. "
             f"We read it as a sentiment gauge and leave it at that.")
     if mac.get("copper") is not None and mac.get("oil") is not None:
@@ -1345,11 +1347,11 @@ def monthly_content():
         growth = ("a genuine growth impulse" if cop > 0 and oil > 0 else
                   "a growth scare, or at least fading demand" if cop < 0 and oil < 0 else
                   "a mixed message, worth watching but not yet a trend")
+        macro.append("The industrial complex is the reality check on the narrative.")
         macro.append(
-            f"The industrial complex is the reality check on the narrative. Copper, the metal with "
-            f"a PhD in economics, was {cop:+.1f}% and oil {oil:+.1f}%. Read side by side, that "
-            f"points to {growth}. When the paper markets and the physical economy disagree, the "
-            f"physical economy is usually the one worth believing.")
+            f"Copper, the metal with a PhD in economics, was {cop:+.1f}% and oil {oil:+.1f}%. "
+            f"Read side by side, that points to {growth}. When the paper markets and the physical "
+            f"economy disagree, the physical economy is usually the one worth believing.")
     macro.append(
         f"Put it on one canvas and the month's macro tell is this: crypto trading {reg} "
         f"{'while gold also bid suggests liquidity and a debasement theme rather than clean, confident risk-taking' if regime_on and (mac.get('gold') or 0) > 0 else 'while gold slipped is about as honest a risk-on signal as markets produce' if regime_on else 'with havens outperforming is the fingerprint of caution'}. "
@@ -1387,9 +1389,12 @@ def monthly_content():
         cycle.append(
             "A word on how we value the network, because it is fashionable to quote Metcalfe's "
             "Law, the idea that a network is worth the square of its users. It is a good idea that "
-            "has stopped working for bitcoin. Fit against active addresses since 2019 it has an "
-            f"R-squared of about {md['r2']:.2f} and the wrong sign, because exchange batching, "
-            "layer-two activity and post-ETF custody now hide real users from the on-chain count. "
+            "has stopped working for bitcoin.")
+        cycle.append(
+            f"Fit against active addresses since 2019 it has an R-squared of about {md['r2']:.2f} "
+            "and the wrong sign, because exchange batching, layer-two activity and post-ETF "
+            "custody now hide real users from the on-chain count.")
+        cycle.append(
             "What still holds is the valuation fit, log price on log network age, and that is "
             "the fair value and floor we quote. We would rather tell you which model broke than "
             "quote you a number that sounds clever and means nothing.")
