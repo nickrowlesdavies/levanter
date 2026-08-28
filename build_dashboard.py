@@ -446,12 +446,29 @@ def vol_regime_section(classes=None) -> str:
             return ""
     hs = d.get("horizons", [])
     bt = d.get("backtest", {})
-    btparts = [f"{h} {bt[h]['acc']}% (+{bt[h]['edge']})" for h in hs
-               if h in bt and bt[h]["edge"] > 0]
+    ood = d.get("ood", {})
+
+    def _bt(h):
+        b = bt[h]
+        ci = f", 95% CI {b['ci'][0]}–{b['ci'][1]}" if b.get("ci") else ""
+        return f"{h} {b['acc']}% (+{b['edge']}{ci})"
+    btparts = [_bt(h) for h in hs if h in bt and bt[h]["edge"] > 0]
+    # Honest reading: where the confidence interval's lower bound is at or below
+    # the 50% baseline, the edge is not distinguishable from chance at that horizon.
+    weak = [h for h in hs if h in bt and bt[h].get("ci") and bt[h]["ci"][0] <= 50]
+    weak_note = (f' At {", ".join(weak)} the interval reaches the 50% baseline, so we do not '
+                 f'claim a reliable edge that far out.' if weak else "")
     note = ('<div class="pred-recent" style="margin-bottom:8px">Predicts whether the '
             'next period will be <b>TURBULENT</b> (high vol) or <b>CALM</b> (low vol), '
             'not price direction. Backtested skill (5yr): ' + " · ".join(btparts) +
-            '. <b>A real edge, because volatility clusters</b>, unlike direction.</div>')
+            '. <b>A real edge, because volatility clusters</b>, unlike direction.' + weak_note +
+            '</div>')
+    flagged = [a for a in assets if ood.get(a, {}).get("out_of_range")]
+    if flagged:
+        note += ('<div class="pred-recent" style="margin-bottom:8px">⚠ Outside tested range: '
+                 + ", ".join(flagged) + '. Their current volatility sits in the tails of their '
+                 'own 5-year history, so the model is extrapolating and these calls are less '
+                 'trustworthy than usual.</div>')
     head = "<th>Asset</th>" + "".join(f"<th>{h}</th>" for h in hs)
     rows = ""
     for a, hor in assets.items():
@@ -463,7 +480,9 @@ def vol_regime_section(classes=None) -> str:
                 cells += f'<td><span class="{cls}">{v["regime"]}</span></td>'
             else:
                 cells += "<td>–</td>"
-        rows += f'<tr><td class="cn">{a}</td>{cells}</tr>'
+        mark = ' <span title="today\'s volatility is outside its 5-year tested range">⚠</span>' \
+            if ood.get(a, {}).get("out_of_range") else ""
+        rows += f'<tr><td class="cn">{a}{mark}</td>{cells}</tr>'
     table = (f'<div class="tablewrap"><table class="coins vr-table"><thead><tr>{head}'
              f'</tr></thead><tbody>{rows}</tbody></table></div>')
     return (f'<div class="subh">Volatility regime forecast '
