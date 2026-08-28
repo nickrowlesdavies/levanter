@@ -1188,21 +1188,21 @@ def _monthly_opinion(regime_on, phase, mac, bt):
         body = [
             "Every cycle produces the same conversation at roughly the same point. The early move "
             "is dismissed, the middle is doubted, the top is celebrated as a new paradigm, and the "
-            "cooldown is explained away as a healthy pause right up until it is not. We appear to be "
-            "somewhere in the second half of that arc, and the honest position is humility rather "
-            "than a target.",
+            "cooldown is explained away as a healthy pause right up until it is not.",
+            "We appear to be somewhere in the second half of that arc. Humility serves better "
+            "there than a target.",
             "The uncomfortable fact the halving math keeps repeating is diminishing returns. Each "
             "era has delivered a smaller multiple than the one before, because a market cannot keep "
             "compounding at the same rate as its base grows without eventually swallowing the entire "
             "world. That is not bearishness. It is arithmetic. The people who lose the most in this "
             "phase are the ones who size their expectations to the last cycle rather than the trend "
             "of cycles.",
-            "There is a subtler trap in a cooldown, which is that it can last far longer and feel "
-            "far more constructive than a crash. Sideways is not safe. A market that grinds within a "
-            "wide range for months trains people out of their discipline, rewards the sellers of "
-            "options and the takers of leverage, and then reminds everyone at once why those trades "
-            "carried a premium in the first place. Boredom is not the absence of risk. It is often "
-            "where risk quietly accumulates.",
+            "There is a subtler trap in a cooldown. It can last far longer, and feel far more "
+            "constructive, than a crash.",
+            "A market that grinds within a wide range for months trains people out of their "
+            "discipline. It rewards the sellers of options and the takers of borrowed money, then "
+            "reminds everyone at once why those trades carried a premium in the first place. Risk "
+            "accumulates quietly in exactly these stretches, which is what makes them dangerous.",
             "None of that tells you what price does next month, and we will not pretend it does. "
             "What it tells you is how to hold whatever you hold: with position sizes that assume the "
             "drawdowns of this asset class are real and recurring, not theoretical, and with a plan "
@@ -1258,13 +1258,13 @@ def _monthly_opinion(regime_on, phase, mac, bt):
     closers = [
         "If that all sounds like a counsel of modesty, it is, and deliberately so. The single most "
         "expensive belief in this business is that someone, somewhere, can tell you what happens "
-        "next, and the entire architecture of financial media exists to sell you that belief on a "
+        "next. The entire architecture of financial media exists to sell you that belief on a "
         "monthly subscription. We are trying to sell you the opposite: a clear-eyed read of what is "
-        "knowable, an honest label on what is not, and no pretence in between.",
-        "So take from this what the data actually supports and leave the rest. Watch the volatility, "
-        "respect the cycle, read every market against every other, and let the process rather than "
-        "the prediction carry the weight. We will be back next month with the same discipline and, "
-        "in all likelihood, a different-looking market to apply it to."]
+        "knowable, and an honest label on what is not.",
+        "So take from this what the data actually supports and leave the rest. Watch the "
+        "volatility, respect the cycle, and let the process carry the weight. We will be back next "
+        "month with the same discipline and, in all likelihood, a different-looking market to "
+        "apply it to."]
     return body + closers
 
 
@@ -1323,24 +1323,23 @@ def monthly_content():
     else:
         review.append("Commodities data did not return from the feed for this issue; metals, energy "
                       "and copper are covered again on the next update.")
-    if review:
-        review.append("That is the month in four lines.")
-
     macro = []
     macro.append(
-        f"Start with the dollar, because it prices everything else. It was **{mac['dxi']}** on the "
-        f"month, and a {'firmer' if mac['dollar'] > 0 else 'softer'} dollar tends to "
+        f"Start with the dollar, because it prices everything else. It was **{mac['dxi']}** on "
+        f"the month.")
+    macro.append(
+        f"A {'firmer' if mac['dollar'] > 0 else 'softer'} dollar tends to "
         f"{'tighten' if mac['dollar'] > 0 else 'ease'} global financial conditions and to "
         f"{'lean against' if mac['dollar'] > 0 else 'support'} commodities and risk assets priced "
-        f"in it. This is read from the tape rather than from any headline, but it is the single "
-        f"most important number in the paragraph.")
+        f"in it. We take that from the tape, not from any headline. It is the single most "
+        f"important number here.")
     if mac.get("gold") is not None:
         g = mac["gold"]
+        macro.append(f"Gold was {g:+.1f}% on the month.")
         macro.append(
-            f"Gold was {g:+.1f}% on the month. Gold is the market's quiet barometer of real rates "
-            f"and fear at once, and its strength "
+            f"Gold is the market's quiet barometer of real rates and fear at once. Its strength "
             f"{'alongside a softer dollar is the textbook signature of falling real-rate expectations or a safety bid' if g > 0 and mac['dollar'] < 0 else 'even as the dollar firmed is a louder signal, usually a hunt for safety that overrides the currency headwind' if g > 0 else 'giving way points to the opposite, a market comfortable enough to leave the safety trade'}. "
-            f"We read it as a sentiment gauge, not a forecast.")
+            f"We read it as a sentiment gauge and leave it at that.")
     if mac.get("copper") is not None and mac.get("oil") is not None:
         cop, oil = mac["copper"], mac["oil"]
         growth = ("a genuine growth impulse" if cop > 0 and oil > 0 else
@@ -1348,14 +1347,13 @@ def monthly_content():
                   "a mixed message, worth watching but not yet a trend")
         macro.append(
             f"The industrial complex is the reality check on the narrative. Copper, the metal with "
-            f"a PhD in economics, was {cop:+.1f}% and oil {oil:+.1f}%. Taken together that points to "
-            f"{growth}. When the paper markets and the physical economy disagree, the physical "
-            f"economy is usually the one worth believing.")
+            f"a PhD in economics, was {cop:+.1f}% and oil {oil:+.1f}%. Read side by side, that "
+            f"points to {growth}. When the paper markets and the physical economy disagree, the "
+            f"physical economy is usually the one worth believing.")
     macro.append(
         f"Put it on one canvas and the month's macro tell is this: crypto trading {reg} "
         f"{'while gold also bid suggests liquidity and a debasement theme rather than clean, confident risk-taking' if regime_on and (mac.get('gold') or 0) > 0 else 'while gold slipped is about as honest a risk-on signal as markets produce' if regime_on else 'with havens outperforming is the fingerprint of caution'}. "
-        f"None of it is a prediction. All of it is context, and context is what stops you reading a "
-        f"single market in a vacuum.")
+        f"We offer that as context. Context is what stops you reading a single market in a vacuum.")
     macro.append("Everything else is downstream of the dollar.")
 
     cycle = []
@@ -1401,13 +1399,8 @@ def monthly_content():
             + (f", in roughly the {eb['pctile']:.0f}th percentile of its history" if eb.get("pctile") is not None else "")
             + ". Leadership inside crypto rotates, and the majors do not move as one, which is why "
               "a single 'crypto' number hides more than it reveals.")
-    cycle.append(
-        "The through-line across cycles remains diminishing returns. Each halving era has delivered "
-        "a smaller multiple than the last, for the simple reason that a market cannot compound at "
-        "its youthful rate forever without eventually outgrowing everything else in existence. That "
-        "is arithmetic, not pessimism, and it argues against assuming the next run rhymes with the "
-        "biggest one you remember.")
-    cycle.append("Arithmetic, not mood.")
+    # The diminishing-returns argument is made once, in the opinion section. It used to be
+    # restated here and again in the bear case, which read as padding on a close read.
 
     elevated = any(v.get("30d", {}).get("regime") == "HIGH"
                    for v in vr.get("assets", {}).values())
@@ -1425,8 +1418,10 @@ def monthly_content():
         rotation.append(
             f"Step back from the individual names and the rotation is clearest at the asset-class "
             f"level. On average **{lc}** did the most work this month ({lv:+.1f}%) and **{gc}** the "
-            f"least ({gv:+.1f}%). Which class leads tells you what the market is paying up for. Risk "
-            f"and liquidity, or safety and hard assets. That is worth more than any single ticker.")
+            f"least ({gv:+.1f}%).")
+        rotation.append(
+            "Which class leads tells you what the market is paying up for. Risk and liquidity, or "
+            "safety and hard assets. That is worth more than any single ticker.")
     if capw is not None and eqw is not None:
         rotation.append(
             f"Inside crypto, the equal-weighted basket returned {eqw:+.0f}% against {capw:+.0f}% "
@@ -1443,7 +1438,6 @@ def monthly_content():
         "majors to the small caps, from crypto to gold, or from growth-sensitive metals to "
         "defensive ones, is the market rehearsing its next mood while the index still looks calm. "
         "We would rather catch the rehearsal than wait for the show.")
-    rotation.append("Money moves first.")
 
     risks = []
     bull_bits, bear_bits = [], []
@@ -1469,14 +1463,13 @@ def monthly_content():
         "environment where risk has been rewarded and the path of least resistance has been up.")
     risks.append(
         "The bear case. " + (", ".join(bear_bits).capitalize() if bear_bits else
-                             "Few obvious negatives, which is itself a mild warning") + ". Taken "
-        "together that is an environment where the easy gains may already be behind and the margin "
-        "for error is thinner than it feels.")
+                             "Few obvious negatives, which is itself a mild warning") + ". Set "
+        "against the bull case, that leaves the easy gains possibly behind us and the margin for "
+        "error thinner than it feels.")
     risks.append(
         "What would change our mind, either way. A decisive break in the dollar, gold rolling over "
         "or accelerating, a spike in cross-asset correlation, or a flip in the volatility regime. "
         "Those are the signals we watch. A loud headline is not one of them.")
-    risks.append("Both cases are real.")
 
     essay = _monthly_opinion(regime_on, phase, mac, bt)
     ahead = [
@@ -2258,6 +2251,20 @@ def about_section() -> str:
         'Mediterranean and the Levant.</p></div>')
 
 
+def _wilson_ci(acc_pct, n, z=1.96):
+    """95% Wilson score interval (%) for a binomial proportion, from accuracy% and n.
+    Direction calls are point-in-time hit/miss trials, so the interval on the hit
+    rate is the honest way to show whether an accuracy is distinguishable from a
+    coin flip."""
+    if not n or acc_pct is None:
+        return None
+    p = acc_pct / 100.0
+    d = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5) / d
+    return [round((c - h) * 100), round((c + h) * 100)]
+
+
 def track_record_section() -> str:
     vr = _read("vol_regime.json") or {}
     ps = _read("prediction_state.json") or {}
@@ -2299,27 +2306,35 @@ def track_record_section() -> str:
         for c in bt.get("by_class", []):
             lab = c.get("label", c.get("cls", ""))
             if c.get("n") and c.get("acc") is not None:
+                ci = _wilson_ci(c["acc"], c["n"])
+                cistr = f' <span class="mut">(95% CI {ci[0]}–{ci[1]})</span>' if ci else ''
                 cls_rows += (f'<div class="trk-cls"><span class="k">{lab}</span>'
-                             f'<span class="v">{c["acc"]:.0f}% over {c["n"]:,} calls</span></div>')
+                             f'<span class="v">{c["acc"]:.0f}% over {c["n"]:,} calls{cistr}</span></div>')
             else:
                 cls_rows += (f'<div class="trk-cls"><span class="k">{lab}</span>'
                              f'<span class="v mut">no resolved calls yet</span></div>')
         dirscore += (f'<div class="trk-line"><b>Backtested {bt.get("period", "")}, point-in-time, '
                      f'and we show every class:</b></div><div class="trk-clsgrid">{cls_rows}</div>')
         if cr.get("n") and cr.get("acc") is not None:
+            crci = _wilson_ci(cr["acc"], cr["n"])
+            crci_txt = (f' Its 95% confidence interval runs {crci[0]} to {crci[1]} percent, which '
+                        f'straddles 50, so we cannot distinguish it from a coin flip.' if crci else '')
             dirscore += (f'<div class="trk-line">The crypto row is the one that carries weight. At '
                          f'<b>{cr["n"]:,} calls</b> it is a real sample, and at <b>{cr["acc"]:.0f}%</b> '
-                         f'it lands right on the coin-flip baseline. That is the thesis, confirmed on '
-                         f'the class we have the most data for.</div>')
+                         f'it lands right on the coin-flip baseline.{crci_txt} That is the thesis, '
+                         f'confirmed on the class we have the most data for.</div>')
         if co.get("n") and co.get("acc") is not None:
+            coci = _wilson_ci(co["acc"], co["n"])
+            coci_txt = (f'Even taken at face value its 95% interval is {coci[0]} to {coci[1]} percent, '
+                        f'already wide on {co["n"]} calls. ' if coci else '')
             dirscore += (f'<div class="trk-note">Commodities looks stronger at <b>{co["acc"]:.0f}%</b>, '
-                         f'and it is not an edge. It is {co["n"]} calls across a dozen commodities, '
-                         f'about seven a market over four months, so consecutive calls overlap and are '
-                         f'not independent trials. Allow even a little of that serial correlation and '
-                         f'the effective sample roughly halves, at which point {co["acc"]:.0f}% is no '
-                         f'longer statistically significant. The window was a strongly trending one for '
-                         f'the metals too, which flatters any directional model until the trend breaks. '
-                         f'Treat it as noise, not skill.</div>')
+                         f'and it is not an edge. {coci_txt}It is {co["n"]} calls across a dozen '
+                         f'commodities, about seven a market over four months, so consecutive calls '
+                         f'overlap and are not independent trials. Allow even a little of that serial '
+                         f'correlation and the effective sample roughly halves, at which point '
+                         f'{co["acc"]:.0f}% is no longer statistically significant. The window was a '
+                         f'strongly trending one for the metals too, which flatters any directional '
+                         f'model until the trend breaks. Treat it as noise, not skill.</div>')
         dirscore += (f'<div class="trk-line">Taken together the classes average '
                      f'<b>{bt["accuracy"]:.0f}%</b>, but that is a weighted blend of {cr.get("n", 0):,} '
                      f'crypto calls and {co.get("n", 0)} commodity calls pulling opposite ways, not a '

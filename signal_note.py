@@ -141,6 +141,18 @@ def _vol_groups(vr):
     return out
 
 
+def _wilson_ci(acc_pct, n, z=1.96):
+    """95% Wilson score interval (%) for a binomial proportion from accuracy% and n.
+    Same formula as the dashboard, so the Signal and the site never drift."""
+    if not n or acc_pct is None:
+        return None
+    p = acc_pct / 100.0
+    d = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5) / d
+    return [round((c - h) * 100), round((c + h) * 100)]
+
+
 def compose(launch=False, monday=None):
     cm = _read("crypto_map.json")
     vr = _read("vol_regime.json")
@@ -307,7 +319,10 @@ def compose(launch=False, monday=None):
     if cr.get("n") and cr.get("acc") is not None:
         P.append(
             f"On direction the model is close to a coin flip: {cr['acc']:.0f} percent over "
-            f"{cr['n']:,} backtested crypto calls. We forecast volatility, not direction.")
+            f"{cr['n']:,} backtested crypto calls"
+            + (f", a 95 percent interval of {_wc[0]} to {_wc[1]} percent that straddles the "
+               f"coin-flip line" if (_wc := _wilson_ci(cr.get('acc'), cr.get('n'))) else "")
+            + ". We forecast volatility, not direction.")
         P.append("")
 
     # ===== What changed =====
@@ -449,11 +464,15 @@ def teaser(meta, hashtags=True):
               f"valuation context, not a price target or a prediction for Friday.", ""]
     T += ["What is not knowable:", "", "Direction.", ""]
     if cr.get("n") and cr.get("acc") is not None and co.get("n") and co.get("acc") is not None:
+        crci, coci = _wilson_ci(cr["acc"], cr["n"]), _wilson_ci(co["acc"], co["n"])
+        cr_ci_txt = (f", a 95 percent interval of {crci[0]} to {crci[1]} percent that straddles "
+                     f"the coin-flip line" if crci else "")
+        co_ci_txt = (f", a 95 percent interval of {coci[0]} to {coci[1]} percent" if coci else "")
         T += [f"The current direction scorecard says crypto {cr['acc']:.0f} percent, commodities {co['acc']:.0f} "
               f"percent and FX not yet scored. Crypto provides the largest sample, with {cr['n']:,} "
-              f"calls, and its result sits almost exactly at chance.", "",
-              f"The commodities figure looks better, but {co['acc']:.0f} percent from {co['n']} calls in "
-              f"a strongly trending market does not establish an edge. FX has no resolved calls yet.", "",
+              f"calls{cr_ci_txt}, and its result sits almost exactly at chance.", "",
+              f"The commodities figure looks better, but {co['acc']:.0f} percent from {co['n']} calls{co_ci_txt} "
+              f"in a strongly trending market does not establish an edge. FX has no resolved calls yet.", "",
               "Read the individual rows, not a flattering blended number.", ""]
     T += ["That is Levanter's approach: model what can be modelled, identify what cannot, and publish "
           "the scorecard.", ""]
