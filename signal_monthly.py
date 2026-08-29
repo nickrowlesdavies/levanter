@@ -187,9 +187,10 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
 
     # How the month's figures were actually derived, said plainly rather than implied.
     if basis == "exact":
-        span = f"**{mname}**, measured month end to month end"
+        span = (f"**{mname}**, measured from the last day of the prior month to the last day of "
+                f"this one")
     elif basis == "mixed":
-        span = (f"**{mname}**, measured month end to month end where we hold a prior close and on a "
+        span = (f"**{mname}**, measured last day to last day where we hold a prior close and on a "
                 f"trailing thirty-day window otherwise")
     else:
         span = (f"the **thirty days to {now:%-d %B %Y}**, which is close to {mname} but is not the "
@@ -210,7 +211,7 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
 
     if basis == "trailing":
         P += ["## A note on this first issue", "",
-              "We compute month figures by comparing the close we stored at the end of last month "
+              "We compute month figures by comparing the close we stored on the last day of last month "
               "with the close we store today. This is the first issue, so there is no stored prior "
               "close and the numbers below use a trailing thirty-day window instead. From next month "
               "the figures are exact month on month, and this section disappears.", ""]
@@ -393,8 +394,8 @@ def main():
     argv = sys.argv[1:]
     force = "--force" in argv
     now = sn._now_gst()
-    # Default to the month that has just closed, which on the 1st is last month.
-    month = _prev_month(now.strftime("%Y-%m"))
+    # Runs on the last day of the month, so the month being covered is this one.
+    month = now.strftime("%Y-%m")
     if "--month" in argv:
         month = argv[argv.index("--month") + 1]
 
@@ -408,8 +409,9 @@ def main():
         if os.path.exists(note_path):
             print(f"signal_monthly: {month} Signal already prepared; skipping.")
             return
-        if now.day > 3:
-            print("signal_monthly: past the preparation window for this month; skipping.")
+        tomorrow = (now + dt.timedelta(days=1)).date()
+        if tomorrow.day != 1:
+            print(f"signal_monthly: {now:%-d %B} is not the last day of the month; skipping.")
             return
 
     cm, fxm = sn._read("crypto_map.json"), sn._read("fx_map.json")
