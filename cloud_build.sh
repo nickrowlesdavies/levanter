@@ -33,6 +33,7 @@ run btc_metcalfe.py          # BTC network-value gauge (adoption power-law + Met
 run orderflow.py             # Binance taker-buy / funding (may be geo-blocked on US runners)
 run predict.py               # educational directional predictions
 run signal_note.py           # weekly premium Signal + teasers + X thread (publishes Wednesdays 06:00 GST; idempotent per week)
+run signal_monthly.py        # monthly premium Signal + teasers + X thread (publishes last day of month; idempotent per month)
 
 # Marketing landing page at the root; the live dashboard app under /app.
 mkdir -p public/app
