@@ -390,6 +390,49 @@ def teaser(meta, hashtags=True):
     return "\n".join(T).rstrip() + "\n"
 
 
+def x_thread(meta):
+    """The monthly Signal as a short promo X thread (each post under the limit)."""
+    m = meta
+    posts = []
+    posts.append(
+        (f"The Levanter monthly Signal for {m['mname']} is out, our deeper premium read on "
+         f"volatility, valuation and positioning across crypto, FX and commodities. Free while we "
+         f"build the list. Thread.") if SIGNAL_FREE else
+        (f"The Levanter monthly Signal for {m['mname']} is out: the deeper premium read on volatility, "
+         f"valuation and positioning across crypto, FX and commodities. Thread."))
+    st = _stats(m["rets"].get("crypto", []))
+    if st:
+        s0, v0 = st["top"][0]
+        posts.append(
+            f"The month behind. Crypto: {st['up']} of {st['n']} higher, average {st['avg']:+.1f}%. "
+            f"Strongest {s0} {v0:+.1f}%. FX and commodities in the full note.")
+    if m["turbulent"]:
+        vtxt = (f" The 30-day volatility classifier runs about {m['acc30']}% in backtest, a real edge."
+                if m.get("acc30") else "")
+        posts.append(
+            f"For the month ahead the model reads {_turb_txt(m['turbulent'], 4)} turbulent and the "
+            f"rest calm.{vtxt}")
+    if m.get("ou") is not None:
+        posts.append(
+            f"Bitcoin sits about {abs(m['ou']):.0f}% {'below' if m['ou'] < 0 else 'above'} its "
+            f"valuation fit. On a monthly horizon valuation says more than any week-ahead guess. "
+            f"Context, not a target.")
+    # Quote the crypto row (largest sample), never the blended figure. CLAUDE.md.
+    cr = {c.get("cls"): c for c in sn._read_root("direction_backtest.json").get("by_class", [])
+          }.get("crypto", {})
+    if cr.get("n") and cr.get("acc") is not None:
+        ci = sn._wilson_ci(cr["acc"], cr["n"])
+        citxt = f" (95% CI {ci[0]}-{ci[1]})" if ci else ""
+        posts.append(
+            f"Direction we do not sell. Crypto calls run about {cr['acc']:.0f}% over {cr['n']:,} "
+            f"backtested calls{citxt}, a coin flip, and we publish it. Volatility is forecastable, "
+            f"direction is not.")
+    posts.append(
+        "The full monthly Signal, with the levels and the month-on-month changes, is for subscribers: "
+        "read.levantermarkets.com. Educational, not advice.")
+    return sn._thread_file(f"Levanter monthly Signal thread · {m['mname']}", posts)
+
+
 def main():
     argv = sys.argv[1:]
     force = "--force" in argv
@@ -446,6 +489,10 @@ def main():
     open(note_path, "w").write(body)
     open(li_path, "w").write(teaser(meta, hashtags=True))
     open(sub_path, "w").write(teaser(meta, hashtags=False))
+    # The accompanying X thread, in its own channel dir (pasted post by post).
+    x_dir = os.path.join("reports", "x")
+    os.makedirs(x_dir, exist_ok=True)
+    open(os.path.join(x_dir, f"levanter-signal-monthly-x-{month}.md"), "w").write(x_thread(meta))
 
     state[month] = cur_state
     _save_state(state)

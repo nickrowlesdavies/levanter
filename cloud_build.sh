@@ -32,7 +32,7 @@ run vol_regime.py --live     # volatility-regime forecast
 run btc_metcalfe.py          # BTC network-value gauge (adoption power-law + Metcalfe diagnostic)
 run orderflow.py             # Binance taker-buy / funding (may be geo-blocked on US runners)
 run predict.py               # educational directional predictions
-run signal_note.py           # weekly premium Signal note (prepares Mondays 06:00 GST; idempotent per week)
+run signal_note.py           # weekly premium Signal + teasers + X thread (publishes Wednesdays 06:00 GST; idempotent per week)
 
 # Marketing landing page at the root; the live dashboard app under /app.
 mkdir -p public/app

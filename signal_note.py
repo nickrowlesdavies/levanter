@@ -7,9 +7,10 @@ volatility read across crypto, foreign exchange and commodities, and an honest
 line on what is and is not knowable. Also drafts a LinkedIn teaser.
 
 This is a PREMIUM piece, so it is written to reports/signals/ and is NOT copied
-to the public site. It is prepared for 06:00 GST on Mondays: the first build at
-or after that time generates the frozen weekly snapshot, and later builds in the
-same week skip it (idempotent), so the "week ahead" numbers do not drift.
+to the public site. It publishes 06:00 GST on Wednesdays (still anchored to the
+week's Monday in title and filename): the first build at or after that time
+generates the frozen weekly snapshot, and later builds in the same week skip it
+(idempotent), so the "week ahead" numbers do not drift.
 
     python signal_note.py [--force] [--monday YYYY-MM-DD]
 
@@ -486,6 +487,54 @@ def teaser(meta, hashtags=True):
     return "\n".join(T).rstrip() + "\n"
 
 
+X_LIMIT = 280   # characters in a single X post
+
+
+def _thread_file(head, posts):
+    """Render numbered posts as a paste-ready thread file, each within X_LIMIT.
+    The separators carry the numbering and are not part of any post."""
+    posts = [p for p in posts if p and len(p) <= X_LIMIT]
+    out = [f"# {head}",
+           f"X. {len(posts)} posts, each inside the {X_LIMIT}-character limit. Post in order as a "
+           f"thread. The separator lines are not part of any post.", ""]
+    for i, p in enumerate(posts, 1):
+        out += [f"--- {i}/{len(posts)} ({len(p)} chars) ---", "", p, ""]
+    return "\n".join(out).rstrip() + "\n"
+
+
+def x_thread(meta, monday):
+    """The weekly Signal as a short promo X thread (each post under the limit)."""
+    loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, launch = meta
+    cr = {c.get("cls"): c for c in cls}.get("crypto", {})
+    posts = []
+    posts.append(
+        ("The Levanter Signal is out, our weekly premium read on volatility, valuation and the week "
+         "ahead across crypto, FX and commodities. Free while we build the list. Here it is in a thread."
+         ) if launch else
+        ("This week's Levanter Signal is out: the premium read on volatility, valuation and the week "
+         "ahead across crypto, FX and commodities. Here it is in a thread."))
+    posts.append(
+        f"What is knowable: volatility clusters. This week the model expects wider ranges in "
+        f"{loud_txt}, calmer across {quiet_txt}. That turbulent-or-calm call carries measurable "
+        f"backtested skill.")
+    if ou is not None:
+        posts.append(
+            f"On the long view, bitcoin sits about {abs(ou):.0f}% "
+            f"{'below' if ou < 0 else 'above'} its valuation fit, price against how long the network "
+            f"has existed. Valuation context, not a prediction for Friday.")
+    if cr.get("n") and cr.get("acc") is not None:
+        ci = _wilson_ci(cr["acc"], cr["n"])
+        citxt = f" (95% CI {ci[0]}-{ci[1]})" if ci else ""
+        posts.append(
+            f"What is not knowable: direction. Our crypto calls run about {cr['acc']:.0f}% over "
+            f"{cr['n']:,} backtested calls{citxt}, a coin flip, and we publish it. We forecast "
+            f"volatility, not direction.")
+    posts.append(
+        "The full Signal, with the levels and the week-on-week changes, is for subscribers: "
+        "read.levantermarkets.com. Educational, not advice.")
+    return _thread_file(f"Levanter Signal thread · week of {monday.strftime('%-d %B %Y')}", posts)
+
+
 def main():
     argv = sys.argv[1:]
     force = "--force" in argv
@@ -503,12 +552,13 @@ def main():
         if os.path.exists(note_path):
             print(f"signal_note: this week's Signal ({monday}) already prepared; skipping.")
             return
-        if now.weekday() > 2:      # Thu-Sun: the week is underway, do not back-fill it
-            print("signal_note: past the Monday preparation window this week; skipping.")
-            return
-        due = dt.datetime.combine(monday, dt.time(6, 0))   # Monday 06:00 GST
+        # Publishes Wednesday, still anchored to the week's Monday in the title and
+        # filename. Before Wednesday 06:00 GST it is not due; after, the first build
+        # writes it and the rest of the week is idempotent (note already exists).
+        wednesday = monday + dt.timedelta(days=2)
+        due = dt.datetime.combine(wednesday, dt.time(6, 0))   # Wednesday 06:00 GST
         if now < due:
-            print(f"signal_note: not due yet (prepares {monday} 06:00 GST).")
+            print(f"signal_note: not due yet (prepares {wednesday} 06:00 GST).")
             return
 
     launch = SIGNAL_FREE
@@ -519,6 +569,10 @@ def main():
     open(note_path, "w").write(body)
     open(teaser_path, "w").write(teaser(meta, hashtags=True))          # LinkedIn: keep hashtags
     open(teaser_sub_path, "w").write(teaser(meta, hashtags=False))     # Substack: no hashtags
+    # The accompanying X thread. Its own channel dir, no docx (pasted post by post).
+    x_dir = os.path.join("reports", "x")
+    os.makedirs(x_dir, exist_ok=True)
+    open(os.path.join(x_dir, f"levanter-signal-x-{monday}.md"), "w").write(x_thread(meta, monday))
     try:
         import md2docx
         md2docx.convert(note_path, os.path.join(OUT, "docx", f"levanter-signal-{monday}.docx"))

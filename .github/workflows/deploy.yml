@@ -3,7 +3,7 @@ name: Deploy Levanter
 on:
   schedule:
     - cron: "0 */6 * * *"   # every 6 hours (UTC)
-    - cron: "0 2 * * 1"     # Mondays 02:00 UTC = 06:00 GST, to prepare the weekly Signal
+    - cron: "0 2 * * 3"     # Wednesdays 02:00 UTC = 06:00 GST, to prepare the weekly Signal
   workflow_dispatch:          # manual "Run workflow" button
   push:
     branches: [ main ]
@@ -49,6 +49,7 @@ jobs:
           git add review_archive.json signal_history.json
           git add -f reports/crypto_map.json reports/crypto_map_treemap.png reports/crypto_map_correlation.png 2>/dev/null || true
           git add -f reports/signals/*.md reports/signals/docx/*.docx 2>/dev/null || true
+          git add -f reports/x/*.md 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "nothing to persist"
           else

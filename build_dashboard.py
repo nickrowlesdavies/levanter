@@ -1783,7 +1783,7 @@ def _market_line(kind, tier, title, rows, kf, label, vr):
 # kind -> channel -> tier. The daily runs on Substack in full and on X as a
 # thread. LinkedIn carries the weekly and monthly, which run fuller in that order.
 _TIERS = {"daily": {"substack": "mirror", "x": "thread"},
-          "weekly": {"linkedin": "full"},
+          "weekly": {"linkedin": "full", "x": "thread"},
           "monthly": {"linkedin": "deep"}}
 
 _X_LIMIT = 280                    # characters in a single post
@@ -1847,11 +1847,26 @@ def _x_market_post(title, rows, kf, vr, vrc):
     return _fit(blocks, [i for i in (mo_i, wk_i) if i is not None])
 
 
+def _x_week_post(title, rows, kf, vr, vrc):
+    """One market's weekly post: the week itself, then the forward vol call. The
+    daily post leads on 'yesterday'; the weekly leads on the seven-day move."""
+    st = _cstats(rows, kf, "chg7")
+    if not st:
+        return ""
+    blocks = [f"{title} on the week: {st['up']} of {st['n']} higher. "
+              f"{st['bn']} {st['bv']:+.1f}%, {st['wn']} {st['wv']:+.1f}%."]
+    lean, hi, nn = _vol_lean(vr, vrc)
+    if nn:
+        blocks.append(f"Week ahead: {lean}, {hi} of {nn} flagged high-vol.")
+    return _fit(blocks, [1])
+
+
 def _x_thread(kind):
-    """The daily as a numbered X thread. Every post is inside the character limit,
-    so it can be posted as written with no trimming by hand. Returns the file text:
-    the separators carry the numbering and are not part of any post."""
-    if kind != "daily":
+    """The daily or weekly as a numbered X thread. Every post is inside the
+    character limit, so it can be posted as written with no trimming by hand.
+    Returns the file text: the separators carry the numbering and are not part
+    of any post."""
+    if kind not in ("daily", "weekly"):
         return ""
     vr = _read("vol_regime.json") or {}
     cross = _cross_movers(_NOTE_FIELD[kind])
@@ -1860,8 +1875,16 @@ def _x_thread(kind):
     top, bot, n = cross[0], cross[-1], len(cross)
     up = sum(1 for _, _, v in cross if v > 0)
     now = _now_gst()
-    posts = [_fit([_DAILY_HEAD(now), _daily_opener(top, bot, up, n),
-                   "Crypto, FX and commodities below."], [2])]
+    if kind == "weekly":
+        head = f"Levanter weekly · week ending {_week_key(now):%-d %B}"
+        opener = (f"This week {up} of {n} markets across crypto, FX and commodities finished higher. "
+                  f"{top[1]} led the board, {bot[1]} lagged.")
+        lead_in = "The week by asset class below."
+    else:
+        head = _DAILY_HEAD(now)
+        opener = _daily_opener(top, bot, up, n)
+        lead_in = "Crypto, FX and commodities below."
+    posts = [_fit([head, opener, lead_in], [2])]
     # Same running order as the Substack Note: opener, cross-market vol read, then
     # the market blocks. Standalone post, so it takes the no-lead-in form.
     div = _vol_divergence(vr, lead=False)
@@ -1877,8 +1900,9 @@ def _x_thread(kind):
                          f"Coverage resumes on the next update.")
             continue
         leans[title] = _vol_lean(vr, vrc)[0]
-        p = _x_market_post(title, rows, kf, vr, vrc)
-        posts.append(p or f"{title}: quiet this session, nothing notable to flag.")
+        p = (_x_week_post if kind == "weekly" else _x_market_post)(title, rows, kf, vr, vrc)
+        span = "week" if kind == "weekly" else "session"
+        posts.append(p or f"{title}: quiet this {span}, nothing notable to flag.")
     # The divergence post says what _vol_summary says, with the counts, so the
     # closer does not repeat it.
     closer = ["We do not forecast direction. Over one session it is a coin-flip "
@@ -1890,7 +1914,9 @@ def _x_thread(kind):
     else:
         posts.append(_fit([_vol_summary(leans)] + closer, [0, 1]))
     posts = [p for p in posts if p]
-    out = [f"# Levanter daily thread · {now:%A %-d %B}",
+    thread_head = (f"Levanter weekly thread · week ending {_week_key(now):%-d %B}"
+                   if kind == "weekly" else f"Levanter daily thread · {now:%A %-d %B}")
+    out = [f"# {thread_head}",
            f"X. {len(posts)} posts, each inside the {_X_LIMIT}-character limit. "
            f"Post in order as a thread. The separator lines are not part of any post.",
            ""]
@@ -1988,6 +2014,10 @@ def daily_note():
 
 def daily_x_thread():
     return _build_note("daily", "x")
+
+
+def weekly_x_thread():
+    return _build_note("weekly", "x")
 
 
 def weekly_post():
@@ -2117,15 +2147,23 @@ def write_writeups():
         print(f"docx: mirrored {len(files)} pieces to {out_dir}/docx/")
     except Exception as e:
         print("docx skipped (python-docx not installed?):", e)
-    # The daily as an X thread. Its own channel directory, and no docx mirror:
-    # these get pasted post by post, not opened in Word.
+    # The daily (and, on Sundays, the weekly) as an X thread. Its own channel
+    # directory, and no docx mirror: these get pasted post by post, not opened
+    # in Word.
+    x_dir = os.path.join(R, "x")
     xt = daily_x_thread()
     if xt:
-        x_dir = os.path.join(R, "x")
         os.makedirs(x_dir, exist_ok=True)
         p = os.path.join(x_dir, f"levanter-x-daily-{today}.md")
         open(p, "w").write(xt)
         files["x_daily"] = p
+    if weekly_day:
+        wxt = weekly_x_thread()
+        if wxt:
+            os.makedirs(x_dir, exist_ok=True)
+            p = os.path.join(x_dir, f"levanter-x-weekly-{_week_key(now).isoformat()}.md")
+            open(p, "w").write(wxt)
+            files["x_weekly"] = p
     return files
 
 
