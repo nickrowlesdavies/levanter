@@ -1558,6 +1558,7 @@ def _plain(s):
 _NOTE_FIELD = {"daily": "chg1", "weekly": "chg7", "monthly": "chg30"}
 _CLS_NAME = {"crypto": "crypto", "fx": "FX", "commodity": "commodities"}
 _MKT_DISP = {"Crypto": "crypto", "FX": "FX", "Commodities": "commodities"}
+_MKT_HAS = {"Crypto": "has", "FX": "has", "Commodities": "have"}
 
 
 def _note_markets():
@@ -1587,6 +1588,45 @@ def _vol_summary(leans):
         return f"Volatility leans turbulent across {join(turbs)} looking a week out."
     return (f"Volatility leans turbulent on {join(turbs)}, calmer on {join(calms)}, "
             f"looking a week out.")
+
+
+def _vol_divergence(vr, lead=True):
+    """One line on a split week-ahead vol read: which markets carry the high-vol
+    flags and which do not. Returns "" when every market leans the same way,
+    because then there is no divergence worth a sentence. lead=False drops the
+    "And right now ..." run-on, which needs the sentence before it: X posts it
+    on its own, so it has to stand up without one."""
+    reads = []
+    for title, _rows, _kf, label, vrc in _note_markets():
+        lean, hi, n = _vol_lean(vr, vrc)
+        if n:
+            reads.append((title, lean, hi, n, label.lower()))
+    turbs = [r for r in reads if r[1] == "turbulent"]
+    calms = [r for r in reads if r[1] == "calmer"]
+    if not turbs or not calms:
+        return ""
+
+    def join(names):
+        return names[0] if len(names) == 1 else f"{', '.join(names[:-1])} and {names[-1]}"
+
+    calm_names = join([_MKT_DISP[t] for t, *_ in calms])
+    if len(calms) == 1:
+        # "commodities read calm", but "crypto reads calm"
+        verb = "reads" if _MKT_HAS[calms[0][0]] == "has" else "read"
+    else:
+        verb = "both read"
+    if len(turbs) == 1:
+        title, _lean, hi, n, label = turbs[0]
+        pre = "And right now it sits in one place. "
+        head = (f"{title} {_MKT_HAS[title]} {hi} of {n} {label} "
+                f"flagged high-vol for the week ahead")
+    else:
+        counts = join([f"{_MKT_DISP[t]} at {hi} of {n} {lab}"
+                       for t, _l, hi, n, lab in turbs])
+        pre = "And right now it is split. "
+        head = f"The high-vol flags for the week ahead sit on {counts}"
+    body = f"{head}, while {calm_names} {verb} calm. Same board, very different weather."
+    return (pre + body) if lead else body
 
 
 def _moved(v):
@@ -1822,6 +1862,13 @@ def _x_thread(kind):
     now = _now_gst()
     posts = [_fit([_DAILY_HEAD(now), _daily_opener(top, bot, up, n),
                    "Crypto, FX and commodities below."], [2])]
+    # Same running order as the Substack Note: opener, cross-market vol read, then
+    # the market blocks. Standalone post, so it takes the no-lead-in form.
+    div = _vol_divergence(vr, lead=False)
+    if div and len(div) <= _X_LIMIT:
+        posts.append(div)
+    else:
+        div = ""
     leans = {}
     for title, rows, kf, label, vrc in _note_markets():
         if not rows:
@@ -1832,11 +1879,16 @@ def _x_thread(kind):
         leans[title] = _vol_lean(vr, vrc)[0]
         p = _x_market_post(title, rows, kf, vr, vrc)
         posts.append(p or f"{title}: quiet this session, nothing notable to flag.")
-    posts.append(_fit([_vol_summary(leans),
-                       "We do not forecast direction. Over one session it is a coin-flip "
-                       "and the scorecard is public.",
-                       "Full board, charts and forecasts: levantermarkets.com",
-                       "Educational, not advice."], [0, 1]))
+    # The divergence post says what _vol_summary says, with the counts, so the
+    # closer does not repeat it.
+    closer = ["We do not forecast direction. Over one session it is a coin-flip "
+              "and the scorecard is public.",
+              "Full board, charts and forecasts: levantermarkets.com",
+              "Educational, not advice."]
+    if div:
+        posts.append(_fit(closer, [0]))
+    else:
+        posts.append(_fit([_vol_summary(leans)] + closer, [0, 1]))
     posts = [p for p in posts if p]
     out = [f"# Levanter daily thread · {now:%A %-d %B}",
            f"X. {len(posts)} posts, each inside the {_X_LIMIT}-character limit. "
@@ -1891,6 +1943,9 @@ def _build_note(kind, channel):
     if tier == "mirror":
         lines += ["We do not call direction, because over one session that is a coin-flip. "
                   "What the model does call is where the turbulence is likely to sit.", ""]
+        div = _vol_divergence(vr)
+        if div:
+            lines += [div, ""]
 
     leans = {}
     mkt_lines = []
