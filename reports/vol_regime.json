@@ -2,55 +2,55 @@
   "assets": {
     "BTC": {
       "7d": {
-        "regime": "HIGH",
-        "vol_now": 43.6,
+        "regime": "LOW",
+        "vol_now": 25.6,
         "vol_median": 39.1
       },
       "30d": {
         "regime": "LOW",
-        "vol_now": 34.8,
+        "vol_now": 36.2,
         "vol_median": 45.1
       },
       "60d": {
         "regime": "LOW",
-        "vol_now": 30.8,
+        "vol_now": 31.5,
         "vol_median": 49.4
       },
       "90d": {
         "regime": "LOW",
-        "vol_now": 33.6,
+        "vol_now": 34.0,
         "vol_median": 49.5
       },
       "6mo": {
         "regime": "LOW",
-        "vol_now": 32.9,
+        "vol_now": 33.0,
         "vol_median": 51.2
       },
       "12mo": {
         "regime": "LOW",
-        "vol_now": 36.8,
+        "vol_now": 36.9,
         "vol_median": 53.4
       }
     },
     "ETH": {
       "7d": {
-        "regime": "HIGH",
-        "vol_now": 57.9,
+        "regime": "LOW",
+        "vol_now": 35.3,
         "vol_median": 53.4
       },
       "30d": {
         "regime": "LOW",
-        "vol_now": 56.3,
+        "vol_now": 56.7,
         "vol_median": 60.5
       },
       "60d": {
         "regime": "LOW",
-        "vol_now": 47.6,
+        "vol_now": 47.7,
         "vol_median": 62.6
       },
       "90d": {
         "regime": "LOW",
-        "vol_now": 50.7,
+        "vol_now": 50.8,
         "vol_median": 64.3
       },
       "6mo": {
@@ -60,61 +60,61 @@
       },
       "12mo": {
         "regime": "LOW",
-        "vol_now": 53.2,
+        "vol_now": 53.3,
         "vol_median": 70.1
       }
     },
     "SOL": {
       "7d": {
         "regime": "LOW",
-        "vol_now": 48.4,
+        "vol_now": 61.3,
         "vol_median": 70.1
       },
       "30d": {
         "regime": "LOW",
-        "vol_now": 43.3,
+        "vol_now": 47.6,
         "vol_median": 78.2
       },
       "60d": {
         "regime": "LOW",
-        "vol_now": 41.2,
-        "vol_median": 78.2
+        "vol_now": 42.5,
+        "vol_median": 78.1
       },
       "90d": {
         "regime": "LOW",
-        "vol_now": 48.2,
+        "vol_now": 49.4,
         "vol_median": 80.2
       },
       "6mo": {
         "regime": "LOW",
-        "vol_now": 44.6,
+        "vol_now": 45.3,
         "vol_median": 80.8
       },
       "12mo": {
         "regime": "LOW",
         "vol_now": 56.7,
-        "vol_median": 77.6
+        "vol_median": 77.5
       }
     },
     "GOLD": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 15.7,
+        "vol_now": 20.3,
         "vol_median": 14.0
       },
       "30d": {
         "regime": "HIGH",
-        "vol_now": 20.9,
+        "vol_now": 21.8,
         "vol_median": 14.9
       },
       "60d": {
         "regime": "HIGH",
-        "vol_now": 25.4,
+        "vol_now": 25.6,
         "vol_median": 15.2
       },
       "90d": {
         "regime": "HIGH",
-        "vol_now": 23.4,
+        "vol_now": 23.5,
         "vol_median": 15.6
       },
       "6mo": {
@@ -124,19 +124,19 @@
       },
       "12mo": {
         "regime": "HIGH",
-        "vol_now": 26.7,
+        "vol_now": 26.8,
         "vol_median": 16.2
       }
     },
     "SILVER": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 28.9,
+        "vol_now": 34.1,
         "vol_median": 24.0
       },
       "30d": {
         "regime": "HIGH",
-        "vol_now": 33.2,
+        "vol_now": 34.1,
         "vol_median": 26.6
       },
       "60d": {
@@ -163,7 +163,7 @@
     "OIL": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 31.1,
+        "vol_now": 31.2,
         "vol_median": 29.8
       },
       "30d": {
@@ -195,22 +195,22 @@
     "COPPER": {
       "7d": {
         "regime": "LOW",
-        "vol_now": 20.8,
+        "vol_now": 20.1,
         "vol_median": 21.0
       },
       "30d": {
         "regime": "LOW",
-        "vol_now": 20.6,
+        "vol_now": 20.5,
         "vol_median": 22.5
       },
       "60d": {
         "regime": "LOW",
-        "vol_now": 23.3,
+        "vol_now": 23.2,
         "vol_median": 23.4
       },
       "90d": {
         "regime": "HIGH",
-        "vol_now": 25.5,
+        "vol_now": 25.4,
         "vol_median": 23.5
       },
       "6mo": {
@@ -220,14 +220,14 @@
       },
       "12mo": {
         "regime": "HIGH",
-        "vol_now": 36.7,
+        "vol_now": 36.6,
         "vol_median": 24.6
       }
     },
     "NAT GAS": {
       "7d": {
         "regime": "LOW",
-        "vol_now": 29.7,
+        "vol_now": 30.5,
         "vol_median": 45.2
       },
       "30d": {
@@ -259,22 +259,22 @@
     "PLATINUM": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 25.9,
+        "vol_now": 24.4,
         "vol_median": 20.6
       },
       "30d": {
         "regime": "HIGH",
-        "vol_now": 35.8,
+        "vol_now": 35.6,
         "vol_median": 22.3
       },
       "60d": {
         "regime": "HIGH",
-        "vol_now": 38.7,
+        "vol_now": 38.5,
         "vol_median": 23.0
       },
       "90d": {
         "regime": "HIGH",
-        "vol_now": 38.4,
+        "vol_now": 38.3,
         "vol_median": 23.2
       },
       "6mo": {
@@ -284,46 +284,46 @@
       },
       "12mo": {
         "regime": "HIGH",
-        "vol_now": 50.5,
+        "vol_now": 50.4,
         "vol_median": 23.1
       }
     },
     "PALLADIUM": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 31.0,
+        "vol_now": 50.1,
         "vol_median": 28.6
       },
       "30d": {
         "regime": "HIGH",
-        "vol_now": 40.4,
+        "vol_now": 44.5,
         "vol_median": 31.5
       },
       "60d": {
         "regime": "HIGH",
-        "vol_now": 43.3,
+        "vol_now": 45.4,
         "vol_median": 33.1
       },
       "90d": {
         "regime": "HIGH",
-        "vol_now": 41.8,
+        "vol_now": 43.2,
         "vol_median": 33.6
       },
       "6mo": {
         "regime": "HIGH",
-        "vol_now": 61.6,
+        "vol_now": 62.1,
         "vol_median": 35.4
       },
       "12mo": {
         "regime": "HIGH",
-        "vol_now": 51.7,
+        "vol_now": 52.0,
         "vol_median": 36.0
       }
     },
     "BRENT OIL": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 37.3,
+        "vol_now": 37.5,
         "vol_median": 27.0
       },
       "30d": {
@@ -355,59 +355,59 @@
     "WHEAT": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 36.3,
+        "vol_now": 43.0,
         "vol_median": 27.1
       },
       "30d": {
         "regime": "HIGH",
-        "vol_now": 34.8,
+        "vol_now": 37.4,
         "vol_median": 29.1
       },
       "60d": {
         "regime": "HIGH",
-        "vol_now": 32.2,
+        "vol_now": 33.6,
         "vol_median": 29.0
       },
       "90d": {
         "regime": "HIGH",
-        "vol_now": 33.7,
+        "vol_now": 34.6,
         "vol_median": 29.3
       },
       "6mo": {
         "regime": "HIGH",
-        "vol_now": 29.8,
+        "vol_now": 30.3,
         "vol_median": 29.2
       },
       "12mo": {
         "regime": "LOW",
-        "vol_now": 26.5,
+        "vol_now": 26.8,
         "vol_median": 29.1
       }
     },
     "CORN": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 26.5,
+        "vol_now": 27.9,
         "vol_median": 21.9
       },
       "30d": {
         "regime": "HIGH",
-        "vol_now": 28.5,
+        "vol_now": 28.9,
         "vol_median": 23.8
       },
       "60d": {
         "regime": "HIGH",
-        "vol_now": 27.2,
+        "vol_now": 27.4,
         "vol_median": 24.3
       },
       "90d": {
         "regime": "HIGH",
-        "vol_now": 26.4,
+        "vol_now": 26.6,
         "vol_median": 24.4
       },
       "6mo": {
         "regime": "LOW",
-        "vol_now": 22.2,
+        "vol_now": 22.3,
         "vol_median": 25.4
       },
       "12mo": {
@@ -418,114 +418,114 @@
     },
     "SOYBEANS": {
       "7d": {
-        "regime": "LOW",
-        "vol_now": 15.0,
+        "regime": "HIGH",
+        "vol_now": 18.7,
         "vol_median": 18.4
       },
       "30d": {
         "regime": "HIGH",
-        "vol_now": 19.7,
+        "vol_now": 20.5,
         "vol_median": 19.6
       },
       "60d": {
         "regime": "LOW",
-        "vol_now": 19.1,
+        "vol_now": 19.6,
         "vol_median": 19.9
       },
       "90d": {
         "regime": "LOW",
-        "vol_now": 18.9,
+        "vol_now": 19.2,
         "vol_median": 20.6
       },
       "6mo": {
         "regime": "LOW",
-        "vol_now": 17.0,
+        "vol_now": 17.2,
         "vol_median": 21.4
       },
       "12mo": {
         "regime": "LOW",
-        "vol_now": 16.6,
+        "vol_now": 16.7,
         "vol_median": 22.4
       }
     },
     "COFFEE": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 51.4,
+        "vol_now": 70.8,
         "vol_median": 29.8
       },
       "30d": {
         "regime": "HIGH",
-        "vol_now": 45.8,
+        "vol_now": 52.5,
         "vol_median": 32.2
       },
       "60d": {
         "regime": "HIGH",
-        "vol_now": 58.3,
+        "vol_now": 61.1,
         "vol_median": 33.0
       },
       "90d": {
         "regime": "HIGH",
-        "vol_now": 51.4,
+        "vol_now": 53.6,
         "vol_median": 33.2
       },
       "6mo": {
         "regime": "HIGH",
-        "vol_now": 43.4,
+        "vol_now": 44.7,
         "vol_median": 33.3
       },
       "12mo": {
         "regime": "HIGH",
-        "vol_now": 40.7,
+        "vol_now": 41.4,
         "vol_median": 34.6
       }
     },
     "SUGAR": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 27.2,
+        "vol_now": 36.7,
         "vol_median": 26.6
       },
       "30d": {
-        "regime": "LOW",
-        "vol_now": 27.6,
+        "regime": "HIGH",
+        "vol_now": 29.6,
         "vol_median": 29.4
       },
       "60d": {
         "regime": "LOW",
-        "vol_now": 26.4,
+        "vol_now": 27.5,
         "vol_median": 29.2
       },
       "90d": {
         "regime": "LOW",
-        "vol_now": 27.5,
+        "vol_now": 28.2,
         "vol_median": 29.1
       },
       "6mo": {
         "regime": "LOW",
-        "vol_now": 26.5,
+        "vol_now": 26.9,
         "vol_median": 30.2
       },
       "12mo": {
         "regime": "LOW",
-        "vol_now": 24.7,
+        "vol_now": 24.9,
         "vol_median": 30.1
       }
     },
     "COTTON": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 26.7,
+        "vol_now": 24.8,
         "vol_median": 23.5
       },
       "30d": {
         "regime": "LOW",
-        "vol_now": 19.4,
+        "vol_now": 19.7,
         "vol_median": 25.9
       },
       "60d": {
-        "regime": "LOW",
-        "vol_now": 26.3,
+        "regime": "HIGH",
+        "vol_now": 26.5,
         "vol_median": 26.4
       },
       "90d": {
@@ -535,7 +535,7 @@
       },
       "6mo": {
         "regime": "LOW",
-        "vol_now": 23.0,
+        "vol_now": 22.8,
         "vol_median": 25.7
       },
       "12mo": {
@@ -547,59 +547,59 @@
     "GASOLINE": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 83.7,
+        "vol_now": 71.6,
         "vol_median": 31.9
       },
       "30d": {
         "regime": "HIGH",
-        "vol_now": 54.8,
+        "vol_now": 50.9,
         "vol_median": 35.4
       },
       "60d": {
         "regime": "HIGH",
-        "vol_now": 48.8,
+        "vol_now": 46.6,
         "vol_median": 36.9
       },
       "90d": {
         "regime": "HIGH",
-        "vol_now": 48.6,
+        "vol_now": 47.2,
         "vol_median": 37.1
       },
       "6mo": {
         "regime": "HIGH",
-        "vol_now": 50.6,
+        "vol_now": 49.9,
         "vol_median": 37.0
       },
       "12mo": {
         "regime": "HIGH",
-        "vol_now": 41.2,
+        "vol_now": 40.8,
         "vol_median": 38.9
       }
     },
     "HEATING OIL": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 34.5,
+        "vol_now": 32.7,
         "vol_median": 28.4
       },
       "30d": {
         "regime": "HIGH",
-        "vol_now": 45.6,
+        "vol_now": 45.0,
         "vol_median": 31.1
       },
       "60d": {
         "regime": "HIGH",
-        "vol_now": 49.9,
+        "vol_now": 49.6,
         "vol_median": 32.0
       },
       "90d": {
         "regime": "HIGH",
-        "vol_now": 50.6,
+        "vol_now": 50.5,
         "vol_median": 32.1
       },
       "6mo": {
         "regime": "HIGH",
-        "vol_now": 63.9,
+        "vol_now": 63.8,
         "vol_median": 32.4
       },
       "12mo": {
@@ -611,22 +611,22 @@
     "EURUSD": {
       "7d": {
         "regime": "LOW",
-        "vol_now": 5.3,
+        "vol_now": 6.7,
         "vol_median": 7.4
       },
       "30d": {
         "regime": "LOW",
-        "vol_now": 4.3,
+        "vol_now": 4.7,
         "vol_median": 7.9
       },
       "60d": {
         "regime": "LOW",
-        "vol_now": 4.8,
+        "vol_now": 4.9,
         "vol_median": 8.1
       },
       "90d": {
         "regime": "LOW",
-        "vol_now": 4.5,
+        "vol_now": 4.6,
         "vol_median": 8.3
       },
       "6mo": {
@@ -643,17 +643,17 @@
     "GBPUSD": {
       "7d": {
         "regime": "LOW",
-        "vol_now": 4.4,
+        "vol_now": 4.3,
         "vol_median": 7.5
       },
       "30d": {
         "regime": "LOW",
-        "vol_now": 4.8,
+        "vol_now": 5.0,
         "vol_median": 8.0
       },
       "60d": {
         "regime": "LOW",
-        "vol_now": 5.7,
+        "vol_now": 5.6,
         "vol_median": 8.1
       },
       "90d": {
@@ -675,12 +675,12 @@
     "USDJPY": {
       "7d": {
         "regime": "LOW",
-        "vol_now": 5.9,
+        "vol_now": 6.6,
         "vol_median": 8.2
       },
       "30d": {
         "regime": "LOW",
-        "vol_now": 8.7,
+        "vol_now": 8.8,
         "vol_median": 9.1
       },
       "60d": {
@@ -690,12 +690,12 @@
       },
       "90d": {
         "regime": "LOW",
-        "vol_now": 6.7,
+        "vol_now": 6.8,
         "vol_median": 9.2
       },
       "6mo": {
         "regime": "LOW",
-        "vol_now": 7.6,
+        "vol_now": 7.7,
         "vol_median": 9.3
       },
       "12mo": {
@@ -707,18 +707,18 @@
     "AUDUSD": {
       "7d": {
         "regime": "LOW",
-        "vol_now": 5.5,
+        "vol_now": 5.9,
         "vol_median": 9.1
       },
       "30d": {
         "regime": "LOW",
-        "vol_now": 5.9,
+        "vol_now": 6.0,
         "vol_median": 9.6
       },
       "60d": {
         "regime": "LOW",
-        "vol_now": 6.7,
-        "vol_median": 9.8
+        "vol_now": 6.2,
+        "vol_median": 9.7
       },
       "90d": {
         "regime": "LOW",
@@ -739,7 +739,7 @@
     "USDCHF": {
       "7d": {
         "regime": "HIGH",
-        "vol_now": 12.1,
+        "vol_now": 12.6,
         "vol_median": 7.7
       },
       "30d": {
@@ -749,7 +749,7 @@
       },
       "60d": {
         "regime": "LOW",
-        "vol_now": 7.1,
+        "vol_now": 7.2,
         "vol_median": 8.1
       },
       "90d": {
@@ -771,12 +771,12 @@
     "USDCAD": {
       "7d": {
         "regime": "LOW",
-        "vol_now": 5.4,
+        "vol_now": 3.8,
         "vol_median": 6.7
       },
       "30d": {
         "regime": "LOW",
-        "vol_now": 4.1,
+        "vol_now": 4.2,
         "vol_median": 7.1
       },
       "60d": {
@@ -786,7 +786,7 @@
       },
       "90d": {
         "regime": "LOW",
-        "vol_now": 3.9,
+        "vol_now": 4.0,
         "vol_median": 7.4
       },
       "6mo": {
@@ -803,22 +803,22 @@
     "NZDUSD": {
       "7d": {
         "regime": "LOW",
-        "vol_now": 7.6,
+        "vol_now": 6.4,
         "vol_median": 9.9
       },
       "30d": {
         "regime": "LOW",
-        "vol_now": 7.3,
+        "vol_now": 7.6,
         "vol_median": 10.4
       },
       "60d": {
         "regime": "LOW",
-        "vol_now": 7.6,
+        "vol_now": 7.3,
         "vol_median": 10.6
       },
       "90d": {
         "regime": "LOW",
-        "vol_now": 8.3,
+        "vol_now": 8.4,
         "vol_median": 10.8
       },
       "6mo": {
@@ -835,12 +835,12 @@
     "SPX": {
       "7d": {
         "regime": "LOW",
-        "vol_now": 8.0,
+        "vol_now": 8.1,
         "vol_median": 12.6
       },
       "30d": {
         "regime": "LOW",
-        "vol_now": 12.3,
+        "vol_now": 11.9,
         "vol_median": 13.3
       },
       "60d": {
@@ -875,9 +875,9 @@
         67
       ],
       "brier": {
-        "brier": 0.227,
-        "brier_base": 0.251,
-        "skill": 0.095,
+        "brier": 0.223,
+        "brier_base": 0.25,
+        "skill": 0.107,
         "n_eval": 2559
       }
     },
@@ -890,9 +890,9 @@
         76
       ],
       "brier": {
-        "brier": 0.206,
+        "brier": 0.2,
         "brier_base": 0.249,
-        "skill": 0.172,
+        "skill": 0.196,
         "n_eval": 589
       }
     },
@@ -902,42 +902,42 @@
       "n": 577,
       "ci": [
         69,
-        76
+        77
       ],
       "brier": {
-        "brier": 0.216,
-        "brier_base": 0.253,
-        "skill": 0.145,
+        "brier": 0.212,
+        "brier_base": 0.254,
+        "skill": 0.163,
         "n_eval": 288
       }
     },
     "90d": {
-      "acc": 73,
-      "edge": 19,
+      "acc": 72,
+      "edge": 18,
       "n": 379,
       "ci": [
         68,
         77
       ],
       "brier": {
-        "brier": 0.202,
+        "brier": 0.204,
         "brier_base": 0.249,
-        "skill": 0.192,
+        "skill": 0.183,
         "n_eval": 189
       }
     },
     "6mo": {
-      "acc": 73,
-      "edge": 11,
+      "acc": 71,
+      "edge": 9,
       "n": 181,
       "ci": [
-        66,
-        80
+        65,
+        78
       ],
       "brier": {
-        "brier": 0.224,
-        "brier_base": 0.251,
-        "skill": 0.106,
+        "brier": 0.24,
+        "brier_base": 0.256,
+        "skill": 0.063,
         "n_eval": 90
       }
     },
@@ -959,43 +959,43 @@
   },
   "ood": {
     "BTC": {
-      "vol_pctile": 27.1,
+      "vol_pctile": 30.6,
       "out_of_range": false
     },
     "ETH": {
-      "vol_pctile": 42.1,
+      "vol_pctile": 42.9,
       "out_of_range": false
     },
     "SOL": {
-      "vol_pctile": 5.3,
+      "vol_pctile": 9.1,
       "out_of_range": false
     },
     "GOLD": {
-      "vol_pctile": 81.8,
+      "vol_pctile": 84.6,
       "out_of_range": false
     },
     "SILVER": {
-      "vol_pctile": 71.6,
+      "vol_pctile": 74.0,
       "out_of_range": false
     },
     "OIL": {
-      "vol_pctile": 89.0,
+      "vol_pctile": 88.9,
       "out_of_range": false
     },
     "COPPER": {
-      "vol_pctile": 39.3,
+      "vol_pctile": 38.3,
       "out_of_range": false
     },
     "NAT GAS": {
-      "vol_pctile": 20.8,
+      "vol_pctile": 20.9,
       "out_of_range": false
     },
     "PLATINUM": {
-      "vol_pctile": 88.2,
+      "vol_pctile": 88.0,
       "out_of_range": false
     },
     "PALLADIUM": {
-      "vol_pctile": 70.0,
+      "vol_pctile": 78.3,
       "out_of_range": false
     },
     "BRENT OIL": {
@@ -1003,67 +1003,67 @@
       "out_of_range": false
     },
     "WHEAT": {
-      "vol_pctile": 73.2,
+      "vol_pctile": 81.2,
       "out_of_range": false
     },
     "CORN": {
-      "vol_pctile": 68.8,
+      "vol_pctile": 70.1,
       "out_of_range": false
     },
     "SOYBEANS": {
-      "vol_pctile": 50.5,
+      "vol_pctile": 55.2,
       "out_of_range": false
     },
     "COFFEE": {
-      "vol_pctile": 92.9,
+      "vol_pctile": 96.4,
       "out_of_range": false
     },
     "SUGAR": {
-      "vol_pctile": 43.1,
+      "vol_pctile": 51.3,
       "out_of_range": false
     },
     "COTTON": {
-      "vol_pctile": 20.3,
+      "vol_pctile": 21.8,
       "out_of_range": false
     },
     "GASOLINE": {
-      "vol_pctile": 89.1,
+      "vol_pctile": 85.6,
       "out_of_range": false
     },
     "HEATING OIL": {
-      "vol_pctile": 83.4,
+      "vol_pctile": 83.1,
       "out_of_range": false
     },
     "EURUSD": {
-      "vol_pctile": 5.6,
+      "vol_pctile": 7.5,
       "out_of_range": false
     },
     "GBPUSD": {
-      "vol_pctile": 3.8,
-      "out_of_range": false
-    },
-    "USDJPY": {
-      "vol_pctile": 46.4,
-      "out_of_range": false
-    },
-    "AUDUSD": {
       "vol_pctile": 4.7,
       "out_of_range": false
     },
-    "USDCHF": {
-      "vol_pctile": 45.8,
+    "USDJPY": {
+      "vol_pctile": 47.8,
       "out_of_range": false
     },
-    "USDCAD": {
+    "AUDUSD": {
       "vol_pctile": 5.4,
       "out_of_range": false
     },
+    "USDCHF": {
+      "vol_pctile": 46.4,
+      "out_of_range": false
+    },
+    "USDCAD": {
+      "vol_pctile": 7.2,
+      "out_of_range": false
+    },
     "NZDUSD": {
-      "vol_pctile": 9.7,
+      "vol_pctile": 12.7,
       "out_of_range": false
     },
     "SPX": {
-      "vol_pctile": 42.3,
+      "vol_pctile": 38.9,
       "out_of_range": false
     }
   },
