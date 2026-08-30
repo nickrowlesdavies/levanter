@@ -5,7 +5,7 @@ X. 6 posts, each inside the 280-character limit. Post in order as a thread. The 
 
 Levanter daily · Sunday 30 August
 
-UNI led the whole board yesterday (+10.2%), GASOLINE lagged (-9.9%). 47 of 69 markets closed higher. Breadth positive across the board.
+UNI led the whole board yesterday (+14.2%), GASOLINE lagged (-9.9%). 50 of 69 markets closed higher. Breadth positive across the board.
 
 Crypto, FX and commodities below.
 
@@ -15,11 +15,11 @@ Commodities have 14 of 16 markets flagged high-vol for the week ahead, while cry
 
 --- 3/6 (190 chars) ---
 
-Crypto: 30 of 35 higher. UNI +10.2%, ICP -2.1%.
+Crypto: 33 of 35 higher. UNI +14.2%, ICP -1.8%.
 
-Week: 17 of 35 up, UNI best at +18.5%.
+Week: 13 of 35 up, UNI best at +17.8%.
 
-Month: PUMP leads +143.4%, ONDO lags -12.4%.
+Month: PUMP leads +142.3%, ONDO lags -12.0%.
 
 Volatility leans calmer near-term (0/3 high-vol at 7d).
 
