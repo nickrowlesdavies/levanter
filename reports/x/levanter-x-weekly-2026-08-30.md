@@ -5,7 +5,7 @@ X. 6 posts, each inside the 280-character limit. Post in order as a thread. The 
 
 Levanter weekly · week ending 30 August
 
-This week 31 of 69 markets across crypto, FX and commodities finished higher. UNI led the board, COFFEE lagged.
+This week 30 of 69 markets across crypto, FX and commodities finished higher. XMR led the board, COFFEE lagged.
 
 The week by asset class below.
 
@@ -13,9 +13,9 @@ The week by asset class below.
 
 Commodities have 14 of 16 markets flagged high-vol for the week ahead, while crypto and FX both read calm. Same board, very different weather.
 
---- 3/6 (105 chars) ---
+--- 3/6 (106 chars) ---
 
-Crypto on the week: 13 of 35 higher. UNI +17.8%, BCH -9.4%.
+Crypto on the week: 12 of 35 higher. XMR +20.5%, PEPE -9.8%.
 
 Week ahead: calmer, 0 of 3 flagged high-vol.
 
