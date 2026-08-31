@@ -24,6 +24,7 @@ Voice rules: no em dashes, no AI kill-words. Educational, not advice.
 import datetime as dt
 import json
 import os
+import statistics
 import sys
 
 import signal_note as sn
@@ -175,6 +176,56 @@ def _regime_word(reg):
     return {"HIGH": "turbulent", "LOW": "calm"}.get(str(reg).upper(), str(reg).lower())
 
 
+CLS_LABEL = {"crypto": "Crypto", "fx": "FX", "commodity": "Commodities"}
+
+
+def _vol_table(vr, horizon="30d"):
+    """Every tracked market with its own volatility numbers, not just the call.
+    The classification alone is the free tier's level of detail; a subscriber
+    should see the reading, the market's own median, and where it sits."""
+    cls, assets = vr.get("classes", {}), vr.get("assets", {})
+    ood = vr.get("ood", {}) or {}
+    rows = []
+    for sym, c in sorted(cls.items()):
+        a = (assets.get(sym, {}) or {}).get(horizon, {}) or {}
+        if not a or a.get("vol_now") is None:
+            continue
+        now, med = a.get("vol_now"), a.get("vol_median")
+        pct = (ood.get(sym, {}) or {}).get("vol_pctile")
+        rows.append({"sym": sym, "cls": c, "now": now, "med": med,
+                     "ratio": (now / med) if med else None,
+                     "pctile": pct, "call": _regime_word(a.get("regime"))})
+    return rows
+
+
+def _horizon_medians(rows_map):
+    """Median 30d / 180d / 365d move for a class, so the month can be read against
+    the year rather than in isolation."""
+    out = {}
+    for key, field in (("m1", "chg30"), ("m6", "chg180"), ("m12", "chg365")):
+        vals = sorted(v for v in (r.get(field) for r in rows_map) if isinstance(v, (int, float)))
+        out[key] = statistics.median(vals) if vals else None
+        out[key + "_n"] = len(vals)
+    return out
+
+
+def _pct(v, dp=1):
+    return "n/a" if v is None else f"{v:+.{dp}f}%"
+
+
+def _lvl(v):
+    """Exact price for a levels table. signal_note._kfmt rounds to the nearest
+    thousand, which is fine for bitcoin prose and wrong for ether: it renders
+    2,437 as 2,000. A table of levels has to be precise."""
+    if v is None:
+        return "n/a"
+    if v >= 100:
+        return f"{v:,.0f}"
+    if v >= 1:
+        return f"{v:,.2f}"
+    return f"{v:,.4f}"
+
+
 def compose(launch, month, rets, basis, cur_state, prev_state):
     cm, fxm = sn._read("crypto_map.json"), sn._read("fx_map.json")
     com, vr = sn._read("commodities_map.json"), sn._read("vol_regime.json")
@@ -249,6 +300,59 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
             f"Strongest: {_moves(st['top'])}. {tail_word}: {_moves(st['bot'])}.")
         P.append("")
 
+    # ===== The month against the year =====
+    # The free tier reports the month. A subscriber should be able to see whether
+    # the month was ordinary or unusual, which needs the longer horizons alongside it.
+    hz = {"crypto": _horizon_medians(cm.get("coins") or []),
+          "fx": _horizon_medians(fxm.get("pairs") or []),
+          "comd": _horizon_medians(com.get("items") or [])}
+    if any(v.get("m12") is not None for v in hz.values()):
+        P += ["## The month against the year", ""]
+        P.append("One month tells you almost nothing on its own. The table sets the median market in "
+                 "each class against its own six and twelve month record, so you can see whether this "
+                 "month was ordinary, or the outlier the headline number makes it look.")
+        P.append("")
+        P.append("| Class | Median this month | Median 6 months | Median 12 months |")
+        P.append("| --- | --- | --- | --- |")
+        for cls, lab in (("crypto", "Crypto"), ("fx", "FX"), ("comd", "Commodities")):
+            h = hz.get(cls, {})
+            P.append(f"| {lab} | {_pct(h.get('m1'))} | {_pct(h.get('m6'))} | {_pct(h.get('m12'))} |")
+        P.append("")
+        P.append("Medians, not averages, so a single runaway name cannot carry the row. Where a "
+                 "market has too little history for a horizon it is left out of that column rather "
+                 "than padded.")
+        P.append("")
+        # The month-against-year gap is usually the most useful thing on this page,
+        # and it is the read the free monthly cannot give because it has no table.
+        ch = hz.get("crypto", {})
+        if ch.get("m1") is not None and ch.get("m12") is not None and ch["m1"] > 0 > ch["m12"]:
+            P.append(
+                f"That crypto row is the number to sit with. The median coin rose "
+                f"{ch['m1']:.1f} percent this month and is still down {abs(ch['m12']):.0f} percent "
+                f"over twelve months, across the {ch.get('m12_n', 0)} coins with a full year of "
+                f"history. A strong month inside a bad year is a different thing from a recovery, and "
+                f"the monthly number on its own cannot tell you which one you are looking at. This is "
+                f"the gap between a good month and a good year, and it is where position sizing is "
+                f"decided rather than where it is celebrated.")
+            P.append("")
+
+    # Breadth: whether the move was broad or carried by the heavyweights.
+    capw, eqw = cm.get("cap_weighted_ret"), cm.get("equal_weighted_ret")
+    if capw is not None and eqw is not None:
+        broad = eqw > capw
+        P.append(
+            f"Breadth inside crypto. The equal-weighted basket returned {eqw:+.1f} percent against "
+            f"{capw:+.1f} percent cap-weighted. "
+            + (f"The average coin beat the heavyweights, so the move broadened into smaller names. "
+               f"That is the signature of healthy appetite and also of the later stage of a run, when "
+               f"the quality bar quietly drops."
+               if broad else
+               f"The heavyweights carried the move and the average coin lagged them, so the rally is "
+               f"narrower than the index return suggests.")
+            + f" Bitcoin dominance is near {dom:.0f} percent."
+            if dom else "")
+        P.append("")
+
     # ===== Valuation =====
     if fair:
         P += ["## The one chart: bitcoin against its long-run trend", ""]
@@ -271,6 +375,50 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
                 f"so close agreement is near enough guaranteed and tells you nothing the first number did "
                 f"not. On a monthly horizon this is the number that matters most, because valuation "
                 f"says far more about a year than about a week.")
+            P.append("")
+
+    # ===== Cycle detail: the majors against their own trend, not just bitcoin =====
+    cyc_rows = [a for a in (cg.get("assets") or [])
+                if a.get("kind") == "crypto" and a.get("pct_vs_trend") is not None]
+    if cyc_rows:
+        P += ["## The majors against their own trend lines", ""]
+        P.append("Bitcoin is not the whole of crypto and the majors do not sit at the same point on "
+                 "their own curves. Each row below is fitted separately, against that asset's own "
+                 "history, so the comparison is like for like.")
+        P.append("")
+        P.append("| Asset | Price | Cycle gauge fair value | Against trend |")
+        P.append("| --- | --- | --- | --- |")
+        for a in cyc_rows:
+            P.append(f"| {a.get('name', a.get('sym'))} | {_lvl(a.get('price'))} | "
+                     f"{_lvl(a.get('fair'))} | {a['pct_vs_trend']:+.0f}% |")
+        P.append("")
+        if fair:
+            P.append(f"The bitcoin fair value in this table is the cycle gauge's, which is why it "
+                     f"differs from the {sn._kfmt(fair)} quoted above. Two fits, two price histories, "
+                     f"two answers. We show both rather than picking the one that reads better.")
+            P.append("")
+        eb = cg.get("ethbtc") or {}
+        halv = cg.get("days_since_halving")
+        bits = []
+        if eb.get("ratio") is not None:
+            bits.append(f"The ether to bitcoin ratio is {eb['ratio']:.4f}"
+                        + (f", around the {eb['percentile']:.0f}th percentile of its own range"
+                           if eb.get("percentile") is not None else "")
+                        + (f", {eb['chg6m']:+.0f} percent over six months" if eb.get("chg6m") is not None else "")
+                        + ". Leadership inside crypto rotates, which is why a single crypto number "
+                          "hides more than it shows.")
+        if halv:
+            nh = ""
+            if cg.get("next_halving"):
+                try:
+                    nh = (f", with the next due in "
+                          f"{dt.date.fromisoformat(cg['next_halving']):%B %Y}")
+                except (ValueError, TypeError):
+                    nh = f", with the next due {cg['next_halving']}"
+            bits.append(f"We are {halv:,} days past the 2024 halving{nh}, and the gauge reads the "
+                        f"phase as {str(phase).lower()}.")
+        for b in bits:
+            P.append(b)
             P.append("")
 
     P += ["## What the model can and cannot do", ""]
@@ -322,6 +470,48 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
             f"the board rather than spread across it, which is a different picture from a market that "
             f"is simply nervous everywhere.")
         P.append("")
+
+    # ===== The full volatility board =====
+    # The free tier gets the conclusion. The subscriber gets the working: every
+    # tracked market's own reading against its own median, which is what the call
+    # is actually made from.
+    vt = _vol_table(vr, "30d")
+    if vt:
+        P += ["### The full board, market by market", ""]
+        P.append("This is the model's working rather than its conclusion. Volatility is annualised. "
+                 "The median column is each market's own long-run median, so every row is judged "
+                 "against itself and not against a common threshold. Percentile is where the current "
+                 "reading sits in that market's own history.")
+        P.append("")
+        P.append("| Market | Class | 30d vol | Its median | vs median | Percentile | Call |")
+        P.append("| --- | --- | --- | --- | --- | --- | --- |")
+        for r in sorted(vt, key=lambda x: (x["cls"], -(x["ratio"] or 0))):
+            ratio = f"{r['ratio']:.2f}x" if r.get("ratio") else "n/a"
+            pct = f"{r['pctile']:.0f}" if r.get("pctile") is not None else "n/a"
+            med = f"{r['med']:.0f}" if r.get("med") is not None else "n/a"
+            P.append(f"| {r['sym']} | {CLS_LABEL.get(r['cls'], str(r['cls']).title())} | "
+                     f"{r['now']:.0f} | {med} | {ratio} | {pct} | {r['call']} |")
+        P.append("")
+        hi = [r for r in vt if r["call"] == "turbulent"]
+        if hi:
+            top = max(hi, key=lambda x: x.get("ratio") or 0)
+            P.append(f"The most stretched reading on the board is {top['sym']}, running "
+                     f"{top['ratio']:.2f} times its own median. A market can be called turbulent while "
+                     f"still sitting below another market's calm reading, which is the point of judging "
+                     f"each one against itself.")
+            P.append("")
+        # A call sitting on the median is a coin flip dressed as a classification.
+        # Say so rather than letting the table imply equal confidence in every row.
+        edge = sorted((r for r in vt if r.get("ratio") and 0.9 <= r["ratio"] <= 1.1),
+                      key=lambda x: abs(x["ratio"] - 1))
+        if edge:
+            names = sn._join([f"{r['sym']} at {r['ratio']:.2f}x" for r in edge[:4]])
+            P.append(f"Treat the rows near the line with less confidence than the rest. {names} are "
+                     f"close enough to their own medians that the call could go either way, and we "
+                     f"would rather flag that than present every row as equally settled. The ones "
+                     f"worth acting on are the stretched readings at the top and the quiet ones at "
+                     f"the bottom.")
+            P.append("")
 
     # ===== What changed =====
     P += ["## What changed since the last monthly Signal", ""]
@@ -378,13 +568,58 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
         "next issue and show where it was wrong.")
     P.append("")
 
-    n, dacc = dbt.get("n"), dbt.get("accuracy")
-    if dacc:
+    # CLAUDE.md: quote all three scorecard rows with the commodities caveat attached.
+    # Never the blended figure, which flatters the weaker sample by averaging it away.
+    rows = {c.get("cls"): c for c in (dbt.get("by_class") or [])}
+    crow, comrow, fxrow = rows.get("crypto", {}), rows.get("commodity", {}), rows.get("fx", {})
+    if crow.get("acc") is not None:
+        ci = sn._wilson_ci(crow.get("acc"), crow.get("n"))
+        citxt = f", 95 percent interval {ci[0]} to {ci[1]}" if ci else ""
         P.append(
-            f"One honesty line to close. Across {n} scored direction calls our accuracy is about "
-            f"{dacc} percent, which is close to a coin flip and exactly what the research says to "
-            f"expect. We publish it because the number is the point. Volatility is forecastable and we "
-            f"forecast it. Direction is not, so we do not sell it.")
+            f"One honesty section to close, quoted by asset class rather than blended into a single "
+            f"number. On direction our crypto calls run about {crow['acc']:.0f} percent over "
+            f"{crow['n']:,} backtested calls{citxt}. That is a coin flip.")
+        P.append("")
+        if comrow.get("acc") is not None and comrow.get("n"):
+            P.append(
+                f"Commodities read {comrow['acc']:.0f} percent over {comrow['n']:,} calls. We do not "
+                f"present that as an edge and you should not read it as one. The sample is small, "
+                f"commodity moves are serially correlated so consecutive calls are not independent "
+                f"bets, the window trended, and we scored three asset classes. The highest of three "
+                f"is the one most likely to be luck.")
+            P.append("")
+        if not fxrow.get("n"):
+            P.append("FX has no scored sample yet, so we quote nothing for it rather than filling the "
+                     "gap with the blended figure.")
+            P.append("")
+        P.append(
+            f"These are backtested calls over a fixed window{(', ' + dbt['period']) if dbt.get('period') else ''}, "
+            f"not a live public record, and we label them that way every time. We publish them because "
+            f"the number is the point. Volatility is forecastable and we forecast it. Direction is not, "
+            f"so we do not sell it.")
+        P.append("")
+
+    # ===== Appendix: the complete board =====
+    # Top three and bottom three is a summary. A paid note should not make the
+    # reader take our word for what the other thirty markets did.
+    P += ["## Appendix: every market we track", ""]
+    P.append("The full month for every market on the board, not a selection. Ranked within each "
+             "class. This is the same data the summary above is drawn from.")
+    P.append("")
+    for cls, lab in (("crypto", "Crypto"), ("fx", "Foreign exchange"), ("comd", "Commodities")):
+        rowset = rets.get(cls) or []
+        if not rowset:
+            continue
+        P += [f"### {lab}", ""]
+        P.append("| Market | Move | Market | Move |")
+        P.append("| --- | --- | --- | --- |")
+        ordered = sorted(rowset, key=lambda kv: kv[1], reverse=True)
+        half = (len(ordered) + 1) // 2
+        left, right = ordered[:half], ordered[half:]
+        for i in range(half):
+            a = f"{left[i][0]} | {left[i][1]:+.1f}%"
+            b = f"{right[i][0]} | {right[i][1]:+.1f}%" if i < len(right) else " | "
+            P.append(f"| {a} | {b} |")
         P.append("")
 
     P += ["---", ""]
@@ -399,7 +634,9 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
                  "levantermarkets.com. Educational market analysis, not financial advice.*")
 
     meta = {"month": month, "mname": mname, "turbulent": turbulent, "rets": rets,
-            "basis": basis, "ou": ou, "dom": dom, "acc30": b30.get("acc"), "dacc": dacc}
+            "basis": basis, "ou": ou, "dom": dom, "acc30": b30.get("acc"),
+            # The crypto row, never the blended figure. CLAUDE.md.
+            "dacc": crow.get("acc")}
     return "\n".join(P).rstrip() + "\n", meta
 
 
