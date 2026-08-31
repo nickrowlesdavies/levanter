@@ -160,6 +160,21 @@ def _moves(rows):
     return sn._join([f"{s} {v:+.1f} percent" for s, v in rows])
 
 
+def _voldetail30(vr, sym):
+    """Thirty-day volatility detail. signal_note._voldetail is hard-wired to the 7d
+    horizon, which is the wrong window to quote in a monthly note."""
+    a30 = vr.get("assets", {}).get(sym, {}).get("30d", {})
+    if not a30:
+        return None
+    return {"now": round(a30.get("vol_now", 0)), "med": round(a30.get("vol_median", 0)),
+            "reg30": a30.get("regime")}
+
+
+def _regime_word(reg):
+    """The note's vocabulary is turbulent/calm; the model's is HIGH/LOW."""
+    return {"HIGH": "turbulent", "LOW": "calm"}.get(str(reg).upper(), str(reg).lower())
+
+
 def compose(launch, month, rets, basis, cur_state, prev_state):
     cm, fxm = sn._read("crypto_map.json"), sn._read("fx_map.json")
     com, vr = sn._read("commodities_map.json"), sn._read("vol_regime.json")
@@ -226,9 +241,12 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
                      f"not covered here. It resumes in the next issue.")
             P.append("")
             continue
+        # Calling a +0.6 percent move "weakest" reads as an error. When the tail is
+        # still positive the honest word is laggards, not weakest.
+        tail_word = "Weakest" if all(v < 0 for _, v in st["bot"]) else "Laggards"
         P.append(
             f"**{label[cls]}.** {st['up']} of {st['n']} higher, average {st['avg']:+.1f} percent. "
-            f"Strongest: {_moves(st['top'])}. Weakest: {_moves(st['bot'])}.")
+            f"Strongest: {_moves(st['top'])}. {tail_word}: {_moves(st['bot'])}.")
         P.append("")
 
     # ===== Valuation =====
@@ -237,8 +255,8 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
         P.append(
             f"Bitcoin is near {sn._kfmt(price)} dollars. The **valuation fit** models price against "
             f"how long the network has existed, on a log-log scale. Fair value on that fit lands near "
-            f"{sn._kfmt(fair)}, about {abs(ou):.0f} percent "
-            f"{'below' if ou < 0 else 'above'} the line, and the fitted floor sits near "
+            f"{sn._kfmt(fair)}, with bitcoin about {abs(ou):.0f} percent "
+            f"{'below' if ou < 0 else 'above'} it, and the fitted floor sits near "
             f"{sn._kfmt(floor)}. Bitcoin has closed above that floor for roughly 95 percent of the "
             f"historical sample. That is an in-sample observation, not a tested probability and not a "
             f"guaranteed level of support.")
@@ -250,7 +268,7 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
                 f"then adds halving timing to classify the phase. It reads bitcoin as {phase.lower()}, "
                 f"about {abs(cyc_b):.0f} percent below its own trend line. Do not read the two figures "
                 f"as confirming each other. They are the same kind of fit run over overlapping data, "
-                f"so close agreement is close to guaranteed and tells you nothing the first number did "
+                f"so close agreement is near enough guaranteed and tells you nothing the first number did "
                 f"not. On a monthly horizon this is the number that matters most, because valuation "
                 f"says far more about a year than about a week.")
             P.append("")
@@ -277,9 +295,10 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
             + " That is a backtest rather than a live forward record, and the live scoreboard is only "
               "now filling.")
         P.append("")
-    if vr.get("ood"):
-        P.append("The model also flags that current conditions sit outside the range it was fitted on, "
-                 "so treat this month's classifications with more caution than usual.")
+    ood_hits = sorted(s for s, v in (vr.get("ood") or {}).items() if v.get("out_of_range"))
+    if ood_hits:
+        P.append(f"The model also flags {sn._join(ood_hits)} as sitting outside the volatility range it "
+                 f"was fitted on, so treat those classifications with more caution than the rest.")
         P.append("")
     P.append(
         (f"For the month ahead it reads {_turb_txt(turbulent, 6)} as turbulent and the rest of the "
@@ -288,6 +307,21 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
         + (f" Average cross-asset correlation is near {corr:.2f}, so diversification is "
            f"{'thin' if corr > 0.5 else 'doing real work'}." if corr else ""))
     P.append("")
+
+    # When every turbulent market sits inside one asset class, that concentration is
+    # the month's real story and is worth stating outright rather than leaving the
+    # reader to count the names.
+    _ONE = {"crypto": "a crypto market", "fx": "a currency pair", "commodity": "a commodity"}
+    _MANY = {"crypto": "crypto", "fx": "foreign exchange", "commodity": "commodities"}
+    hot = [k for k, v in g.items() if v[0]]
+    if turbulent and len(hot) == 1:
+        calm_cls = [_MANY[k] for k in g if k != hot[0] and (g[k][0] or g[k][1])]
+        P.append(
+            f"Worth naming: every market the model calls turbulent this month is {_ONE[hot[0]]}. It "
+            f"reads the whole of {sn._join(calm_cls)} as calm. Turbulence is sitting in one corner of "
+            f"the board rather than spread across it, which is a different picture from a market that "
+            f"is simply nervous everywhere.")
+        P.append("")
 
     # ===== What changed =====
     P += ["## What changed since the last monthly Signal", ""]
@@ -317,14 +351,14 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
 
     # ===== Watchlist =====
     P += ["## Subscriber watchlist, with levels", ""]
-    ve = sn._voldetail(vr, "ETH")
+    ve = _voldetail30(vr, "ETH")
     bullets = [
         (f"- **Bitcoin.** Fitted floor near {sn._kfmt(floor)}, fair value near {sn._kfmt(fair)}. A "
          f"monthly close below the fitted floor would be historically unusual and would challenge the "
          f"model, rather than automatically creating a buying opportunity.") if fair else "",
-        (f"- **Ether volatility.** Annualised volatility is near {ve['now']} percent against a "
-         f"historical median around {ve['med']}. The thirty-day classification currently reads "
-         f"{str(ve['reg30']).lower()}.") if ve else "",
+        (f"- **Ether volatility.** Thirty-day annualised volatility is near {ve['now']} percent against "
+         f"a historical median around {ve['med']}. The thirty-day classification currently reads "
+         f"{_regime_word(ve['reg30'])}.") if ve else "",
         (f"- **The metals.** Whether the turbulent bid broadens beyond "
          f"{sn._join([m for m in g['commodity'][0] if m in METALS])} or fades back to calm."
          ) if [m for m in g["commodity"][0] if m in METALS] else "",
