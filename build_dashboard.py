@@ -1372,7 +1372,7 @@ def monthly_content():
         if nvm.get("floor") and nvm.get("fair_value"):
             cparts.append(f"our separate **valuation fit**, run on a different price history, "
                           f"puts fair value near {_kfmt(nvm['fair_value'])} and its floor around "
-                          f"{_kfmt(nvm['floor'])}; both fit price against network age, so read their "
+                          f"{_kfmt(nvm['floor'])}. Both fit price against network age, so read their "
                           f"agreement as overlap rather than confirmation")
     if cga.get("ETH", {}).get("pct_vs_trend") is not None:
         v = cga["ETH"]["pct_vs_trend"]
@@ -1491,9 +1491,16 @@ def monthly_content():
     sf = (f"A longer look across crypto, FX and commodities for {today:%B}: what moved, the macro "
           f"picture the tape is painting, where we sit in the cycle, and a proper opinion on where "
           f"the balance of risk lies from here.")
+    # CLAUDE.md: every figure is stamped to a period. This piece is built from
+    # trailing thirty-day moves, so saying only "August" invites a reader to compare
+    # it against a calendar-month figure and find a discrepancy that is not an error.
+    basis = (f"*Figures cover the **thirty days to {today:%-d %B %Y}**, a trailing window rather "
+             f"than the calendar month, and are captured at {today:%H:%M} GST on that day. Another "
+             f"Levanter piece drawn on a different day will differ for that reason alone.*")
+    review = [basis] + review
     return dict(
         kicker="Levanter Monthly", title="The Month in Markets, and the Bigger Picture",
-        dateline=f"{today:%B %Y}", standfirst=sf,
+        dateline=f"{today:%B %Y} · figures to {today:%-d %B}", standfirst=sf,
         sections=[("The month in review", review), ("Rotation and leadership", rotation),
                   ("The macro picture", macro), ("Where we are in the cycle", cycle),
                   ("Risks, and what would change our mind", risks),
@@ -1502,7 +1509,11 @@ def monthly_content():
 
 def _md_bold_html(s):
     import re
-    return re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+    # Bold first, so the pairs are consumed before single asterisks are read as
+    # italics. Without the italic pass a *stamped period* line reaches the page
+    # with its asterisks intact.
+    s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+    return re.sub(r"\*(.+?)\*", r"<i>\1</i>", s)
 
 
 def render_piece_html(c):
