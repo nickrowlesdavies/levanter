@@ -5,7 +5,7 @@ X. 6 posts, each inside the 280-character limit. Post in order as a thread. The 
 
 Levanter daily · Monday 31 August
 
-XMR led the whole board yesterday (+8.7%), PUMP lagged (-12.1%). 23 of 69 markets closed higher. Breadth negative, most of the board lower.
+XMR led the whole board yesterday (+8.4%), PUMP lagged (-12.4%). 22 of 69 markets closed higher. Breadth negative, most of the board lower.
 
 Crypto, FX and commodities below.
 
@@ -15,7 +15,7 @@ Commodities have 14 of 16 markets flagged high-vol for the week ahead, while cry
 
 --- 3/6 (188 chars) ---
 
-Crypto: 5 of 35 higher. XMR +8.7%, PUMP -12.1%.
+Crypto: 5 of 35 higher. XMR +8.4%, PUMP -12.4%.
 
 Week: 7 of 35 up, XMR best at +24.3%.
 
@@ -25,13 +25,13 @@ Volatility leans calmer near-term (0/3 high-vol at 7d).
 
 --- 4/6 (192 chars) ---
 
-FX: 8 of 16 higher. USDZAR +1.0%, NZDUSD -0.6%.
+FX: 7 of 16 higher. USDZAR +1.0%, NZDUSD -0.7%.
 
-Week: 9 of 16 up, USDSEK best at +1.5%.
+Week: 8 of 16 up, USDSEK best at +1.5%.
 
-Month: AUDUSD leads +2.0%, USDZAR lags -2.1%.
+Month: AUDUSD leads +2.0%, USDNOK lags -3.8%.
 
-Volatility leans calmer near-term (0/7 high-vol at 7d).
+Volatility leans calmer near-term (1/7 high-vol at 7d).
 
 --- 5/6 (210 chars) ---
 
