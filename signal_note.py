@@ -29,11 +29,18 @@ OUT = "reports/signals"
 # on 7 September and, worse, promised "free this week and next" in the meantime.
 # Set to False on the week the Signal actually goes subscriber-only.
 SIGNAL_FREE = True
+# Separate from the pricing flag above: this one is the one-time "introducing our new
+# weekly newsletter, here is the first Signal" copy in the teaser. It is true for the
+# launch issue only. It used to be keyed off SIGNAL_FREE, which meant every issue for
+# the whole free period announced itself as the first one.
+SIGNAL_FIRST_ISSUE = False
 NAMES = {
     "BTC": "bitcoin", "ETH": "ether", "SOL": "solana", "XRP": "XRP",
     "GOLD": "gold", "SILVER": "silver", "PLATINUM": "platinum",
     "PALLADIUM": "palladium", "OIL": "oil", "WTI OIL": "oil", "BRENT OIL": "Brent crude",
     "COPPER": "copper", "NAT GAS": "natural gas", "WHEAT": "wheat", "CORN": "corn",
+    "COFFEE": "coffee", "SUGAR": "sugar", "COTTON": "cotton", "SOYBEANS": "soybeans",
+    "GASOLINE": "gasoline", "HEATING OIL": "heating oil",
     "AGRICULTURE": "agriculture", "BROAD": "broad commodities",
     "EURUSD": "the euro", "GBPUSD": "sterling", "USDJPY": "the yen",
     "AUDUSD": "the Aussie", "USDCHF": "the Swiss franc", "USDCAD": "the loonie",
@@ -154,7 +161,7 @@ def _wilson_ci(acc_pct, n, z=1.96):
     return [round((c - h) * 100), round((c + h) * 100)]
 
 
-def compose(launch=False, monday=None):
+def compose(free=False, first=False, monday=None):
     cm = _read("crypto_map.json")
     vr = _read("vol_regime.json")
     fx = _read("fx_map.json")
@@ -239,7 +246,7 @@ def compose(launch=False, monday=None):
     prev = hist.get(max(prior)) if prior else None
 
     P = ["# Levanter Signal", ""]
-    if launch:
+    if free:
         P += ["> **The Levanter Signal.** A weekly read of volatility, valuation and the week "
               "ahead across crypto, FX and commodities. This is the subscriber tier, and it is free "
               "while we build the list. We will tell you before that changes. Subscribe at "
@@ -419,7 +426,7 @@ def compose(launch=False, monday=None):
         f"misses. That is the claim you can hold this Signal to.")
     P.append("")
 
-    if launch:
+    if free:
         footer = ("*This is the Levanter Signal, the weekly subscriber note, free for now while we "
                   "build the list. We will tell you before that changes. Subscribe at "
                   "read.levantermarkets.com. The daily, weekly and monthly reviews stay free at "
@@ -435,20 +442,21 @@ def compose(launch=False, monday=None):
         hist.pop(k, None)
     _save_signal_state(hist)
 
-    return "\n".join(P), (loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, launch)
+    return "\n".join(P), (loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, free, first)
 
 
 def teaser(meta, hashtags=True):
-    loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, launch = meta
+    loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, free, first = meta
     byc = {c.get("cls"): c for c in cls}
     cr, co = byc.get("crypto", {}), byc.get("commodity", {})
     T = []
-    if launch:
+    if first:
         T += ["Introducing the Levanter Signal, our new weekly newsletter.", "",
               "Market intelligence across crypto, foreign exchange and commodities, from a site that "
-              "models volatility and refuses to pretend it can forecast direction.", "",
-              "It is free while we build the list, and we will say so before that changes.", "",
-              "Here is the first Signal in one minute."]
+              "models volatility and refuses to pretend it can forecast direction.", ""]
+        if free:
+            T += ["It is free while we build the list, and we will say so before that changes.", ""]
+        T += ["Here is the first Signal in one minute."]
     else:
         T += ["This week's Levanter Signal is out.", "",
               "Market intelligence across crypto, foreign exchange and commodities, from a site that "
@@ -477,7 +485,7 @@ def teaser(meta, hashtags=True):
               "Read the individual rows, not a flattering blended number.", ""]
     T += ["That is Levanter's approach: model what can be modelled, identify what cannot, and publish "
           "the scorecard.", ""]
-    if launch:
+    if free:
         T += ["The Signal is free while we build the list. Subscribe now and you keep receiving it:",
               "", "read.levantermarkets.com", ""]
     else:
@@ -504,13 +512,13 @@ def _thread_file(head, posts):
 
 def x_thread(meta, monday):
     """The weekly Signal as a short promo X thread (each post under the limit)."""
-    loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, launch = meta
+    loud_txt, quiet_txt, ou, nv, n, dacc, period, cls, free, first = meta
     cr = {c.get("cls"): c for c in cls}.get("crypto", {})
     posts = []
     posts.append(
         ("The Levanter Signal is out, our weekly premium read on volatility, valuation and the week "
          "ahead across crypto, FX and commodities. Free while we build the list. Here it is in a thread."
-         ) if launch else
+         ) if free else
         ("This week's Levanter Signal is out: the premium read on volatility, valuation and the week "
          "ahead across crypto, FX and commodities. Here it is in a thread."))
     posts.append(
@@ -561,8 +569,7 @@ def main():
             print(f"signal_note: not due yet (prepares {wednesday} 06:00 GST).")
             return
 
-    launch = SIGNAL_FREE
-    body, meta = compose(launch, monday.isoformat())
+    body, meta = compose(SIGNAL_FREE, SIGNAL_FIRST_ISSUE, monday.isoformat())
     title = f"# Levanter Signal · week of {monday.strftime('%-d %B %Y')}"
     body = body.replace("# Levanter Signal\n", title + "\n", 1)
     teaser_sub_path = os.path.join(OUT, f"levanter-signal-teaser-substack-{monday}.md")
