@@ -5,7 +5,7 @@ X. 6 posts, each inside the 280-character limit. Post in order as a thread. The 
 
 Levanter daily · Monday 31 August
 
-XMR led the whole board yesterday (+9.2%), GASOLINE lagged (-12.1%). 23 of 69 markets closed higher. Breadth negative, most of the board lower.
+XMR led the whole board yesterday (+9.5%), GASOLINE lagged (-12.3%). 23 of 69 markets closed higher. Breadth negative, most of the board lower.
 
 Crypto, FX and commodities below.
 
@@ -15,7 +15,7 @@ Commodities have 13 of 16 markets flagged high-vol for the week ahead, while cry
 
 --- 3/6 (188 chars) ---
 
-Crypto: 7 of 35 higher. XMR +9.2%, PUMP -10.5%.
+Crypto: 8 of 35 higher. XMR +9.5%, PUMP -10.5%.
 
 Week: 7 of 35 up, XMR best at +24.3%.
 
@@ -27,19 +27,19 @@ Volatility leans calmer near-term (0/3 high-vol at 7d).
 
 FX: 6 of 16 higher. USDZAR +0.9%, NZDUSD -0.6%.
 
-Week: 9 of 16 up, AUDJPY best at +1.3%.
+Week: 9 of 16 up, USDCHF best at +0.9%.
 
 Month: AUDUSD leads +2.0%, USDNOK lags -3.8%.
 
 Volatility leans calmer near-term (0/7 high-vol at 7d).
 
---- 5/6 (209 chars) ---
+--- 5/6 (208 chars) ---
 
-Commodities: 10 of 18 higher. CORN +5.1%, GASOLINE -12.1%.
+Commodities: 9 of 18 higher. CORN +5.0%, GASOLINE -12.3%.
 
-Week: 9 of 18 up, WHEAT best at +14.2%.
+Week: 8 of 18 up, WHEAT best at +14.2%.
 
-Month: CORN leads +22.1%, GASOLINE lags -4.8%.
+Month: CORN leads +22.0%, GASOLINE lags -5.0%.
 
 Volatility leans turbulent near-term (13/16 high-vol at 7d).
 
