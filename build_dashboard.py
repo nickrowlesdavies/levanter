@@ -21,6 +21,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 R = "reports"
+# The monthly review publishes on the 28th. The archive freezes on the same
+# day, so the website copy and the piece sent to Substack stay identical.
+MONTHLY_PUBLISH_DAY = 28
 # Archive lives at the repo root (reports/ is gitignored) so the CI job can
 # commit it back and past reviews survive each rebuild.
 ARCHIVE_PATH = "review_archive.json"
@@ -2079,7 +2082,7 @@ def write_writeups():
     now = _now_gst()
     force = os.environ.get("LEVANTER_FORCE_WRITEUPS") == "1"
     weekly_day = force or now.weekday() == 6          # Sunday
-    monthly_day = force or now.day == 28
+    monthly_day = force or now.day == MONTHLY_PUBLISH_DAY
     # Anchor to what the site actually shows. update_review_archive() runs first
     # and freezes the week's piece; reading it back here means the Markdown, the
     # docx and the LinkedIn post are the same snapshot as the published article,
@@ -2203,7 +2206,8 @@ def _daily_blocks_html() -> str:
 def update_review_archive() -> dict:
     """Persist today's daily / weekly / monthly reviews into review_archive.json
     so past pieces are kept and shown in an archive, not overwritten each build.
-    Daily keyed by day, monthly by month (upsert). Weekly is anchored to the Sunday
+    Daily keyed by day. Monthly is keyed by month and upserts while the month
+    runs, then freezes from the 28th so the site matches what was published. Weekly is anchored to the Sunday
     that ENDS the week and FROZEN once, so a re-run mid-week and the Sunday->Monday
     ISO-week roll cannot create a second near-identical weekly."""
     now = _now_gst()
@@ -2236,9 +2240,15 @@ def update_review_archive() -> dict:
     mo = monthly_content()
     if mo:
         mkey = now.strftime("%Y-%m")
-        monthly[mkey] = {"key": mkey, "label": now.strftime("%B %Y"),
-                         "title": mo.get("title", ""), "html": render_piece_html(mo),
-                         "md": render_piece_md(mo), "li": monthly_post()}
+        # Upsert while the month is still running, so the site shows a current
+        # read, then FREEZE from the publication day onward. Without the freeze
+        # the entry kept drifting for the rest of the month, so the website copy
+        # and the piece already sent to Substack on the 28th stopped agreeing.
+        if not (monthly.get(mkey) or {}).get("frozen"):
+            monthly[mkey] = {"key": mkey, "label": now.strftime("%B %Y"),
+                             "title": mo.get("title", ""), "html": render_piece_html(mo),
+                             "md": render_piece_md(mo), "li": monthly_post(),
+                             "frozen": now.day >= MONTHLY_PUBLISH_DAY}
 
     def _cap(d, n):
         return {k: d[k] for k in sorted(d.keys(), reverse=True)[:n]}
