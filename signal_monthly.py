@@ -516,9 +516,12 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
     # ===== What changed =====
     P += ["## What changed since the last monthly Signal", ""]
     if prev_state:
-        prev_high = set(prev_state.get("high", []))
+        # Iterate the stored LIST, not the set, or the "calmed" order varies
+        # between runs on identical data and the issue is not reproducible.
+        prev_high_list = prev_state.get("high", []) or []
+        prev_high = set(prev_high_list)
         flips = [h for h in turbulent if h not in prev_high]
-        calmed = [h for h in prev_high if h not in turbulent]
+        calmed = [h for h in prev_high_list if h not in turbulent]
         d_ou = (round(ou) - prev_state["btc_ou"]) if (ou is not None
                                                       and prev_state.get("btc_ou") is not None) else None
         bits = []

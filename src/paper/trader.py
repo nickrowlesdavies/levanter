@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import asdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 
 import pandas as pd
@@ -35,7 +35,7 @@ _LOOKBACK_DAYS = {"1d": 600, "4h": 160, "1h": 70, "30m": 40, "15m": 25}
 
 
 def _now() -> datetime:
-    return datetime.utcnow()
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class PaperTrader:

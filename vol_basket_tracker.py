@@ -19,7 +19,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import numpy as np
 import pandas as pd
@@ -73,7 +73,7 @@ def save_state(s):
 
 
 def run_cycle(state):
-    wk = "-".join(map(str, datetime.utcnow().isocalendar()[:2]))
+    wk = "-".join(map(str, datetime.now(timezone.utc).replace(tzinfo=None).isocalendar()[:2]))
     if state["last_week"] == wk:
         return state
     weights, prices = target_weights()
@@ -88,7 +88,7 @@ def run_cycle(state):
                 r += w * (prices[a] / p0 - 1)
         state["equity"] *= (1 + r)
     state["weights"], state["_prices"], state["last_week"] = weights, prices, wk
-    state["history"].append({"week": str(datetime.utcnow().date()),
+    state["history"].append({"week": str(datetime.now(timezone.utc).replace(tzinfo=None).date()),
                              "equity": round(state["equity"], 2),
                              "gross": round(sum(weights.values()), 3)})
     return state

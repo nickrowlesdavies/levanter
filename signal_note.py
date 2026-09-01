@@ -78,7 +78,7 @@ def _save_signal_state(d):
 
 
 def _now_gst():
-    return dt.datetime.utcnow() + dt.timedelta(hours=4)
+    return dt.datetime.now(dt.timezone.utc).replace(tzinfo=None) + dt.timedelta(hours=4)
 
 
 def _name(sym):
@@ -369,9 +369,13 @@ def compose(free=False, first=False, monday=None):
     # ===== What changed =====
     P += ["## What changed since the last Signal", ""]
     if prev:
-        prev_high = set(prev.get("high", []))
+        # Iterate the stored LIST, not the set. Iterating the set made the
+        # "calmed back to normal" order vary between runs on identical data,
+        # so the same issue could not be reproduced from the same inputs.
+        prev_high_list = prev.get("high", []) or []
+        prev_high = set(prev_high_list)
         flips = [h for h in all_high if h not in prev_high]
-        calmed = [h for h in prev_high if h not in all_high]
+        calmed = [h for h in prev_high_list if h not in all_high]
         d_ou = (round(ou) - prev["btc_ou"]) if (ou is not None and prev.get("btc_ou") is not None) else None
         bits = []
         if flips:

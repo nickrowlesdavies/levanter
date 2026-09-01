@@ -23,7 +23,7 @@ from __future__ import annotations
 import json
 import math
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import numpy as np
 import pandas as pd
@@ -103,7 +103,7 @@ def build_inputs(sym, s, cls, btc, btc_ma, cg_val, shared_phase):
 
 
 def main():
-    today = datetime.utcnow().date()
+    today = datetime.now(timezone.utc).replace(tzinfo=None).date()
     cg = _read("reports/cycle_gauge.json")
     cg_val = {a["sym"]: a.get("pct_vs_trend", 0.0) for a in cg.get("assets", [])
               if a.get("kind") == "crypto"}

@@ -20,7 +20,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pandas as pd
 
@@ -34,7 +34,7 @@ START_EQUITY = 10000.0
 
 def current_usd_values() -> dict:
     """Latest 'value of 1 unit of ccy in USD' for each currency."""
-    end = (datetime.utcnow()).strftime("%Y-%m-%d")
+    end = (datetime.now(timezone.utc).replace(tzinfo=None)).strftime("%Y-%m-%d")
     out = {}
     for ccy, (sym, inv) in CCY_PAIRS.items():
         inst = Instrument(ccy, sym, 0.01 if "JPY" in sym else 0.0001, 1.0)
@@ -85,7 +85,7 @@ def choose_basket(spreads: dict, k: int):
 
 
 def run_cycle(state: dict) -> dict:
-    today = datetime.utcnow()
+    today = datetime.now(timezone.utc).replace(tzinfo=None)
     month = today.strftime("%Y-%m")
     spreads = current_spreads()
     vals = current_usd_values()

@@ -13,7 +13,7 @@ import io
 import json
 import os
 import traceback
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import matplotlib
 matplotlib.use("Agg")
@@ -59,7 +59,7 @@ def _save_archive(a):
 
 def _now_gst():
     # Levanter is a Dubai (GST, UTC+4) publication; build runners are UTC.
-    return datetime.utcnow() + timedelta(hours=4)
+    return datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=4)
 
 
 def _series_from_history(hist, key="equity"):
@@ -2644,7 +2644,7 @@ def main():
     chart = "" if market_only else equity_chart(cards)
     # Build runners are UTC; Levanter is a Dubai (GST, UTC+4) publication, so
     # stamp the "last updated" time in GST explicitly rather than an unlabelled UTC.
-    stamp = (datetime.utcnow() + timedelta(hours=4)).strftime("%Y-%m-%d %H:%M") + " GST"
+    stamp = (datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=4)).strftime("%Y-%m-%d %H:%M") + " GST"
     year = datetime.now().year
 
     research = [
