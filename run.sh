@@ -3,7 +3,7 @@
 # Used by cron so the environment is always correct regardless of PATH.
 #   ./run.sh paper_trade.py --once
 #   ./run.sh carry_signal.py
-cd "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine" || exit 1
+cd "$(dirname "$0")" || exit 1
 # shellcheck disable=SC1091
 source .venv/bin/activate
 exec python "$@"
