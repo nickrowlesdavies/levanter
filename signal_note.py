@@ -315,14 +315,47 @@ def compose(free=False, first=False, monday=None):
         f"therefore contained even though a few names are carrying wide ranges.")
     P.append("")
     if vb and ve:
-        P.append(
-            f"The loudest reads are in big crypto. Bitcoin's one-week volatility is near {vb['now']} "
-            f"percent against a {vb['med']} median, and ether near {ve['now']} against {ve['med']}, "
-            f"close to double its normal. Both are turbulent at seven days while their thirty-day "
-            f"classifications remain calm. The two horizons disagree, which flags a near-term "
-            f"disturbance without telling us whether it will last. The metals read turbulent at both "
-            f"seven and thirty days, indicating that their elevated-volatility classification extends "
-            f"beyond the coming week.")
+        # Every claim here is derived. This paragraph used to hardcode "close to
+        # double its normal ... both are turbulent ... the two horizons disagree",
+        # which fired regardless of the data and contradicted the calm/turbulent
+        # list directly above whenever crypto was quiet.
+        _W = {"HIGH": "turbulent", "LOW": "calm"}
+
+        def _w(reg):
+            return _W.get(str(reg).upper(), str(reg).lower())
+
+        def _rel(v):
+            m = v.get("med") or 0
+            if not m:
+                return f"near {v['now']} percent"
+            r = v["now"] / m
+            return (f"near {v['now']} percent against a {v['med']} median, "
+                    f"{r:.2f} times its own normal")
+
+        b7, b30 = _w(vb.get("regime")), _w(vb.get("reg30"))
+        e7, e30 = _w(ve.get("regime")), _w(ve.get("reg30"))
+        agree = (b7 == b30) and (e7 == e30)
+        def _horizons(name, h7, h30):
+            return (f"{name} reads {h7} at both seven and thirty days"
+                    if h7 == h30 else
+                    f"{name} reads {h7} at seven days and {h30} at thirty")
+        line = (f"The big crypto reads. Bitcoin's one-week volatility is {_rel(vb)}, and ether is "
+                f"{_rel(ve)}. {_horizons('Bitcoin', b7, b30)}, and "
+                f"{_horizons('ether', e7, e30)}.")
+        line += (" The two horizons agree, so this is a settled read rather than a near-term "
+                 "disturbance." if agree else
+                 " The two horizons disagree, which flags a near-term move without telling us "
+                 "whether it lasts.")
+        # Only claim the metals are stretched on both horizons when they are.
+        _assets = vr.get("assets", {})
+        both = [m for m in sorted(METALS)
+                if (_assets.get(m, {}).get("7d", {}) or {}).get("regime") == "HIGH"
+                and (_assets.get(m, {}).get("30d", {}) or {}).get("regime") == "HIGH"]
+        if both:
+            _m = _join([m.lower() for m in both])
+            line += (f" In the metals, {_m} read turbulent at both seven and thirty days, so that "
+                     f"is not just a one-week disturbance.")
+        P.append(line)
         P.append("")
     if cr.get("n") and cr.get("acc") is not None:
         P.append(
