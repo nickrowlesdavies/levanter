@@ -3,7 +3,7 @@
 # Runs each signal (safe/idempotent - it won't double-count a bar/week/month),
 # so it also catches up any cycles cron missed while the Mac was asleep.
 #   ./dashboard.sh
-cd "/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine" || exit 1
+cd "$(dirname "$0")" || exit 1
 # shellcheck disable=SC1091
 source .venv/bin/activate
 

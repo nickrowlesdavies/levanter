@@ -7,7 +7,7 @@
 # While running, this regenerates the dashboard every 30 min AND the page
 # itself reloads every 5 min, so your phone always shows current numbers.
 # Local network only - nothing leaves your network.
-DIR="/Users/nickrowles-davies/Documents/Claude/Claude Outputs/fx-signal-engine"
+DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DIR/reports" || exit 1
 PORT=8137
 
