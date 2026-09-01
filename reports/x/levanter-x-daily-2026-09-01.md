@@ -1,11 +1,11 @@
 # Levanter daily thread · Tuesday 1 September
 X. 6 posts, each inside the 280-character limit. Post in order as a thread. The separator lines are not part of any post.
 
---- 1/6 (187 chars) ---
+--- 1/6 (207 chars) ---
 
 Levanter daily · Tuesday 1 September
 
-UNI led the whole board yesterday (+12.8%), COFFEE lagged (-12.3%). 41 of 69 markets closed higher. Breadth mixed.
+UNI led the whole board yesterday (+13.4%), COFFEE lagged (-11.8%). 46 of 69 markets closed higher. Breadth positive across the board.
 
 Crypto, FX and commodities below.
 
@@ -15,7 +15,7 @@ Commodities have 12 of 16 markets flagged high-vol for the week ahead, while cry
 
 --- 3/6 (188 chars) ---
 
-Crypto: 22 of 35 higher. UNI +12.8%, MNT -5.6%.
+Crypto: 26 of 35 higher. UNI +13.4%, MNT -5.5%.
 
 Week: 9 of 35 up, UNI best at +35.2%.
 
@@ -23,23 +23,23 @@ Month: PUMP leads +106.5%, ONDO lags -9.5%.
 
 Volatility leans calmer near-term (0/3 high-vol at 7d).
 
---- 4/6 (193 chars) ---
+--- 4/6 (194 chars) ---
 
-FX: 9 of 16 higher. USDSEK +1.0%, NZDUSD -0.4%.
+FX: 10 of 16 higher. USDZAR +1.1%, USDMXN -0.4%.
 
 Week: 10 of 16 up, USDSEK best at +1.4%.
 
-Month: AUDUSD leads +1.8%, USDZAR lags -2.1%.
+Month: AUDUSD leads +1.8%, USDMXN lags -2.2%.
 
 Volatility leans calmer near-term (0/7 high-vol at 7d).
 
 --- 5/6 (207 chars) ---
 
-Commodities: 10 of 18 higher. CORN +4.2%, COFFEE -12.3%.
+Commodities: 10 of 18 higher. CORN +4.2%, COFFEE -11.8%.
 
-Week: 12 of 18 up, WHEAT best at +13.7%.
+Week: 12 of 18 up, WHEAT best at +13.6%.
 
-Month: SUGAR leads +22.2%, COFFEE lags -9.1%.
+Month: SUGAR leads +22.3%, COFFEE lags -8.7%.
 
 Volatility leans turbulent near-term (12/16 high-vol at 7d).
 
