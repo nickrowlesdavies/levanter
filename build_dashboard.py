@@ -29,6 +29,7 @@ MONTHLY_PUBLISH_DAY = 28
 ARCHIVE_PATH = "review_archive.json"
 
 
+import repo_lock
 from source_guard import SourceError, MARKET_SOURCES, check_sources
 
 
@@ -2638,6 +2639,13 @@ APP_JSONLD = """<script type="application/ld+json">
 
 def main():
     import sys
+    # One writer at a time. The build rewrites the same feeds and the review
+    # archive that the Signals read, so it must not run alongside them.
+    try:
+        repo_lock.acquire("build_dashboard")
+    except repo_lock.LockBusy as e:
+        print(f"build_dashboard: {e}", file=sys.stderr)
+        sys.exit(1)
     # The dashboard is built from the same market feeds as the Signals, so a
     # broken feed stops the build rather than silently rendering an empty panel.
     # Strategy *_state.json files are excluded: .gitignore drops them, so they

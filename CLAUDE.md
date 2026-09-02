@@ -23,9 +23,16 @@ briefs, and review of what actually shipped. It writes only into `reports/<chann
 
 ### Rules that keep this from breaking
 
-1. **One at a time.** Do not run both agents against this working tree simultaneously. Two
-   sessions committing here has already produced a rebase conflict on `review_archive.json`
-   and working-tree churn needing autostash.
+1. **One at a time, and now enforced.** `signal_note.py`, `signal_monthly.py` and
+   `build_dashboard.py` take an exclusive lock on the working tree at startup via
+   `repo_lock.py`. A second generator exits 1 and names the process holding it. Set
+   `LEVANTER_LOCK_WAIT=60` to wait instead of failing; cron jobs should. The lock is an
+   flock, so a killed run cannot strand it and there is nothing to clear by hand.
+   Asking politely was not enough: on 2026-09-02 two sessions here produced a commit
+   importing an untracked module, repeated rebase conflicts, and a `crypto_map.json`
+   full of git conflict markers that came one run short of being published. The lock
+   covers the generators, not git, so **still do not run two sessions here**: nothing
+   stops two agents committing and rebasing over each other.
 2. **Claude Code owns git.** Cowork writes files into the working tree but does not commit.
    After a Cowork session writes, Claude Code reviews and commits them.
 3. **Read the repo, not an upload.** A build can move figures within minutes. Never work

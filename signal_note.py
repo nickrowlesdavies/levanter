@@ -21,6 +21,7 @@ import json
 import os
 import sys
 
+import repo_lock
 from source_guard import SourceError, SIGNAL_SOURCES, check_sources
 
 OUT = "reports/signals"
@@ -818,6 +819,14 @@ def x_thread(meta, monday):
 
 def main():
     argv = sys.argv[1:]
+    # One writer at a time. Two sessions in this tree have already
+    # produced a half-written feed; see repo_lock.
+    try:
+        repo_lock.acquire("signal_note")
+    except repo_lock.LockBusy as e:
+        print(f"signal_note: {e}", file=sys.stderr)
+        sys.exit(1)
+
     force = "--force" in argv
     now = _now_gst()
     monday = (now - dt.timedelta(days=now.weekday())).date()

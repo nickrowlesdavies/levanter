@@ -7,6 +7,11 @@
 # Jobs call the venv python directly rather than run.sh, so they keep working
 # even if a tracked-file change to run.sh is stashed by a scheduled task.
 #
+# The generators take an exclusive tree lock (repo_lock.py). Cron waits for a
+# holder rather than skipping the run, since a missed scheduled job is worse
+# than a late one. Reinstall after editing:  crontab my.cron
+LEVANTER_LOCK_WAIT=180
+#
 # 4h paper trial: check every 4 hours, act when a new 4h bar has closed.
 0 */4 * * * cd "/Users/nickrowles-davies/dev/fx-signal-engine" && .venv/bin/python paper_trade.py --once >> reports/cron.log 2>&1
 # Carry overlay: rebalance once a month (06:30 on the 1st).

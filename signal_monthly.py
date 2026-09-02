@@ -28,6 +28,7 @@ import statistics
 import sys
 
 import signal_note as sn
+import repo_lock
 from source_guard import SourceError, SIGNAL_SOURCES, check_sources
 
 OUT = sn.OUT
@@ -860,6 +861,14 @@ def x_thread(meta):
 
 def main():
     argv = sys.argv[1:]
+    # One writer at a time. Two sessions in this tree have already
+    # produced a half-written feed; see repo_lock.
+    try:
+        repo_lock.acquire("signal_monthly")
+    except repo_lock.LockBusy as e:
+        print(f"signal_monthly: {e}", file=sys.stderr)
+        sys.exit(1)
+
     # The monthly Signal reads the same feeds as the weekly, so it gets the same
     # hard precondition: a broken feed stops the build rather than quietly
     # costing the note a section.

@@ -21,3 +21,6 @@ data/cache/
 
 # OS
 .DS_Store
+
+# Tree lock, see repo_lock.py. Machine-local, never committed.
+.levanter.lock
