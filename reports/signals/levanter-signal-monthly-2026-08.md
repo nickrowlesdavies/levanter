@@ -34,6 +34,8 @@ Medians, not averages, so a single runaway name cannot carry the row. Where a ma
 
 That crypto row is the number to sit with. The median coin rose 16.7 percent this month and is still down 52 percent over twelve months, across the 33 coins with a full year of history. A strong month inside a bad year is a different thing from a recovery, and the monthly number on its own cannot tell you which one you are looking at. This is the gap between a good month and a good year, and it is where position sizing is decided rather than where it is celebrated.
 
+Drawdown is the other half of that picture. The median coin sits 11 percent below its own recent high and the deepest is 22 percent under, across 35 names. Our risk banding puts 6 of them in the low band, 26 in the medium and 3 in the high. A month can be green and still leave the whole board under water, which is why we quote the distance from the high next to the return rather than instead of it.
+
 Breadth inside crypto. The equal-weighted basket returned +23.7 percent against +25.3 percent cap-weighted. The heavyweights carried the move and the average coin lagged them, so the rally is narrower than the index return suggests. Bitcoin dominance is near 69 percent.
 
 ## The one chart: bitcoin against its long-run trend
@@ -65,6 +67,8 @@ It is a statistical fit of price to time. It has no hard economic mechanism behi
 ## The thirty-day volatility map
 
 This is the part with measurable skill. The model tags each market turbulent or calm for the month ahead. In the point-in-time backtest it classified the thirty-day regime correctly about 74 percent of the time across 1178 calls, 95 percent interval 71 to 76, 20 points above its naive baseline, and 72 percent at ninety days. That is a backtest rather than a live forward record, and the live scoreboard is only now filling.
+
+Accuracy on its own flatters a model that never commits, so we also score the confidence behind each call. The Brier score is 0.198 against 0.248 for always guessing the base rate, a skill score of 0.205 over 589 scored calls. Positive but small. Read the calls as a lean rather than a conviction, and size accordingly.
 
 For the month ahead it reads gold, silver, oil, platinum, palladium, Brent crude and 6 others as turbulent and the rest of the board as calm. Average cross-asset correlation is near 0.56, so diversification is thin.
 
@@ -112,20 +116,20 @@ Treat the rows near the line with less confidence than the rest. SUGAR at 1.01x,
 
 This is the first monthly Signal, so there is no prior month end to difference against. We do have our own weekly record from inside the month, and it shows the month had a direction rather than just an end state.
 
-Between 24 August and 31 August the number of markets the model called turbulent went from 6 to 11. Newly turbulent: Brent crude, coffee, cotton, gasoline, oil, palladium, solana, sugar and wheat. Calmed back to normal: USDCHF, bitcoin, ether and platinum.
+Between our weekly Signal for the week of 24 August and the one for the week of 31 August, the number of markets the model called turbulent went from 6 to 11. Newly turbulent: Brent crude, coffee, cotton, gasoline, heating oil, oil, palladium, sugar and wheat. Calmed back to normal: USDCHF, bitcoin, ether and platinum.
 
 Read those two lists together rather than separately. Turbulence did not simply increase, it moved: out of the names that calmed and into the ones that flipped. That is the same rotation the thirty-day board shows at month end, caught while it was happening rather than inferred from the finish.
 
 Bitcoin went from 42 to 43 percent below its fitted value over the same stretch, with price easing from 78,976 to 77,411 dollars. A wider discount on a lower price is the fit doing what it should, not a signal in itself.
 
-Two caveats worth stating. These are seven-day classifications from the weekly Signal, not the thirty-day calls used above, and two snapshots is a short record. From next month this section compares month end against month end directly, on the same horizon as the rest of the note.
+Two caveats worth stating. These are seven-day classifications from the weekly Signal, not the thirty-day calls used above, they are keyed to the week they cover rather than the day they were drawn, and two snapshots is a short record. From next month this section compares month end against month end directly, on the same horizon as the rest of the note.
 
 ## Subscriber watchlist, with levels
 
 - **Bitcoin.** Fitted floor near 59,000, fair value near 135,000. A monthly close below the fitted floor would be historically unusual and would challenge the model, rather than automatically creating a buying opportunity.
 - **Ether volatility.** Thirty-day annualised volatility is near 57 percent against a historical median around 60. The thirty-day classification currently reads calm.
 - **The metals.** Whether the turbulent bid broadens beyond gold, silver, platinum and palladium or fades back to calm.
-- **Pegs and dominance.** Bitcoin dominance is near 69 percent and the stablecoins we track are holding. A tracked peg below 0.995 would trigger Levanter's wobble alert.
+- **Pegs and dominance.** Bitcoin dominance is near 69 percent. Of the 16 stablecoins we track the weakest print this month was USDF at 0.9959, still above the 0.995 line that triggers Levanter's wobble alert. We publish the weakest reading rather than a pass mark, because the number is the point.
 
 To score next month: the model calls gold, silver, oil, platinum and 8 others turbulent and the rest calm. In the next issue we score each call the way the model does, whether realised volatility over the month came in above or below the asset's running-median volatility, and show the hits and the misses. That is the claim you can hold this Signal to.
 
@@ -136,6 +140,16 @@ Commodities read 62 percent over 90 calls. We do not present that as an edge and
 FX has no scored sample yet, so we quote nothing for it rather than filling the gap with the blended figure.
 
 These are backtested calls over a fixed window, May to August 2026, not a live public record, and we label them that way every time. We publish them because the number is the point. Volatility is forecastable and we forecast it. Direction is not, so we do not sell it.
+
+## What would make this read wrong
+
+Every claim above is checkable, so here is what would falsify it. These are the things we will be marked against, not a disclaimer.
+
+- **The concentration breaks.** We say turbulence is sitting in one corner of the board. If crypto or the dollar pairs flip turbulent next month while the commodity complex calms, the rotation read was wrong, not early.
+- **The hit rate slips.** The classifier runs about 74 percent in backtest. If next month's scored calls come in materially under that, the backtest was flattering the live model and we will say so in the scoring.
+- **Bitcoin closes below the fitted floor.** Near 59,000. That has happened in roughly 5 percent of history. A monthly close under it does not confirm the model, it challenges it, and we would report it that way.
+- **A tracked peg breaks 0.995.** The weakest this month was USDF at 0.9959. Below that line the wobble alert fires and the calm reading across crypto stops being the whole story.
+- **Correlation keeps climbing.** Near 0.56 now. Higher and the calm names stop being a diversifier, which would matter more than any single call on this page.
 
 ## Appendix: every market we track
 

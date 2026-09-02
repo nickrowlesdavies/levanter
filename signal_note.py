@@ -21,6 +21,8 @@ import json
 import os
 import sys
 
+from source_guard import SourceError, SIGNAL_SOURCES, check_sources
+
 OUT = "reports/signals"
 # The Signal is the PAID tier, currently free while the list is built. There is no
 # end date: the plan is to tell readers before that changes, so this is a flag a
@@ -61,6 +63,11 @@ def _read_root(p):
         return json.load(open(p))
     except Exception:
         return {}
+
+
+def _check_sources():
+    """Refuse to write a Signal on top of a broken feed. See source_guard."""
+    check_sources(SIGNAL_SOURCES, "the Signal")
 
 
 SIGNAL_STATE = "signal_history.json"   # not *_state.json, which .gitignore excludes
@@ -201,6 +208,7 @@ def _reorder(P, order):
 
 
 def compose(free=False, first=False, monday=None):
+    _check_sources()
     cm = _read("crypto_map.json")
     vr = _read("vol_regime.json")
     fx = _read("fx_map.json")
@@ -659,11 +667,34 @@ def compose(free=False, first=False, monday=None):
     ]
     P += [b for b in bullets if b]
     P.append("")
-    P.append(
+    # Marginal calls stay in the scored set. Dropping the ones that look shaky would
+    # flatter next week's scoreboard, so they are named here instead.
+    # The scored claim covers the whole board, calm calls included, so a marginal
+    # calm call is just as much a hostage to fortune as a marginal turbulent one.
+    _marg = [(_name(r["sym"]), r["ratio"], r["call"]) for r in _rows
+             if 0.93 <= r["ratio"] <= 1.07]
+    _score = (
         f"To score next week: the model calls {_join(all_high)} turbulent and the rest calm. In the "
         f"next issue we score each call the way the model does, whether realised volatility over the "
         f"week came in above or below the asset's running-median volatility, and show the hits and "
         f"misses. That is the claim you can hold this Signal to.")
+    if _marg:
+        _one = len(_marg) == 1
+        _clauses = []
+        for _call in ("turbulent", "calm"):
+            _set = [(n, v) for n, v, c in _marg if c == _call]
+            if _set:
+                _clauses.append(_join([f"{n} at {v:.2f}x" for n, v in _set])
+                                + f", called {_call}")
+        _score += (
+            f" {_cap(_num(len(_marg)))} {'call sits' if _one else 'calls sit'} close enough to "
+            f"the line "
+            f"that we would not defend {'it' if _one else 'them'} hard: "
+            + "; ".join(_clauses)
+            + f". We score {'it' if _one else 'them'} anyway. Quietly dropping the calls that look "
+            f"shaky is how a scoreboard gets flattered, and a scoreboard you cannot trust is worth "
+            f"nothing to you.")
+    P.append(_score)
     P.append("")
 
     P = _reorder(P, SECTION_ORDER)
@@ -811,7 +842,11 @@ def main():
             print(f"signal_note: not due yet (prepares {wednesday} 06:00 GST).")
             return
 
-    body, meta = compose(SIGNAL_FREE, SIGNAL_FIRST_ISSUE, monday.isoformat())
+    try:
+        body, meta = compose(SIGNAL_FREE, SIGNAL_FIRST_ISSUE, monday.isoformat())
+    except SourceError as e:
+        print(f"signal_note: {e}", file=sys.stderr)
+        sys.exit(1)
     title = f"# Levanter Signal · week of {monday.strftime('%-d %B %Y')}"
     body = body.replace("# Levanter Signal\n", title + "\n", 1)
     teaser_sub_path = os.path.join(OUT, f"levanter-signal-teaser-substack-{monday}.md")

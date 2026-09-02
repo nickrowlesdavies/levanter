@@ -29,6 +29,9 @@ MONTHLY_PUBLISH_DAY = 28
 ARCHIVE_PATH = "review_archive.json"
 
 
+from source_guard import SourceError, MARKET_SOURCES, check_sources
+
+
 def _read(path):
     p = os.path.join(R, path)
     if not os.path.exists(p):
@@ -2635,6 +2638,16 @@ APP_JSONLD = """<script type="application/ld+json">
 
 def main():
     import sys
+    # The dashboard is built from the same market feeds as the Signals, so a
+    # broken feed stops the build rather than silently rendering an empty panel.
+    # Strategy *_state.json files are excluded: .gitignore drops them, so they
+    # are legitimately absent on a fresh checkout.
+    try:
+        check_sources({os.path.join(R, os.path.basename(k)): v
+                       for k, v in MARKET_SOURCES.items()}, "the dashboard")
+    except SourceError as e:
+        print(f"build_dashboard: {e}", file=sys.stderr)
+        sys.exit(1)
     market_only = "--market-only" in sys.argv
     out_path = os.path.join(R, "dashboard.html")
     if "--out" in sys.argv:
