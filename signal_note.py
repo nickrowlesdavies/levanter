@@ -895,7 +895,16 @@ def main():
     # The accompanying X thread. Its own channel dir, no docx (pasted post by post).
     x_dir = os.path.join("reports", "x")
     os.makedirs(x_dir, exist_ok=True)
-    open(os.path.join(x_dir, f"levanter-signal-x-{monday}.md"), "w").write(x_thread(meta, monday))
+    # The note and teasers are already written. A thread that will not fit is a
+    # loud failure, not a reason to lose the issue, so report it and exit non-zero.
+    try:
+        open(os.path.join(x_dir, f"levanter-signal-x-{monday}.md"), "w").write(
+            x_thread(meta, monday))
+    except x_text.PostTooLong as e:
+        print(f"signal_note: X thread not written. {e}", file=sys.stderr)
+        _x_failed = True
+    else:
+        _x_failed = False
     try:
         import md2docx
         md2docx.convert(note_path, os.path.join(OUT, "docx", f"levanter-signal-{monday}.docx"))
@@ -905,6 +914,8 @@ def main():
     except Exception as e:
         print("signal_note: docx skipped:", e)
     print(f"signal_note: prepared week-of-{monday} Signal + teaser in {OUT}/")
+    if _x_failed:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

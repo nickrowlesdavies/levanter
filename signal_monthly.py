@@ -938,7 +938,16 @@ def main():
     # The accompanying X thread, in its own channel dir (pasted post by post).
     x_dir = os.path.join("reports", "x")
     os.makedirs(x_dir, exist_ok=True)
-    open(os.path.join(x_dir, f"levanter-signal-monthly-x-{month}.md"), "w").write(x_thread(meta))
+    # As in signal_note: the note is already written, so an over-long thread is
+    # reported loudly rather than taking the issue down with it.
+    try:
+        open(os.path.join(x_dir, f"levanter-signal-monthly-x-{month}.md"), "w").write(
+            x_thread(meta))
+    except sn.x_text.PostTooLong as e:
+        print(f"signal_monthly: X thread not written. {e}", file=sys.stderr)
+        _x_failed = True
+    else:
+        _x_failed = False
 
     state[month] = cur_state
     _save_state(state)
@@ -951,6 +960,8 @@ def main():
     except Exception as e:
         print("signal_monthly: docx skipped:", e)
     print(f"signal_monthly: prepared {month} Signal ({basis} basis) + teasers in {OUT}/")
+    if _x_failed:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

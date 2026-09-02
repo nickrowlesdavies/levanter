@@ -30,6 +30,7 @@ ARCHIVE_PATH = "review_archive.json"
 
 
 import repo_lock
+import x_text
 from source_guard import SourceError, MARKET_SOURCES, check_sources
 
 
@@ -1804,7 +1805,7 @@ _TIERS = {"daily": {"substack": "mirror", "x": "thread"},
           "weekly": {"linkedin": "full", "x": "thread"},
           "monthly": {"linkedin": "deep"}}
 
-_X_LIMIT = 280                    # characters in a single post
+_X_LIMIT = x_text.X_LIMIT        # characters in a single post, as X counts them
 
 
 def _DAILY_HEAD(now):
@@ -1833,7 +1834,9 @@ def _fit(blocks, drop_order, limit=_X_LIMIT):
     keep = list(range(len(blocks)))
     for i in list(drop_order) + [None]:
         text = "\n\n".join(blocks[j] for j in keep)
-        if len(text) <= limit:
+        # X charges a flat 23 for any link, so a plain len() here trims a post
+        # down to a size X still rejects.
+        if x_text.x_len(text) <= limit:
             return text
         if i is not None:
             keep = [j for j in keep if j != i]
@@ -1938,8 +1941,9 @@ def _x_thread(kind):
            f"X. {len(posts)} posts, each inside the {_X_LIMIT}-character limit. "
            f"Post in order as a thread. The separator lines are not part of any post.",
            ""]
+    x_text.require_fit(posts, where=thread_head, limit=_X_LIMIT)
     for i, p in enumerate(posts, 1):
-        out += [f"--- {i}/{len(posts)} ({len(p)} chars) ---", "", p, ""]
+        out += [f"--- {i}/{len(posts)} ({x_text.x_len(p)} chars) ---", "", p, ""]
     return "\n".join(out).strip() + "\n"
 
 

@@ -32,13 +32,10 @@ Written in the Cowork session, for Claude Code to execute. Newest last.
   `signal_note.py`, `signal_monthly.py` and `build_dashboard.py` each read
   `direction_backtest.json` themselves, so the three surfaces can still drift apart. Doing
   the weekly is the small half. The shared helper is the part that stops it recurring.
-- **The X character count does not weight URLs.** `_thread_file` uses plain `len()`, so the
-  warning at the foot of this file is documented but not implemented. Worse, a post over the
-  limit is dropped from the thread silently, so a thread can publish a post short with no
-  error. No current thread trips either problem: today's daily, weekly and monthly threads
-  max out at 212, 222 and 189 characters with no URLs in the long posts, and nothing is
-  being dropped. It is latent, not active, and it will bite the first time a post carries a
-  link. Fix both together, and make the drop loud rather than silent.
+- ~~The X character count does not weight URLs, and an over-long post is dropped
+  silently.~~ **Done 2026-09-02.** `x_text.py` counts the way X does and both renderers
+  use it. See the note at the foot of this file, which is now implemented rather than
+  only documented.
 - **`direction_backtest.json` is a frozen backtest with a review date.** 410 calls at 52
   percent over a window that closed 15 August, flagged `review_after: 2026-10-01`. From
   October it should be refreshed or superseded by the live scoreboard, and until then every
@@ -70,3 +67,9 @@ Recorded here because it changes how you work in this repo, not because it needs
 X weights every URL at 23 characters whatever its real length. A plain character count
 will pass a post that X rejects. This caught the launch post at 277 by a normal count and
 281 by X's.
+
+Since 2026-09-02 this is enforced rather than remembered. `x_text.x_len` charges every
+link 23, and `x_text.require_fit` raises rather than letting a post through. The launch
+post case is a test: 277 plain, 281 as X counts it. Note a long link counts *down*, so a
+56-character post carrying a 52-character URL is 27 to X. Hand-written X copy should be
+measured with `x_text.x_len`, never `len`.
