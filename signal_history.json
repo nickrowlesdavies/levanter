@@ -11,5 +11,26 @@
     "btc_ou": -42,
     "btc_price": 78976,
     "capw7": 27
+  },
+  "2026-08-31": {
+    "high": [
+      "Brent crude",
+      "coffee",
+      "corn",
+      "cotton",
+      "gasoline",
+      "gold",
+      "heating oil",
+      "oil",
+      "palladium",
+      "platinum",
+      "silver",
+      "solana",
+      "sugar",
+      "wheat"
+    ],
+    "btc_ou": -43,
+    "btc_price": 77411,
+    "capw7": -2
   }
 }
