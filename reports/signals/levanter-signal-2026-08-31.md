@@ -2,7 +2,7 @@
 
 > **The Levanter Signal.** A weekly read of volatility, valuation and the week ahead across crypto, FX and commodities. This is the subscriber tier, and it is free while we build the list. We will tell you before that changes. Subscribe at read.levantermarkets.com.
 
-*Data captured at 12:07 GST on 2 September 2026. Every figure below is stamped to a period. This is the accountable read behind the free weekly: the changes since last week, the levels to watch, and a claim we will score in the next issue.*
+*Data captured at 13:38 GST on 2 September 2026. Every figure below is stamped to a period. This is the accountable read behind the free weekly: the changes since last week, the levels to watch, and a claim we will score in the next issue.*
 
 ---
 
@@ -18,7 +18,7 @@ For the coming week the model reads eleven markets turbulent: gold, silver, oil,
 
 Worth naming: every market the model calls turbulent this week sits in one asset class, commodities. It reads the rest of the board as calm. Turbulence concentrated in one corner is a different picture from a market that is nervous everywhere, and it is the more common of the two.
 
-Average cross-asset correlation is near 0.55. That is high enough that diversification is thin: position count is not the same as risk spread this week.
+Average cross-asset correlation is near 0.56. That is high enough that diversification is thin: position count is not the same as risk spread this week.
 
 ### The full board, market by market
 
@@ -84,7 +84,7 @@ It is a statistical fit of price to time. It has no hard economic mechanism behi
 
 ## The week behind, and what it rhymes with
 
-Over the past seven days crypto was narrow and speculative-led: 12 of 35 coins higher, cap-weighted about -2 percent on the week and +25 percent over thirty days, led by the speculative end, UNI +47 percent and XMR +17 percent, with a best-to-worst spread near 58 points. Dominance held near 69 percent and the stablecoins we track kept their pegs. In foreign exchange the biggest seven-day move was USDSEK at +1.8 percent, ranges otherwise tight. In commodities the metals fell across the board, palladium -0 percent, copper -1 percent and gold -5 percent. The gains were narrow, but the largest moves stayed further out on the risk curve, and the dollar and most FX ranges were comparatively quiet.
+Over the past seven days crypto was narrow and speculative-led: 10 of 35 coins higher, cap-weighted about -3 percent on the week and +24 percent over thirty days, led by the speculative end, UNI +45 percent and XMR +16 percent, with a best-to-worst spread near 58 points. Dominance held near 69 percent and the stablecoins we track kept their pegs. In foreign exchange the biggest seven-day move was USDSEK at +1.8 percent, ranges otherwise tight. In commodities the metals fell across the board, palladium -0 percent, copper -1 percent and gold -5 percent. The gains were narrow, but the largest moves stayed further out on the risk curve, and the dollar and most FX ranges were comparatively quiet.
 
 Read across the three asset classes, the turbulence is concentrated in gold, silver, oil, palladium, Brent crude, wheat, coffee, sugar, cotton, gasoline and heating oil while the rest stays quiet. That is specific pockets of risk rather than a broad regime shift, and the tape alone does not tell us why they are the loud ones this week.
 

@@ -22,6 +22,7 @@ import os
 import sys
 
 import repo_lock
+import x_text
 from source_guard import SourceError, SIGNAL_SOURCES, check_sources
 
 OUT = "reports/signals"
@@ -259,16 +260,37 @@ def compose(free=False, first=False, monday=None):
     phase = next((a.get("phase", "") for a in cg.get("assets", [])
                   if a.get("sym") == "BTC"), "")
 
+    # Judge each complex on its own members and on the balance of them, not on a
+    # single name. This used to call energy quiet whenever any one of oil, copper
+    # or natural gas was calm: copper is a metal, and on 2 September it printed
+    # "calmer across energy" in the LinkedIn and X copy on a week when oil, Brent,
+    # gasoline and heating oil were all turbulent and gasoline was the most
+    # stretched market on the board.
+    ENERGY_SET = {"OIL", "WTI OIL", "BRENT OIL", "NAT GAS", "GASOLINE", "HEATING OIL"}
+    _hi7 = {sym for sym, a in vr.get("assets", {}).items()
+            if (a.get("7d") or {}).get("regime") == "HIGH"}
+    _lo7 = {sym for sym, a in vr.get("assets", {}).items()
+            if (a.get("7d") or {}).get("regime") == "LOW"}
+
+    def _complex_state(syms):
+        hi, lo = len(syms & _hi7), len(syms & _lo7)
+        if hi == lo:
+            return None
+        return "loud" if hi > lo else "quiet"
+
     loud, quiet = [], []
-    if g["commodity"][0]:
-        loud.append("the metals" if any(m in g["commodity"][0]
-                    for m in ("gold", "silver", "platinum")) else "commodities")
+    for _label, _syms in (("the metals", METALS), ("energy", ENERGY_SET)):
+        _state = _complex_state(_syms)
+        if _state == "loud":
+            loud.append(_label)
+        elif _state == "quiet":
+            quiet.append(_label)
+    if not loud and g["commodity"][0]:
+        loud.append("commodities")
     if g["crypto"][0]:
         loud.append("big-cap crypto")
     if len(g["fx"][1]) >= 4:
         quiet.append("most foreign exchange markets")
-    if any(x in g["commodity"][1] for x in ("oil", "copper", "natural gas")):
-        quiet.append("energy")
     loud_txt = _join(loud) or "a couple of pockets of the market"
     quiet_txt = " and across ".join(quiet) or "the rest of the board"
     # Direction backtest (committed fact) for the one honesty line and the teaser meta.
@@ -769,18 +791,26 @@ def teaser(meta, hashtags=True):
     return "\n".join(T).rstrip() + "\n"
 
 
-X_LIMIT = 280   # characters in a single X post
+X_LIMIT = x_text.X_LIMIT   # characters in a single X post, as X counts them
 
 
 def _thread_file(head, posts):
     """Render numbered posts as a paste-ready thread file, each within X_LIMIT.
-    The separators carry the numbering and are not part of any post."""
-    posts = [p for p in posts if p and len(p) <= X_LIMIT]
+    The separators carry the numbering and are not part of any post.
+
+    Lengths are counted the way X counts them, with every URL charged a flat 23
+    characters. An over-long post raises rather than being dropped: this used to
+    filter them out silently, so a thread could publish a post short with nothing
+    in the output to say which one went missing.
+    """
+    posts = [p for p in posts if p]
+    x_text.require_fit(posts, where=head, limit=X_LIMIT)
     out = [f"# {head}",
-           f"X. {len(posts)} posts, each inside the {X_LIMIT}-character limit. Post in order as a "
-           f"thread. The separator lines are not part of any post.", ""]
+           f"X. {len(posts)} posts, each inside the {X_LIMIT}-character limit as X counts it, "
+           f"with links charged at {x_text.URL_WEIGHT}. Post in order as a thread. The separator "
+           f"lines are not part of any post.", ""]
     for i, p in enumerate(posts, 1):
-        out += [f"--- {i}/{len(posts)} ({len(p)} chars) ---", "", p, ""]
+        out += [f"--- {i}/{len(posts)} ({x_text.x_len(p)} chars) ---", "", p, ""]
     return "\n".join(out).rstrip() + "\n"
 
 

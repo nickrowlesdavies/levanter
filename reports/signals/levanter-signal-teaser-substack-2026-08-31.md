@@ -6,7 +6,7 @@ Here is this week's Signal in one minute.
 
 What is knowable:
 
-Volatility clusters, so a turbulent-or-calm classification can carry measurable skill. This week the model expects wider ranges in the metals, with calmer conditions across most foreign exchange markets and across energy.
+Volatility clusters, so a turbulent-or-calm classification can carry measurable skill. This week the model expects wider ranges in the metals and energy, with calmer conditions across most foreign exchange markets.
 
 On the longer view, bitcoin is trading about 43 percent below the fair value produced by Levanter's long-run valuation fit, which models price against how long the network has existed. That is valuation context, not a price target or a prediction for Friday.
 
