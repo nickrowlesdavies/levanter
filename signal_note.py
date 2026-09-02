@@ -161,6 +161,45 @@ def _wilson_ci(acc_pct, n, z=1.96):
     return [round((c - h) * 100), round((c + h) * 100)]
 
 
+SECTION_ORDER = [
+    "## The seven-day volatility map",
+    "## What changed since the last Signal",
+    "## The one chart: bitcoin against its long-run trend",
+    "## What the model can and cannot do",
+    "## The week behind, and what it rhymes with",
+    "## Subscriber watchlist, with levels",
+]
+
+
+def _reorder(P, order):
+    """Reassemble the note so the volatility map leads.
+
+    The map is the only part of the Signal with a measured, scoreable edge, and
+    the valuation section repeats figures the free weekly already gives away, so
+    the map runs first. Sections are built in whatever order is convenient in
+    code; this puts them in reading order. Anything not named keeps its relative
+    position at the end.
+    """
+    head, cur, secs = [], None, []
+    for line in P:
+        if line.startswith("## "):
+            cur = [line]
+            secs.append(cur)
+        elif cur is None:
+            head.append(line)
+        else:
+            cur.append(line)
+    named = {sec[0]: sec for sec in secs}
+    out = list(head)
+    for h in order:
+        if h in named:
+            out += named.pop(h)
+    for sec in secs:
+        if sec[0] in named:
+            out += sec
+    return out
+
+
 def compose(free=False, first=False, monday=None):
     cm = _read("crypto_map.json")
     vr = _read("vol_regime.json")
@@ -296,16 +335,31 @@ def compose(free=False, first=False, monday=None):
     # ===== Seven-day volatility map =====
     P += ["## The seven-day volatility map", ""]
     if acc7 and acc30:
+        _bt7 = (vr.get("backtest", {}) or {}).get("7d", {}) or {}
+        _n7, _ci7 = _bt7.get("n"), _bt7.get("ci")
+        _br = _bt7.get("brier") or {}
         P.append(
-            f"This is the part with measurable skill. The model tags each market turbulent or calm for "
-            f"the week ahead. In the five-year point-in-time backtest it classified the seven-day "
-            f"regime correctly about {acc7} percent of the time, {edge7} percentage points above its "
-            f"naïve baseline, and {acc30} percent at thirty days, {edge30} points above baseline. That "
-            f"is a backtest, not a live forward record: the live scoreboard is only now starting to "
-            f"fill.")
+            f"This is the part with measurable skill, and it is why it leads the issue. The model "
+            f"tags each market turbulent or calm for the week ahead. In the five-year "
+            f"point-in-time backtest it classified the seven-day regime correctly about {acc7} "
+            f"percent of the time"
+            + (f" across {_n7:,} calls" if _n7 else "")
+            + (f", 95 percent interval {_ci7[0]} to {_ci7[1]}," if _ci7 else "")
+            + f" {edge7} percentage points above its naïve baseline, and {acc30} percent at "
+            f"thirty days, {edge30} points above baseline. That is a backtest, not a live forward "
+            f"record: the live scoreboard is only now starting to fill.")
         P.append("")
+        if _br.get("skill") is not None:
+            P.append(
+                f"Accuracy alone can flatter a model that never commits, so we also score the "
+                f"confidence behind each call. The Brier score is {_br['brier']} against "
+                f"{_br['brier_base']} for always guessing the base rate, a skill score of "
+                f"{_br['skill']:.3f} over {_br.get('n_eval', 0):,} scored calls. Positive but "
+                f"small. Read the calls as a lean, not a conviction.")
+            P.append("")
     calm_names = list(g["crypto"][1])   # calm crypto, e.g. solana
-    calm_names.append(f"{_num(fx_low)} of the {_num(fx_total)} FX pairs")
+    calm_names.append(f"all {_num(fx_total)} FX pairs" if fx_low == fx_total
+                      else f"{_num(fx_low)} of the {_num(fx_total)} FX pairs")
     if spx and spx.get("regime") == "LOW":
         calm_names.append("the S&P 500")
     calm_names += [x for x in g["commodity"][1] if x in ("oil", "copper", "natural gas")]
@@ -314,6 +368,132 @@ def compose(free=False, first=False, monday=None):
         f"The rest of the displayed set is calm, including {_join(calm_names)}. The average market is "
         f"therefore contained even though a few names are carrying wide ranges.")
     P.append("")
+    # ---- concentration: which classes are actually carrying the turbulence ----
+    _CLSNAME = {"crypto": "Crypto", "fx": "FX", "commodity": "Commodities", "equity": "Equity"}
+    _cls = vr.get("classes", {})
+    _assets_all = vr.get("assets", {})
+    _hi_cls = sorted({_cls.get(sym) for sym in _assets_all
+                      if (_assets_all.get(sym, {}).get("7d", {}) or {}).get("regime") == "HIGH"
+                      and _cls.get(sym)})
+    if len(_hi_cls) == 1:
+        P.append(
+            f"Worth naming: every market the model calls turbulent this week sits in one asset class, "
+            f"{_CLSNAME.get(_hi_cls[0], _hi_cls[0]).lower()}. It reads the rest of the board as calm. "
+            f"Turbulence concentrated in one corner is a different picture from a market that is "
+            f"nervous everywhere, and it is the more common of the two.")
+        P.append("")
+    elif len(_hi_cls) > 1:
+        # A single marginal name in a second class is not cross-asset turbulence, and
+        # saying so would overclaim a shared driver that the data does not show.
+        _hi_by_cls = {}
+        for sym in _assets_all:
+            if (_assets_all.get(sym, {}).get("7d", {}) or {}).get("regime") == "HIGH":
+                _hi_by_cls.setdefault(_cls.get(sym), []).append(sym)
+        _dom_cls = max(_hi_by_cls, key=lambda c: len(_hi_by_cls[c]))
+        _dom_n, _tot_n = len(_hi_by_cls[_dom_cls]), sum(len(v) for v in _hi_by_cls.values())
+        _others = [s2 for c, v in _hi_by_cls.items() if c != _dom_cls for s2 in v]
+        if _dom_n / _tot_n >= 0.8:
+            P.append(
+                f"Worth naming: {_num(_dom_n)} of the {_num(_tot_n)} turbulent markets are "
+                f"{_CLSNAME.get(_dom_cls, _dom_cls).lower()}, with only "
+                f"{_join([_name(x) for x in _others])} outside that class, and "
+                f"{'that name sits' if len(_others) == 1 else 'those names sit'} close to the line. "
+                f"Treat this as turbulence concentrated in one corner of the board rather than a "
+                f"market that is nervous everywhere. The two call for different responses.")
+        else:
+            P.append(
+                f"The turbulence is spread across "
+                f"{_join([_CLSNAME.get(c, c).lower() for c in sorted(_hi_by_cls)])} rather than "
+                f"sitting in one corner of the board. Cross-class turbulence is the rarer reading, "
+                f"and it usually points to one shared driver rather than several unrelated stories.")
+        P.append("")
+    if corr is not None:
+        P.append(
+            f"Average cross-asset correlation is near {corr:.2f}. "
+            + ("That is high enough that diversification is thin: position count is not the same as "
+               "risk spread this week." if corr >= 0.5 else
+               "That is loose enough that markets are still trading their own stories, so spreading "
+               "risk across them is doing real work."))
+        P.append("")
+
+    # ---- the full board ----
+    _rows = []
+    for sym, a in _assets_all.items():
+        a7, a30 = a.get("7d") or {}, a.get("30d") or {}
+        nowv, medv = a7.get("vol_now"), a7.get("vol_median")
+        if not nowv or not medv:
+            continue
+        _rows.append({
+            "sym": sym, "cls": _CLSNAME.get(_cls.get(sym), "Other"),
+            "now": nowv, "med": medv, "ratio": nowv / medv,
+            "pctile": ((vr.get("ood", {}) or {}).get(sym, {}) or {}).get("vol_pctile"),
+            "call": "turbulent" if a7.get("regime") == "HIGH" else "calm",
+            "call30": "turbulent" if a30.get("regime") == "HIGH" else
+                      ("calm" if a30.get("regime") else "n/a"),
+        })
+    _rows.sort(key=lambda r: -r["ratio"])
+    if _rows:
+        P += ["### The full board, market by market", ""]
+        P.append(
+            "This is the model's working rather than its conclusion. Volatility is annualised. The "
+            "median column is each market's own long-run median, so every row is judged against "
+            "itself and never against a common threshold: a 6 percent reading in FX can be stretched "
+            "while a 35 percent reading in crypto is quiet. Percentile is where the current reading "
+            "sits in that market's own history. The thirty-day column is there so you can see whether "
+            "a call is a one-week disturbance or a settled regime.")
+        P.append("")
+        P.append("| Market | Class | 7d vol | Its median | vs median | Percentile | 30d | Call |")
+        P.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+        for r in _rows:
+            _pc = f"{r['pctile']:.0f}" if r["pctile"] is not None else "n/a"
+            P.append(f"| {r['sym']} | {r['cls']} | {r['now']:.0f} | {r['med']:.0f} | "
+                     f"{r['ratio']:.2f}x | {_pc} | {r['call30']} | {r['call']} |")
+        P.append("")
+        _top, _bot = _rows[0], _rows[-1]
+        P.append(
+            f"The most stretched reading on the board is {_name(_top['sym'])}, running "
+            f"{_top['ratio']:.2f} times its own median, and the quietest is {_name(_bot['sym'])} at "
+            f"{_bot['ratio']:.2f} times. A market can be called turbulent while still sitting below "
+            f"another market's calm reading, which is the whole point of judging each one against "
+            f"itself.")
+        P.append("")
+        # Rows close to their own median are coin-flip calls and are flagged as such.
+        _near = [r for r in _rows if 0.93 <= r["ratio"] <= 1.07]
+        if _near:
+            P.append(
+                "Treat the rows near the line with less confidence than the rest. "
+                + _cap(_join([f"{_name(r['sym'])} at {r['ratio']:.2f}x" for r in _near[:5]]))
+                + (" are" if len(_near[:5]) > 1 else " is")
+                + " close enough to their own median that the call could go either way. We would "
+                  "rather flag that than present every row as equally settled. The rows worth acting "
+                  "on are the stretched readings at the top and the quiet ones at the bottom.")
+            P.append("")
+        # Horizon disagreement is the weekly's own signal: the monthly cannot show it.
+        _split = [r for r in _rows if r["call30"] in ("turbulent", "calm")
+                  and r["call30"] != r["call"]]
+        if _split:
+            _now_hi = [_name(r["sym"]) for r in _split if r["call"] == "turbulent"]
+            _now_lo = [_name(r["sym"]) for r in _split if r["call"] == "calm"]
+            _bits = []
+            if _now_hi:
+                _bits.append(f"turbulent this week but calm at thirty days, {_join(_now_hi)}")
+            if _now_lo:
+                _bits.append(f"calm this week but turbulent at thirty days, {_join(_now_lo)}")
+            P.append(
+                "Where the two horizons disagree. " + _sentences(_bits) + ". A split like that flags "
+                "a near-term move without telling you whether it lasts, so it is the set to watch "
+                "rather than the set to act on.")
+            P.append("")
+        _ood = [r["sym"] for r in _rows
+                if ((vr.get("ood", {}) or {}).get(r["sym"], {}) or {}).get("out_of_range")]
+        if _ood:
+            P.append(
+                f"Out-of-range flag: {_join([_name(x) for x in _ood])} "
+                + ("is" if len(_ood) == 1 else "are")
+                + " trading outside the volatility range the model was fitted on. The call still "
+                  "prints, but it is an extrapolation and we would discount it accordingly.")
+            P.append("")
+
     if vb and ve:
         # Every claim here is derived. This paragraph used to hardcode "close to
         # double its normal ... both are turbulent ... the two horizons disagree",
@@ -363,8 +543,14 @@ def compose(free=False, first=False, monday=None):
             f"{cr['n']:,} backtested crypto calls"
             + (f", a 95 percent interval of {_wc[0]} to {_wc[1]} percent that straddles the "
                f"coin-flip line" if (_wc := _wilson_ci(cr.get('acc'), cr.get('n'))) else "")
-            + ". We forecast volatility, not direction.")
+            + ". We forecast volatility, not direction. Anyone selling you the second thing at "
+              "these sample sizes is selling you noise.")
         P.append("")
+    P.append(
+        "What this map is not: it says nothing about which way a price goes, it cannot tell you why a "
+        "market is stretched, and a turbulent call is not a reason to trade. It is a statement about "
+        "the width of the range, which is the input to position size, not to direction.")
+    P.append("")
 
     # ===== What changed =====
     P += ["## What changed since the last Signal", ""]
@@ -385,7 +571,8 @@ def compose(free=False, first=False, monday=None):
         if not flips and not calmed:
             bits.append("the volatility roster is unchanged from last week")
         if d_ou:
-            bits.append(f"bitcoin is about {abs(d_ou)} points "
+            bits.append(f"bitcoin is about {abs(d_ou)} "
+                        f"{'point' if abs(d_ou) == 1 else 'points'} "
                         f"{'cheaper' if d_ou < 0 else 'richer'} against its fitted value")
         P.append("Week on week: " + _sentences([_cap(b) for b in bits]) + ".")
     else:
@@ -403,9 +590,13 @@ def compose(free=False, first=False, monday=None):
                    f"{mv7[1]['coin']} {mv7[1]['ret']:+.0f} percent")
     # All three asset classes are always addressed here, even if a feed did not
     # return, so crypto, FX and commodities never silently drop out of the Signal.
+    # Breadth is read off the up/down split rather than asserted, so the prose cannot
+    # claim a broad tape on a week when only a third of the board closed higher.
+    _bratio = (w_up / w_n) if w_n else 0.0
+    breadth = "broad" if _bratio >= 0.6 else ("narrow" if _bratio <= 0.4 else "mixed")
     if w_n:
         crypto_clause = (
-            f"Over the past seven days crypto was broad and speculative-led: {w_up} of {w_n} coins "
+            f"Over the past seven days crypto was {breadth} and speculative-led: {w_up} of {w_n} coins "
             f"higher, cap-weighted about {w_capw:+.0f} percent on the week"
             + (f" and {capw30:+.0f} percent over thirty days" if capw30 is not None else "")
             + f"{wk_lead}, with a best-to-worst spread near {abs(w_disp):.0f} points. Dominance held "
@@ -417,12 +608,23 @@ def compose(free=False, first=False, monday=None):
         f" In foreign exchange the biggest seven-day move was {fp[-1][0]} at {fp[-1][1]:+.1f} percent, "
         f"ranges otherwise tight." if fp else
         " In foreign exchange the feed was quiet or unavailable this week, with nothing notable to flag.")
-    comm_clause = (
-        " In commodities the metals led the week, "
-        + _join([f"{_name(nn)} {vv:+.0f} percent" for nn, vv in metals[-3:][::-1]]) + "." if metals else
-        " In commodities the feed was quiet or unavailable this week, with nothing notable to flag.")
-    tail = (" The gains were broad, but the largest moves stayed further out on the risk curve, and "
-            "the dollar and most FX ranges were comparatively quiet." if (w_n and metals) else "")
+    if metals:
+        _shown = metals[-3:][::-1]
+        _vals = [vv for _, vv in _shown]
+        if all(v < 0 for v in _vals):
+            _verb = "the metals fell across the board"
+        elif all(v > 0 for v in _vals):
+            _verb = "the metals led the week"
+        else:
+            _verb = "the metals were mixed"
+        comm_clause = (f" In commodities {_verb}, "
+                       + _join([f"{_name(nn)} {vv:+.0f} percent" for nn, vv in _shown]) + ".")
+    else:
+        comm_clause = (" In commodities the feed was quiet or unavailable this week, with nothing "
+                       "notable to flag.")
+    tail = (f" The gains were {breadth}, but the largest moves stayed further out on the risk "
+            "curve, and the dollar and most FX ranges were comparatively quiet."
+            if (w_n and metals) else "")
     P.append(crypto_clause + fx_clause + comm_clause + tail)
     P.append("")
     metals_hi = [m for m in g["commodity"][0] if m in ("gold", "silver", "platinum")]
@@ -448,7 +650,8 @@ def compose(free=False, first=False, monday=None):
         (f"- **Ether volatility.** Current annualised volatility is near {ve['now']} percent against a "
          f"historical median around {ve['med']}. Watch whether the thirty-day classification also flips "
          f"from calm to turbulent.") if ve else "",
-        (f"- **The metals.** Whether the turbulent bid broadens beyond {_join(g['commodity'][0])} or "
+        (f"- **The commodity complex.** Whether the turbulent bid broadens beyond "
+         f"{_join(g['commodity'][0])} or "
          f"fades back to calm.") if g["commodity"][0] else "",
         (f"- **Pegs and dominance.** Stablecoins are holding and bitcoin dominance is near {dom:.0f} "
          f"percent. A tracked peg below 0.995 would trigger Levanter's wobble alert. A sharp dominance "
@@ -462,6 +665,8 @@ def compose(free=False, first=False, monday=None):
         f"week came in above or below the asset's running-median volatility, and show the hits and "
         f"misses. That is the claim you can hold this Signal to.")
     P.append("")
+
+    P = _reorder(P, SECTION_ORDER)
 
     if free:
         footer = ("*This is the Levanter Signal, the weekly subscriber note, free for now while we "

@@ -28,6 +28,7 @@ import statistics
 import sys
 
 import signal_note as sn
+from source_guard import SourceError, SIGNAL_SOURCES, check_sources
 
 OUT = sn.OUT
 SIGNAL_FREE = sn.SIGNAL_FREE
@@ -367,6 +368,25 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
                 f"decided rather than where it is celebrated.")
             P.append("")
 
+    # How far the board sits below its own highs. A strong month can still leave
+    # every name well under water, and that gap is the one that decides sizing.
+    _dd = sorted(c["dd"] for c in (cm.get("coins") or [])
+                 if isinstance(c.get("dd"), (int, float)))
+    if _dd:
+        _med = statistics.median(_dd)
+        _bands = {}
+        for c in (cm.get("coins") or []):
+            _bands[c.get("risk_band")] = _bands.get(c.get("risk_band"), 0) + 1
+        _hi = _bands.get("high", 0)
+        P.append(
+            f"Drawdown is the other half of that picture. The median coin sits {abs(_med):.0f} percent "
+            f"below its own recent high and the deepest is {abs(_dd[0]):.0f} percent under, across "
+            f"{len(_dd)} names. Our risk banding puts {_bands.get('low', 0)} of them in the low band, "
+            f"{_bands.get('medium', 0)} in the medium and {_hi} in the high. A month can be green and "
+            f"still leave the whole board under water, which is why we quote the distance from the "
+            f"high next to the return rather than instead of it.")
+        P.append("")
+
     # Breadth: whether the move was broad or carried by the heavyweights.
     capw, eqw = cm.get("cap_weighted_ret"), cm.get("equal_weighted_ret")
     if capw is not None and eqw is not None:
@@ -473,6 +493,15 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
             + (f", and {b90['acc']} percent at ninety days." if b90.get("acc") else ".")
             + " That is a backtest rather than a live forward record, and the live scoreboard is only "
               "now filling.")
+        P.append("")
+    br = (b30 or {}).get("brier") or {}
+    if br.get("brier") is not None and br.get("brier_base") is not None:
+        P.append(
+            f"Accuracy on its own flatters a model that never commits, so we also score the "
+            f"confidence behind each call. The Brier score is {br['brier']:.3f} against "
+            f"{br['brier_base']:.3f} for always guessing the base rate, a skill score of "
+            f"{br.get('skill', 0):.3f} over {br.get('n_eval', 0):,} scored calls. Positive but small. "
+            f"Read the calls as a lean rather than a conviction, and size accordingly.")
         P.append("")
     ood_hits = sorted(s for s, v in (vr.get("ood") or {}).items() if v.get("out_of_range"))
     if ood_hits:
@@ -584,7 +613,8 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
                 f"month had a direction rather than just an end state.")
             P.append("")
             P.append(
-                f"Between {_d(k0)} and {_d(k1)} the number of markets the model called turbulent went "
+                f"Between our weekly Signal for the week of {_d(k0)} and the one for the week of "
+                f"{_d(k1)}, the number of markets the model called turbulent went "
                 f"from {len(a_list)} to {len(b_list)}."
                 + (f" Newly turbulent: {sn._join(gained)}." if gained else "")
                 + (f" Calmed back to normal: {sn._join(lost)}." if lost else ""))
@@ -613,7 +643,8 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
                 P.append("")
             P.append(
                 f"Two caveats worth stating. These are seven-day classifications from the weekly "
-                f"Signal, not the thirty-day calls used above, and {_num_word(len(wk))} snapshots is a "
+                f"Signal, not the thirty-day calls used above, they are keyed to the week they cover "
+                f"rather than the day they were drawn, and {_num_word(len(wk))} snapshots is a "
                 f"short record. From next month this section compares month end against month end "
                 f"directly, on the same horizon as the rest of the note.")
         else:
@@ -625,6 +656,9 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
 
     # ===== Watchlist =====
     P += ["## Subscriber watchlist, with levels", ""]
+    _stb = [x for x in (cm.get("stables") or []) if isinstance(x.get("minp"), (int, float))]
+    _wk = min(_stb, key=lambda x: x["minp"]) if _stb else {}
+    _off = ("still above" if _wk.get("minp", 0) >= 0.995 else "below")
     ve = _voldetail30(vr, "ETH")
     bullets = [
         (f"- **Bitcoin.** Fitted floor near {sn._kfmt(floor)}, fair value near {sn._kfmt(fair)}. A "
@@ -636,8 +670,12 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
         (f"- **The metals.** Whether the turbulent bid broadens beyond "
          f"{sn._join([m for m in g['commodity'][0] if m in METALS])} or fades back to calm."
          ) if [m for m in g["commodity"][0] if m in METALS] else "",
-        (f"- **Pegs and dominance.** Bitcoin dominance is near {dom:.0f} percent and the stablecoins "
-         f"we track are holding. A tracked peg below 0.995 would trigger Levanter's wobble alert."
+        (f"- **Pegs and dominance.** Bitcoin dominance is near {dom:.0f} percent. "
+         + (f"Of the {len(_stb)} stablecoins we track the weakest print this month was {_wk['coin']} "
+            f"at {_wk['minp']:.4f}, {_off} the 0.995 line that triggers Levanter's wobble alert. "
+            if _stb and _wk.get("minp") is not None else
+            "The stablecoins we track are holding. ")
+         + "We publish the weakest reading rather than a pass mark, because the number is the point."
          ) if dom else "",
     ]
     P += [b for b in bullets if b]
@@ -682,6 +720,38 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
             f"the number is the point. Volatility is forecastable and we forecast it. Direction is not, "
             f"so we do not sell it.")
         P.append("")
+
+    # ===== What would make this wrong =====
+    # The free monthly argues a view. A paid note should say what would break it,
+    # in terms specific enough to check next month rather than general caution.
+    P += ["## What would make this read wrong", ""]
+    P.append("Every claim above is checkable, so here is what would falsify it. These are the "
+             "things we will be marked against, not a disclaimer.")
+    P.append("")
+    _f = []
+    if turbulent:
+        _f.append(f"**The concentration breaks.** We say turbulence is sitting in one corner of the "
+                  f"board. If crypto or the dollar pairs flip turbulent next month while the "
+                  f"commodity complex calms, the rotation read was wrong, not early.")
+    if b30.get("acc"):
+        _f.append(f"**The hit rate slips.** The classifier runs about {b30['acc']} percent in "
+                  f"backtest. If next month's scored calls come in materially under that, the "
+                  f"backtest was flattering the live model and we will say so in the scoring.")
+    if floor:
+        _f.append(f"**Bitcoin closes below the fitted floor.** Near {sn._kfmt(floor)}. That has "
+                  f"happened in roughly 5 percent of history. A monthly close under it does not "
+                  f"confirm the model, it challenges it, and we would report it that way.")
+    if _stb and _wk.get("minp") is not None:
+        _f.append(f"**A tracked peg breaks 0.995.** The weakest this month was {_wk['coin']} at "
+                  f"{_wk['minp']:.4f}. Below that line the wobble alert fires and the calm reading "
+                  f"across crypto stops being the whole story.")
+    if corr:
+        _f.append(f"**Correlation keeps climbing.** Near {corr:.2f} now. Higher and the calm names "
+                  f"stop being a diversifier, which would matter more than any single call on this "
+                  f"page.")
+    for _b in _f:
+        P.append("- " + _b)
+    P.append("")
 
     # ===== Appendix: the complete board =====
     # Top three and bottom three is a summary. A paid note should not make the
@@ -790,6 +860,14 @@ def x_thread(meta):
 
 def main():
     argv = sys.argv[1:]
+    # The monthly Signal reads the same feeds as the weekly, so it gets the same
+    # hard precondition: a broken feed stops the build rather than quietly
+    # costing the note a section.
+    try:
+        check_sources(SIGNAL_SOURCES, "the monthly Signal")
+    except SourceError as e:
+        print(f"signal_monthly: {e}", file=sys.stderr)
+        sys.exit(1)
     force = "--force" in argv
     if "--as-of" in argv:
         global _AS_OF
