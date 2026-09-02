@@ -9,7 +9,7 @@ worth watching, and a claim we score in the next issue.
 
 PREMIUM. Written to reports/signals/ and never copied to the public site.
 
-    python signal_monthly.py [--force] [--month YYYY-MM]
+    python signal_monthly.py [--force] [--month YYYY-MM] [--as-of ISO8601]
 
 A note on the month figures. The maps store a usable daily history for FX and
 commodities, but the crypto `hist` array is CoinGecko's 7-day hourly sparkline,
@@ -161,6 +161,37 @@ def _moves(rows):
     return sn._join([f"{s} {v:+.1f} percent" for s, v in rows])
 
 
+# Pinned capture time, set by --as-of. A published issue has to be
+# reproducible: regenerating August in September must stamp and difference
+# as August, not as today. None means use the real clock.
+_AS_OF = None
+
+
+def _now():
+    return _AS_OF or sn._now_gst()
+
+
+def _d(iso):
+    """2026-08-24 -> 24 August."""
+    try:
+        return dt.date.fromisoformat(str(iso)).strftime("%-d %B")
+    except (ValueError, TypeError):
+        return str(iso)
+
+
+def _num_word(n):
+    return {2: "two", 3: "three", 4: "four", 5: "five"}.get(n, str(n))
+
+
+def _weekly_in_month(month):
+    """Weekly Signal snapshots captured inside the covered month, oldest first.
+    Used only for the first monthly issue, when no prior month-end snapshot
+    exists to difference against. These are SEVEN-day classifications, so
+    anything built from them has to say so."""
+    h = sn._read_root("signal_history.json") or {}
+    return [(k, h[k]) for k in sorted(k for k in h if str(k).startswith(month))]
+
+
 def _voldetail30(vr, sym):
     """Thirty-day volatility detail. signal_note._voldetail is hard-wired to the 7d
     horizon, which is the wrong window to quote in a monthly note."""
@@ -248,7 +279,7 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
     bt = vr.get("backtest", {}) or {}
     b30, b90 = bt.get("30d", {}) or {}, bt.get("90d", {}) or {}
     mname = _month_name(month)
-    now = sn._now_gst()
+    now = _now()
     stamp = now.strftime("%H:%M GST on %-d %B %Y")
 
     # How the month's figures were actually derived, said plainly rather than implied.
@@ -536,10 +567,60 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
                         f"{'cheaper' if d_ou < 0 else 'richer'} against its fitted value")
         P.append("Month on month: " + sn._sentences([sn._cap(b) for b in bits]) + ".")
     else:
-        P.append(
-            "From next month this section flags which markets newly flipped turbulent or calm and how "
-            "far bitcoin moved against its fitted value, so you can see what changed rather than only "
-            "the latest state.")
+        # No prior month end to difference against on a first issue. Rather than
+        # promise value next month, use our own weekly record from inside this
+        # one: it shows the rotation happening rather than only its end state.
+        wk = _weekly_in_month(month)
+        if len(wk) >= 2:
+            (k0, w0), (k1, w1) = wk[0], wk[-1]
+            a_list = w0.get("high", []) or []
+            b_list = w1.get("high", []) or []
+            a_set, b_set = set(a_list), set(b_list)
+            gained = [x for x in b_list if x not in a_set]
+            lost = [x for x in a_list if x not in b_set]
+            P.append(
+                f"This is the first monthly Signal, so there is no prior month end to difference "
+                f"against. We do have our own weekly record from inside the month, and it shows the "
+                f"month had a direction rather than just an end state.")
+            P.append("")
+            P.append(
+                f"Between {_d(k0)} and {_d(k1)} the number of markets the model called turbulent went "
+                f"from {len(a_list)} to {len(b_list)}."
+                + (f" Newly turbulent: {sn._join(gained)}." if gained else "")
+                + (f" Calmed back to normal: {sn._join(lost)}." if lost else ""))
+            P.append("")
+            if gained and lost:
+                P.append(
+                    "Read those two lists together rather than separately. Turbulence did not simply "
+                    "increase, it moved: out of the names that calmed and into the ones that flipped. "
+                    "That is the same rotation the thirty-day board shows at month end, caught while "
+                    "it was happening rather than inferred from the finish.")
+                P.append("")
+            o0, o1 = w0.get("btc_ou"), w1.get("btc_ou")
+            p0, p1 = w0.get("btc_price"), w1.get("btc_price")
+            if o0 is not None and o1 is not None:
+                moved = o1 - o0
+                P.append(
+                    f"Bitcoin went from {abs(o0):.0f} to {abs(o1):.0f} percent below its fitted value "
+                    f"over the same stretch"
+                    + (f", with price easing from {p0:,.0f} to {p1:,.0f} dollars"
+                       if p0 and p1 and p1 < p0 else
+                       f", with price moving from {p0:,.0f} to {p1:,.0f} dollars" if p0 and p1 else "")
+                    + ". "
+                    + ("A wider discount on a lower price is the fit doing what it should, not a "
+                       "signal in itself." if moved < 0 else
+                       "The gap narrowed, which on a monthly horizon is context rather than a trigger."))
+                P.append("")
+            P.append(
+                f"Two caveats worth stating. These are seven-day classifications from the weekly "
+                f"Signal, not the thirty-day calls used above, and {_num_word(len(wk))} snapshots is a "
+                f"short record. From next month this section compares month end against month end "
+                f"directly, on the same horizon as the rest of the note.")
+        else:
+            P.append(
+                "From next month this section flags which markets newly flipped turbulent or calm and "
+                "how far bitcoin moved against its fitted value, so you can see what changed rather "
+                "than only the latest state.")
     P.append("")
 
     # ===== Watchlist =====
@@ -710,7 +791,11 @@ def x_thread(meta):
 def main():
     argv = sys.argv[1:]
     force = "--force" in argv
-    now = sn._now_gst()
+    if "--as-of" in argv:
+        global _AS_OF
+        raw = argv[argv.index("--as-of") + 1]
+        _AS_OF = dt.datetime.fromisoformat(raw)
+    now = _now()
     # Runs on the last day of the month, so the month being covered is this one.
     month = now.strftime("%Y-%m")
     if "--month" in argv:
