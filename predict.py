@@ -39,6 +39,10 @@ PAIRS = {"EURUSD": "EURUSD=X", "GBPUSD": "GBPUSD=X", "USDJPY": "USDJPY=X",
          "AUDUSD": "AUDUSD=X", "USDCHF": "USDCHF=X", "USDCAD": "USDCAD=X",
          "NZDUSD": "NZDUSD=X"}
 CLASSES = ("crypto", "commodity", "fx")
+# Log source -> scorecard name. backfill is the pre-live backtest; live is what
+# was actually published on the day; live_pit is the point-in-time rebuild of
+# the live window on settled closes, used to fill the days the job never ran.
+SOURCES = {"backfill": "backtest", "live": "live", "reconstructed": "live_pit"}
 HORIZONS = [7, 30]
 LOG = "reports/prediction_log.json"
 STATE = "reports/prediction_state.json"
@@ -56,7 +60,13 @@ def fetch(sym):
         return None
     if isinstance(raw, pd.DataFrame):
         raw = raw.iloc[:, 0]
-    return pd.Series(np.asarray(raw).ravel(), index=raw.index).dropna()
+    s = pd.Series(np.asarray(raw).ravel(), index=raw.index).dropna()
+    # Drop the current day's partial bar. yfinance hands back a still-moving
+    # intraday price for today, so price0 was an intraday snapshot while price1
+    # at resolution was always a settled close. Two different bases on the two
+    # ends of the same call, and a call nobody could reproduce afterwards.
+    # Settled closes only, both ends.
+    return s[s.index < pd.Timestamp(datetime.now(timezone.utc).date())]
 
 
 def _logistic(x):
@@ -130,7 +140,10 @@ def main():
 
     log = _read(LOG) if os.path.exists(LOG) else {"predictions": []}
     preds = log["predictions"]
-    existing = {(p["date"], p["asset"], p["horizon"]) for p in preds}
+    # Only live rows block a new live row. Reconstructed rows share the same
+    # (date, asset, horizon) keys on purpose and must not suppress the real one.
+    existing = {(p["date"], p["asset"], p["horizon"]) for p in preds
+                if p.get("source") == "live"}
 
     for sym, (s, cls) in series.items():
         inp = build_inputs(sym, s, cls, btc, btc_ma, cg_val, shared_phase)
@@ -140,7 +153,9 @@ def main():
             prob = make_prediction(inp, h)
             preds.append(dict(date=str(today), asset=sym, horizon=h,
                               cls=cls,
-                              price0=inp["price"], prob_up=round(prob, 3),
+                              price0=inp["price"],
+                              price_date=str(s.index[-1].date()),
+                              prob_up=round(prob, 3),
                               predicted="up" if prob >= 0.5 else "down",
                               resolve_date=str(today + timedelta(days=h)),
                               resolved=False, actual=None, correct=None,
@@ -162,9 +177,37 @@ def main():
     json.dump({"predictions": preds}, open(LOG, "w"), indent=2)
 
     # ---- scorecard ----
+    # Three records, never pooled. They measure different things and mixing them
+    # is what produced the misleading 45% headline: a 3-month backtest averaged
+    # with three days of live calls, where the live rows were 19% of the sample
+    # but drove the whole move.
     res = [p for p in preds if p["resolved"]]
     def acc(items):
         return (sum(1 for p in items if p["correct"]) / len(items) * 100) if items else None
+
+    def record(items):
+        """A self-contained scorecard for ONE source.
+
+        `dates` matters as much as `n`: a single day fires every asset at once
+        and they move together, so 33 rows on one date is closer to one
+        observation than to 33. Publishing n without dates overstates the
+        evidence by roughly the size of the universe.
+        """
+        if not items:
+            return dict(n=0, dates=0, accuracy=None,
+                        by_horizon={str(h): None for h in HORIZONS}, window=None)
+        return dict(
+            n=len(items),
+            dates=len({p["date"] for p in items}),
+            accuracy=acc(items),
+            by_horizon={str(h): acc([p for p in items if p["horizon"] == h])
+                        for h in HORIZONS},
+            window=[min(p["date"] for p in items), max(p["date"] for p in items)])
+
+    def split(items):
+        return {label: record([p for p in items if p.get("source") == src_key])
+                for src_key, label in SOURCES.items()}
+
     open_latest = {}
     for p in preds:
         if not p["resolved"]:
@@ -185,9 +228,7 @@ def main():
         copen = [p for p in openc if p.get("cls") == cl]
         cups = sum(1 for p in copen if p["predicted"] == "up")
         by_class[cl] = dict(
-            resolved_count=len(cres), accuracy=acc(cres),
-            accuracy_by_horizon={h: acc([p for p in cres if p["horizon"] == h])
-                                 for h in HORIZONS},
+            records=split(cres),
             n_assets=sum(1 for c in cls_of.values() if c == cl),
             open_up=cups, open_down=len(copen) - cups,
             top_calls=sorted(copen, key=lambda p: abs(p["prob_up"] - 0.5),
@@ -195,10 +236,9 @@ def main():
 
     state = dict(
         updated=str(today),
-        resolved_count=len(res), accuracy=acc(res),
-        accuracy_by_horizon={h: acc([p for p in res if p["horizon"] == h]) for h in HORIZONS},
-        accuracy_by_class={cl: acc([p for p in res if p.get("cls") == cl])
-                           for cl in CLASSES},
+        # No pooled `accuracy` key by design. Anything that wants a number has
+        # to pick a record and say which one it picked.
+        records=split(res),
         by_class=by_class,
         n_assets=len(series), open_up=ups, open_down=len(openc) - ups,
         top_calls=sorted(openc, key=lambda p: abs(p["prob_up"] - 0.5), reverse=True)[:6],
@@ -206,10 +246,15 @@ def main():
         recent_resolved=sorted(res, key=lambda p: p["resolve_date"])[-8:])
     json.dump(state, open(STATE, "w"), indent=2)
 
-    a = state["accuracy"]
     print(f"predict: {len(preds)} logged across {len(series)} assets, "
-          f"{len(res)} resolved, accuracy " +
-          (f"{a:.0f}%" if a is not None else "n/a (building)"))
+          f"{len(res)} resolved")
+    for label, r in state["records"].items():
+        if r["n"]:
+            print(f"  {label:9s} {r['accuracy']:5.1f}%  "
+                  f"n={r['n']:4d} over {r['dates']:2d} dates  "
+                  f"({r['window'][0]} to {r['window'][1]})")
+        else:
+            print(f"  {label:9s}     -   no resolved calls yet")
     print(f"  open calls: {ups} UP / {len(openc)-ups} DOWN  |  "
           f"stablecoins tracked {len(stables)}, at-risk {at_risk or 'none'}")
 

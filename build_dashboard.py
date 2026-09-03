@@ -404,21 +404,57 @@ def prediction_section(cls="crypto") -> str:
             'These are mechanical up/down calls logged to test whether a model can '
             'match reality. NOT a forecast, NOT advice, NO liability. Expect accuracy '
             'near a coin-flip (50%). Do not trade on this.</div>')
-    acc, rc = bc.get("accuracy"), bc.get("resolved_count", 0)
-    byh = bc.get("accuracy_by_horizon", {})
     n = bc.get("n_assets", "?")
-    if rc == 0 or acc is None:
-        score = (f'<div class="pred-score">Track record ({label}): '
-                 f'<b>building history</b>, 0 calls scored yet.</div>')
-    else:
-        parts = [f"{rc} scored across {n} {label} assets", f"<b>{acc:.0f}% correct</b>"]
+    recs = bc.get("records") or {}
+
+    # Backtest and live are never averaged together. Pooling them is what gave
+    # the old single headline: a 3-month backtest blended with a few days of
+    # live calls, where the live rows were a fifth of the sample and moved the
+    # whole number. Each record is shown on its own terms, with the number of
+    # distinct dates next to the number of calls, because a day fires every
+    # asset at once and those outcomes are not independent.
+    def line(rec, title, note=""):
+        if not rec or not rec.get("n"):
+            return (f'<div class="pred-score">{title}: '
+                    f'<b>building history</b>, no calls scored yet.{note}</div>')
+        a, cnt, dates = rec["accuracy"], rec["n"], rec.get("dates", 0)
+        byh = rec.get("by_horizon", {})
+        parts = [f"<b>{a:.0f}% correct</b>",
+                 f"{cnt} calls over {dates} dates"]
         if byh.get("7") is not None:
             parts.append(f"7d {byh['7']:.0f}%")
         if byh.get("30") is not None:
             parts.append(f"30d {byh['30']:.0f}%")
-        vs = "beating" if acc > 52 else "≈" if acc >= 48 else "below"
-        score = (f'<div class="pred-score">Track record: {" · ".join(parts)}, '
-                 f'{vs} coin-flip (50%)</div>')
+        # The interval is computed on the number of DATES, not the number of
+        # calls. A date fires every asset at once and those outcomes move
+        # together, and the backfill grid overlaps within each horizon, so
+        # calls are not independent trials. Dates are the conservative unit.
+        # Anything whose interval still covers 50% is reported as not
+        # distinguishable from chance, which is why the 62% commodity figure
+        # is never sold here as an edge.
+        ci = _wilson_ci(a, dates)
+        if ci and ci[0] > 50:
+            parts.append(f"above coin-flip (95% CI {ci[0]}-{ci[1]}% on {dates} dates)")
+        elif ci and ci[1] < 50:
+            parts.append(f"below coin-flip (95% CI {ci[0]}-{ci[1]}% on {dates} dates)")
+        elif ci:
+            parts.append(f'<span class="mut">not distinguishable from a coin flip '
+                         f'(95% CI {ci[0]}-{ci[1]}% on {dates} dates)</span>')
+        w = rec.get("window") or []
+        span = f' <span class="mut">({w[0]} to {w[1]})</span>' if len(w) == 2 else ""
+        return (f'<div class="pred-score">{title}: {" · ".join(parts)}{span}'
+                f'{note}</div>')
+
+    score = (line(recs.get("backtest"),
+                  f"Backtested ({label})")
+             + line(recs.get("live"),
+                    f"Live record ({label})",
+                    note=' <span class="mut">calls as published on the day.</span>')
+             + line(recs.get("live_pit"),
+                    f"Live window, point-in-time ({label})",
+                    note=' <span class="mut">the same window rebuilt on settled '
+                         'closes, including the days the job did not run. '
+                         'Reconstructed, not published live.</span>'))
     up, down = bc.get("open_up", 0), bc.get("open_down", 0)
     summary = (f'<div class="pred-score">This period: <b class="up">{up} UP</b> / '
                f'<b class="down">{down} DOWN</b> across {n} {label} assets. '
