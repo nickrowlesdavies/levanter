@@ -5,7 +5,7 @@ X. 6 posts, each inside the 280-character limit. Post in order as a thread. The 
 
 Levanter daily · Thursday 3 September
 
-SUI led the whole board yesterday (+5.6%), UNI lagged (-9.2%). 38 of 69 markets closed higher. Breadth mixed.
+SUI led the whole board yesterday (+5.5%), UNI lagged (-9.5%). 35 of 69 markets closed higher. Breadth mixed.
 
 Crypto, FX and commodities below.
 
@@ -15,29 +15,29 @@ Commodities have 12 of 16 markets flagged high-vol for the week ahead, while cry
 
 --- 3/6 (187 chars) ---
 
-Crypto: 22 of 35 higher. SUI +5.6%, UNI -9.2%.
+Crypto: 21 of 35 higher. SUI +5.5%, UNI -9.5%.
 
-Week: 13 of 35 up, UNI best at +30.7%.
+Week: 12 of 35 up, UNI best at +30.8%.
 
-Month: PUMP leads +95.8%, ONDO lags -5.8%.
+Month: PUMP leads +93.4%, ONDO lags -5.5%.
 
 Volatility leans calmer near-term (0/3 high-vol at 7d).
 
 --- 4/6 (192 chars) ---
 
-FX: 6 of 16 higher. USDCHF +0.4%, GBPJPY -2.1%.
+FX: 4 of 16 higher. AUDUSD +0.3%, GBPJPY -2.2%.
 
-Week: 6 of 16 up, USDZAR best at +1.5%.
+Week: 6 of 16 up, USDSEK best at +0.7%.
 
-Month: AUDUSD leads +2.5%, USDNOK lags -2.4%.
+Month: AUDUSD leads +2.5%, USDZAR lags -3.0%.
 
 Volatility leans calmer near-term (1/7 high-vol at 7d).
 
 --- 5/6 (211 chars) ---
 
-Commodities: 10 of 18 higher. CORN +4.3%, COFFEE -4.0%.
+Commodities: 10 of 18 higher. CORN +4.2%, COFFEE -4.0%.
 
-Week: 12 of 18 up, HEATING OIL best at +8.4%.
+Week: 12 of 18 up, HEATING OIL best at +8.5%.
 
 Month: SUGAR leads +24.6%, COPPER lags -0.4%.
 
