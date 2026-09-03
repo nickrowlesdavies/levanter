@@ -6,7 +6,7 @@
 
 ---
 
-> **Editor's line (add before publishing, then delete this prompt):** one sentence of your own read of the month. What it changes about how you are positioned, or the single thing you would tell a friend who asked. This is the line the model cannot write.
+> *A strong month does not undo a hard year. Crypto is up a fifth since July and still down about half over twelve months, so I am reading this as room to stay patient rather than a reason to chase. Metals and the largest coins bid together while the dollar stayed quiet, which looks to me like liquidity hunting for a home rather than conviction about anything in particular, and liquidity can leave as fast as it arrives. The number I would sit with is not the plus twenty in crypto but the coin-flip direction record beside it, so enjoy the green, size for the drawdowns, and do not mistake a good month for a good year.*
 
 ## A note on this first issue
 
