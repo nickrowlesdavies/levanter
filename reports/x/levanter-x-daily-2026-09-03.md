@@ -5,7 +5,7 @@ X. 6 posts, each inside the 280-character limit. Post in order as a thread. The 
 
 Levanter daily · Thursday 3 September
 
-SUI led the whole board yesterday (+6.9%), UNI lagged (-7.5%). 36 of 69 markets closed higher. Breadth mixed.
+SUI led the whole board yesterday (+7.1%), UNI lagged (-7.8%). 36 of 69 markets closed higher. Breadth mixed.
 
 Crypto, FX and commodities below.
 
@@ -15,21 +15,21 @@ Commodities have 12 of 16 markets flagged high-vol for the week ahead, while cry
 
 --- 3/6 (187 chars) ---
 
-Crypto: 19 of 35 higher. SUI +6.9%, UNI -7.5%.
+Crypto: 21 of 35 higher. SUI +7.1%, UNI -7.8%.
 
-Week: 14 of 35 up, UNI best at +29.9%.
+Week: 14 of 35 up, UNI best at +31.2%.
 
-Month: PUMP leads +98.2%, ONDO lags -6.5%.
+Month: PUMP leads +96.3%, ONDO lags -5.2%.
 
 Volatility leans calmer near-term (0/3 high-vol at 7d).
 
 --- 4/6 (192 chars) ---
 
-FX: 7 of 16 higher. USDSEK +0.4%, USDJPY -1.5%.
+FX: 5 of 16 higher. AUDUSD +0.3%, GBPJPY -1.7%.
 
-Week: 6 of 16 up, USDSEK best at +1.7%.
+Week: 6 of 16 up, USDSEK best at +0.9%.
 
-Month: AUDJPY leads +2.6%, USDZAR lags -3.0%.
+Month: AUDJPY leads +2.5%, USDZAR lags -3.0%.
 
 Volatility leans calmer near-term (1/7 high-vol at 7d).
 
