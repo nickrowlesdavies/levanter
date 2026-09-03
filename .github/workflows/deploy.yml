@@ -55,6 +55,10 @@ jobs:
           git add -f reports/prediction_log.json 2>/dev/null || true
           git add -f reports/signals/*.md reports/signals/docx/*.docx 2>/dev/null || true
           git add -f reports/x/*.md 2>/dev/null || true
+          # The Substack writeups too, so the copy handed to Nick each morning
+          # is the same build the site is serving. Persisting the X thread but
+          # not the Note left the pair disagreeing with each other.
+          git add -f reports/substack/*.md reports/substack/docx/*.docx 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "nothing to persist"
           else
