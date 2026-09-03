@@ -1,47 +1,47 @@
 # Levanter daily thread · Thursday 3 September
 X. 6 posts, each inside the 280-character limit. Post in order as a thread. The separator lines are not part of any post.
 
---- 1/6 (183 chars) ---
+--- 1/6 (207 chars) ---
 
 Levanter daily · Thursday 3 September
 
-SUI led the whole board yesterday (+5.8%), UNI lagged (-9.6%). 37 of 69 markets closed higher. Breadth mixed.
+SUI led the whole board yesterday (+7.7%), COFFEE lagged (-10.7%). 46 of 69 markets closed higher. Breadth positive across the board.
 
 Crypto, FX and commodities below.
 
 --- 2/6 (142 chars) ---
 
-Commodities have 13 of 16 markets flagged high-vol for the week ahead, while crypto and FX both read calm. Same board, very different weather.
+Commodities have 12 of 16 markets flagged high-vol for the week ahead, while crypto and FX both read calm. Same board, very different weather.
 
---- 3/6 (187 chars) ---
+--- 3/6 (189 chars) ---
 
-Crypto: 22 of 35 higher. SUI +5.8%, UNI -9.6%.
+Crypto: 30 of 35 higher. SUI +7.7%, MORPHO -3.2%.
 
-Week: 12 of 35 up, UNI best at +30.8%.
+Week: 8 of 35 up, UNI best at +36.6%.
 
-Month: PUMP leads +93.4%, ONDO lags -5.5%.
+Month: PUMP leads +94.1%, ONDO lags -4.6%.
 
 Volatility leans calmer near-term (0/3 high-vol at 7d).
 
 --- 4/6 (192 chars) ---
 
-FX: 5 of 16 higher. USDSEK +0.4%, GBPJPY -1.9%.
+FX: 6 of 16 higher. AUDUSD +0.6%, GBPJPY -2.6%.
 
-Week: 6 of 16 up, USDSEK best at +1.7%.
+Week: 8 of 16 up, USDZAR best at +0.7%.
 
-Month: AUDUSD leads +2.5%, USDZAR lags -2.7%.
+Month: AUDUSD leads +2.8%, USDZAR lags -2.8%.
 
-Volatility leans calmer near-term (0/7 high-vol at 7d).
+Volatility leans calmer near-term (1/7 high-vol at 7d).
 
---- 5/6 (212 chars) ---
+--- 5/6 (218 chars) ---
 
-Commodities: 10 of 18 higher. CORN +3.9%, HEATING OIL -4.4%.
+Commodities: 10 of 18 higher. PALLADIUM +2.4%, COFFEE -10.7%.
 
-Week: 12 of 18 up, WTI OIL best at +8.1%.
+Week: 11 of 18 up, WTI OIL best at +11.3%.
 
-Month: SUGAR leads +24.0%, COPPER lags -0.3%.
+Month: BRENT OIL leads +22.8%, COFFEE lags -9.5%.
 
-Volatility leans turbulent near-term (13/16 high-vol at 7d).
+Volatility leans turbulent near-term (12/16 high-vol at 7d).
 
 --- 6/6 (178 chars) ---
 
