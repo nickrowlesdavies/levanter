@@ -6,7 +6,7 @@
 
 ---
 
-> **Editor's line (add before publishing, then delete this prompt):** one sentence of your own read of the week. Two minutes. What it means for how you are positioned, or the single thing you would tell a friend who asked. This is the line the model cannot write.
+> *Editor's line. Calm crypto is not an invitation to add, it is just a quieter week for what you already hold; if I were changing anything it would be trimming the commodity names running at twice their normal range, not chasing the quiet ones.*
 
 ## The seven-day volatility map
 

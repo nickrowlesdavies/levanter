@@ -841,6 +841,23 @@ def x_thread(meta, monday):
             f"What is not knowable: direction. Our crypto calls run about {cr['acc']:.0f}% over "
             f"{cr['n']:,} backtested calls{citxt}, a coin flip, and we publish it. We forecast "
             f"volatility, not direction.")
+    # The full board is the paid tier's concrete differentiator, so name the extremes
+    # rather than only asserting that a board exists. Read straight from the feed:
+    # the promo thread should never drift from the note it is advertising.
+    _vr = _read("vol_regime.json")
+    _board = []
+    for _sym, _a in (_vr.get("assets") or {}).items():
+        _a7 = _a.get("7d") or {}
+        if _a7.get("vol_now") and _a7.get("vol_median"):
+            _board.append((_sym, _a7["vol_now"] / _a7["vol_median"]))
+    if _board:
+        _board.sort(key=lambda r: -r[1])
+        _top, _bot = _board[0], _board[-1]
+        posts.append(
+            f"Subscribers get the full board: {len(_board)} markets, each judged against its own "
+            f"median rather than one threshold for everything. Most stretched this week, "
+            f"{_name(_top[0])} at {_top[1]:.2f}x its own normal. Quietest, {_name(_bot[0])} at "
+            f"{_bot[1]:.2f}x.")
     posts.append(
         "The full Signal, with the levels and the week-on-week changes, is for subscribers: "
         "read.levantermarkets.com. Educational, not advice.")
@@ -897,9 +914,9 @@ def main():
     os.makedirs(x_dir, exist_ok=True)
     # The note and teasers are already written. A thread that will not fit is a
     # loud failure, not a reason to lose the issue, so report it and exit non-zero.
+    x_md = os.path.join(x_dir, f"levanter-signal-x-{monday}.md")
     try:
-        open(os.path.join(x_dir, f"levanter-signal-x-{monday}.md"), "w").write(
-            x_thread(meta, monday))
+        open(x_md, "w").write(x_thread(meta, monday))
     except x_text.PostTooLong as e:
         print(f"signal_note: X thread not written. {e}", file=sys.stderr)
         _x_failed = True
@@ -911,6 +928,13 @@ def main():
         md2docx.convert(teaser_path, os.path.join(OUT, "docx", f"levanter-signal-teaser-{monday}.docx"))
         md2docx.convert(teaser_sub_path,
                         os.path.join(OUT, "docx", f"levanter-signal-teaser-substack-{monday}.docx"))
+        # The thread is copy to be posted, so it ships in the same format as the
+        # teasers rather than as the only asset the publisher has to open in a
+        # text editor.
+        if not _x_failed:
+            os.makedirs(os.path.join(x_dir, "docx"), exist_ok=True)
+            md2docx.convert(x_md, os.path.join(x_dir, "docx",
+                                               f"levanter-signal-x-{monday}.docx"))
     except Exception as e:
         print("signal_note: docx skipped:", e)
     print(f"signal_note: prepared week-of-{monday} Signal + teaser in {OUT}/")
