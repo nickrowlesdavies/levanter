@@ -1,29 +1,33 @@
 {
-  "n": 410,
-  "accuracy": 52,
+  "n": 528,
+  "accuracy": 51,
+  "dates": 37,
   "period": "May to August 2026",
   "by_class": [
     {
       "cls": "crypto",
       "label": "Crypto",
       "n": 320,
-      "acc": 49
+      "dates": 16,
+      "acc": 50
     },
     {
       "cls": "commodity",
       "label": "Commodities",
-      "n": 90,
-      "acc": 62
+      "n": 96,
+      "dates": 16,
+      "acc": 54
     },
     {
       "cls": "fx",
       "label": "FX",
-      "n": 0,
-      "acc": null
+      "n": 112,
+      "dates": 15,
+      "acc": 50
     }
   ],
-  "as_of": "2026-08-22",
-  "note": "Backfilled point-in-time direction calls scored against known outcomes over a FIXED window ending 15 August 2026. Not a live public record. After review_after, the live-forward calls will have matured and this should be refreshed or superseded by the live scoreboard. The 62% commodity figure is not an edge (serial correlation, trending window, three classes tested); see the track-record page.",
+  "as_of": "2026-09-03",
+  "note": "Backfilled point-in-time direction calls scored against known outcomes over a FIXED window anchored at 15 August 2026, closing before the model went live on 22 August, so no backtest row sits inside the live window. Not a live public record; the live scoreboard is reported separately and is never averaged with this. FX is included as of 3 September 2026: the seven pairs previously had no backtest at all. The grid was also rebuilt so each asset's windows are non-overlapping by construction. That rebuild is why commodities now reads 54% rather than the 62% published earlier: the old figure was inflated by windows that overlapped their neighbours. None of the three classes is distinguishable from a coin flip once the interval is computed on the number of dates rather than the number of calls, which is the honest unit because every asset in a class is called on the same day and they move together.",
   "window_close": "15 August 2026",
   "review_after": "2026-10-01"
 }

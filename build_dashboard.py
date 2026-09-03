@@ -2469,8 +2469,13 @@ def track_record_section() -> str:
         for c in bt.get("by_class", []):
             lab = c.get("label", c.get("cls", ""))
             if c.get("n") and c.get("acc") is not None:
-                ci = _wilson_ci(c["acc"], c["n"])
-                cistr = f' <span class="mut">(95% CI {ci[0]}–{ci[1]})</span>' if ci else ''
+                # Interval on dates, not calls: every asset in a class is called
+                # on the same day and they move together, so calls are not
+                # independent trials and an interval on n would be far too tight.
+                unit = c.get("dates") or c["n"]
+                ci = _wilson_ci(c["acc"], unit)
+                cistr = (f' <span class="mut">(95% CI {ci[0]}–{ci[1]} on {unit} dates)</span>'
+                         if ci else '')
                 cls_rows += (f'<div class="trk-cls"><span class="k">{lab}</span>'
                              f'<span class="v">{c["acc"]:.0f}% over {c["n"]:,} calls{cistr}</span></div>')
             else:
@@ -2479,7 +2484,7 @@ def track_record_section() -> str:
         dirscore += (f'<div class="trk-line"><b>Backtested {bt.get("period", "")}, point-in-time, '
                      f'and we show every class:</b></div><div class="trk-clsgrid">{cls_rows}</div>')
         if cr.get("n") and cr.get("acc") is not None:
-            crci = _wilson_ci(cr["acc"], cr["n"])
+            crci = _wilson_ci(cr["acc"], cr.get("dates") or cr["n"])
             crci_txt = (f' Its 95% confidence interval runs {crci[0]} to {crci[1]} percent, which '
                         f'straddles 50, so we cannot distinguish it from a coin flip.' if crci else '')
             dirscore += (f'<div class="trk-line">The crypto row is the one that carries weight. At '
@@ -2487,17 +2492,20 @@ def track_record_section() -> str:
                          f'it lands right on the coin-flip baseline.{crci_txt} That is the thesis, '
                          f'confirmed on the class we have the most data for.</div>')
         if co.get("n") and co.get("acc") is not None:
-            coci = _wilson_ci(co["acc"], co["n"])
-            coci_txt = (f'Even taken at face value its 95% interval is {coci[0]} to {coci[1]} percent, '
-                        f'already wide on {co["n"]} calls. ' if coci else '')
+            coun = co.get("dates") or co["n"]
+            coci = _wilson_ci(co["acc"], coun)
+            coci_txt = (f'Its 95% interval is {coci[0]} to {coci[1]} percent, which covers 50. '
+                        if coci else '')
             dirscore += (f'<div class="trk-note">Commodities looks stronger at <b>{co["acc"]:.0f}%</b>, '
-                         f'and it is not an edge. {coci_txt}It is {co["n"]} calls across a dozen '
-                         f'commodities, about seven a market over four months, so consecutive calls '
-                         f'overlap and are not independent trials. Allow even a little of that serial '
-                         f'correlation and the effective sample roughly halves, at which point '
-                         f'{co["acc"]:.0f}% is no longer statistically significant. The window was a '
-                         f'strongly trending one for the metals too, which flatters any directional '
-                         f'model until the trend breaks. Treat it as noise, not skill.</div>')
+                         f'and it is still not an edge. {coci_txt}The {co["n"]} calls are only '
+                         f'{coun} distinct dates across six markets, and on any given date those six '
+                         f'move together, so the honest sample is closer to {coun} than to '
+                         f'{co["n"]}. An earlier version of this page showed 62% here. That figure '
+                         f'was inflated by a backtest grid whose windows overlapped their '
+                         f'neighbours; on a rebuilt non-overlapping grid the same method gives '
+                         f'{co["acc"]:.0f}%. The window was a strongly trending one for the metals '
+                         f'too, which flatters any directional model until the trend breaks. Treat '
+                         f'it as noise, not skill.</div>')
         dirscore += (f'<div class="trk-line">Taken together the classes average '
                      f'<b>{bt["accuracy"]:.0f}%</b>, but that is a weighted blend of {cr.get("n", 0):,} '
                      f'crypto calls and {co.get("n", 0)} commodity calls pulling opposite ways, not a '
