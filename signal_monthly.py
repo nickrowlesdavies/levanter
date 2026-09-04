@@ -417,6 +417,7 @@ def compose(launch, month, rets, basis, cur_state, prev_state):
             f"historical sample. That is an in-sample observation, not a tested probability and not a "
             f"guaranteed level of support.")
         P.append("")
+        P += ["*(Chart: bitcoin price against its fitted fair value and floor.)*", ""]
         if cyc_b is not None:
             P.append(
                 f"Our **cycle gauge** reports a second number. It fits the same shape of curve, price "

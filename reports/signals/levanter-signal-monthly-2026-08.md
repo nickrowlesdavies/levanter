@@ -42,6 +42,8 @@ Breadth inside crypto. The equal-weighted basket returned +23.7 percent against 
 
 Bitcoin is near 78,000 dollars. The **valuation fit** models price against how long the network has existed, on a log-log scale. Fair value on that fit lands near 135,000, with bitcoin about 43 percent below it, and the fitted floor sits near 59,000. Bitcoin has closed above that floor for roughly 95 percent of the historical sample. That is an in-sample observation, not a tested probability and not a guaranteed level of support.
 
+*(Chart: bitcoin price against its fitted fair value and floor.)*
+
 Our **cycle gauge** reports a second number. It fits the same shape of curve, price against network age, but on a different price history and with a different band, then adds halving timing to classify the phase. It reads bitcoin as post-peak cooldown, about 45 percent below its own trend line. Do not read the two figures as confirming each other. They are the same kind of fit run over overlapping data, so close agreement is near enough guaranteed and tells you nothing the first number did not. On a monthly horizon this is the number that matters most, because valuation says far more about a year than about a week.
 
 ## The majors against their own trend lines
