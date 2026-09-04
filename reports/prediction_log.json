@@ -12946,11 +12946,12 @@
       "prob_up": 0.77,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "up",
+      "correct": true,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 81271.7421875
     },
     {
       "date": "2026-08-27",
@@ -12978,11 +12979,12 @@
       "prob_up": 0.75,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "down",
+      "correct": false,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 2508.020751953125
     },
     {
       "date": "2026-08-27",
@@ -13010,11 +13012,12 @@
       "prob_up": 0.755,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "up",
+      "correct": true,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 724.9962158203125
     },
     {
       "date": "2026-08-27",
@@ -13042,11 +13045,12 @@
       "prob_up": 0.828,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "down",
+      "correct": false,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 1.4513189792633057
     },
     {
       "date": "2026-08-27",
@@ -13074,11 +13078,12 @@
       "prob_up": 0.746,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "up",
+      "correct": true,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 0.2212270051240921
     },
     {
       "date": "2026-08-27",
@@ -13106,11 +13111,12 @@
       "prob_up": 0.835,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "down",
+      "correct": false,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 103.97835540771484
     },
     {
       "date": "2026-08-27",
@@ -13138,11 +13144,12 @@
       "prob_up": 0.781,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "down",
+      "correct": false,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 0.08778099715709686
     },
     {
       "date": "2026-08-27",
@@ -13170,11 +13177,12 @@
       "prob_up": 0.68,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "up",
+      "correct": true,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 0.888001024723053
     },
     {
       "date": "2026-08-27",
@@ -13202,11 +13210,12 @@
       "prob_up": 0.668,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "down",
+      "correct": false,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 7.518126010894775
     },
     {
       "date": "2026-08-27",
@@ -13234,11 +13243,12 @@
       "prob_up": 0.803,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "down",
+      "correct": false,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 11.835028648376465
     },
     {
       "date": "2026-08-27",
@@ -13266,11 +13276,12 @@
       "prob_up": 0.61,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "down",
+      "correct": false,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 0.3308059871196747
     },
     {
       "date": "2026-08-27",
@@ -13298,11 +13309,12 @@
       "prob_up": 0.68,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "up",
+      "correct": true,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 51.48094940185547
     },
     {
       "date": "2026-08-27",
@@ -13330,11 +13342,12 @@
       "prob_up": 0.825,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "down",
+      "correct": false,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 256.8126220703125
     },
     {
       "date": "2026-08-27",
@@ -13362,11 +13375,12 @@
       "prob_up": 0.664,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "down",
+      "correct": false,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 0.18432199954986572
     },
     {
       "date": "2026-08-27",
@@ -13394,11 +13408,12 @@
       "prob_up": 0.676,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "down",
+      "correct": false,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 1.5070029497146606
     },
     {
       "date": "2026-08-27",
@@ -13426,11 +13441,12 @@
       "prob_up": 0.727,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "up",
+      "correct": true,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 0.07926999777555466
     },
     {
       "date": "2026-08-27",
@@ -13458,11 +13474,12 @@
       "prob_up": 0.665,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "up",
+      "correct": true,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 2.5155251026153564
     },
     {
       "date": "2026-08-27",
@@ -13490,11 +13507,12 @@
       "prob_up": 0.793,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "up",
+      "correct": true,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 520.8059692382812
     },
     {
       "date": "2026-08-27",
@@ -13522,11 +13540,12 @@
       "prob_up": 0.794,
       "predicted": "up",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "down",
+      "correct": false,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 7.588479995727539
     },
     {
       "date": "2026-08-27",
@@ -13554,11 +13573,12 @@
       "prob_up": 0.385,
       "predicted": "down",
       "resolve_date": "2026-09-03",
-      "resolved": false,
-      "actual": null,
-      "correct": null,
+      "resolved": true,
+      "actual": "up",
+      "correct": false,
       "source": "reconstructed",
-      "feat_basis": "pit-exact"
+      "feat_basis": "pit-exact",
+      "price1": 0.7915160059928894
     },
     {
       "date": "2026-08-27",
