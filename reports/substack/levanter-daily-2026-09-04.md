@@ -2,7 +2,7 @@
 
 ## Crypto
 
-**Yesterday.** 33 of 35 coins closed higher. Best ZEC +15.7%, weakest MORPHO -1.3%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **calmer** conditions near-term (0/3 flagged high-vol at 7d). Most active names to watch: ENA, UNI.
+**Yesterday.** 32 of 35 coins closed higher. Best ZEC +16.8%, weakest MORPHO -1.7%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **calmer** conditions near-term (0/3 flagged high-vol at 7d). Most active names to watch: ENA, UNI.
 
 ## FX
 
@@ -10,7 +10,7 @@
 
 ## Commodities
 
-**Yesterday.** 11 of 18 markets closed higher. Best PALLADIUM +5.8%, weakest COFFEE -10.2%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **turbulent** conditions near-term (13/16 flagged high-vol at 7d). Most active names to watch: BRENT OIL, COFFEE.
+**Yesterday.** 10 of 18 markets closed higher. Best PALLADIUM +5.7%, weakest COFFEE -4.0%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **turbulent** conditions near-term (13/16 flagged high-vol at 7d). Most active names to watch: BRENT OIL, WTI OIL.
 
 ---
 Live dashboard: levantermarkets.com     Subscribe: read.levantermarkets.com
