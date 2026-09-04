@@ -5,7 +5,7 @@ X. 6 posts, each inside the 280-character limit. Post in order as a thread. The 
 
 Levanter daily · Friday 4 September
 
-ZEC led the whole board yesterday (+18.3%), COFFEE lagged (-10.2%). 50 of 69 markets closed higher. Breadth positive across the board.
+ZEC led the whole board yesterday (+15.7%), COFFEE lagged (-10.2%). 48 of 69 markets closed higher. Breadth positive across the board.
 
 Crypto, FX and commodities below.
 
@@ -13,33 +13,33 @@ Crypto, FX and commodities below.
 
 Commodities have 13 of 16 markets flagged high-vol for the week ahead, while crypto and FX both read calm. Same board, very different weather.
 
---- 3/6 (189 chars) ---
+--- 3/6 (190 chars) ---
 
-Crypto: 34 of 35 higher. ZEC +18.3%, ASTER -2.5%.
+Crypto: 33 of 35 higher. ZEC +15.7%, MORPHO -1.3%.
 
-Week: 21 of 35 up, UNI best at +35.0%.
+Week: 12 of 35 up, UNI best at +36.1%.
 
-Month: ZEC leads +91.5%, ONDO lags -1.6%.
+Month: ZEC leads +83.4%, ONDO lags -3.1%.
 
-Volatility leans calmer near-term (1/3 high-vol at 7d).
+Volatility leans calmer near-term (0/3 high-vol at 7d).
 
 --- 4/6 (192 chars) ---
 
-FX: 4 of 16 higher. AUDUSD +0.8%, GBPJPY -2.6%.
+FX: 4 of 16 higher. NZDUSD +0.8%, USDJPY -1.6%.
 
-Week: 6 of 16 up, AUDUSD best at +0.3%.
+Week: 5 of 16 up, USDCHF best at +0.6%.
 
-Month: AUDUSD leads +3.0%, USDZAR lags -3.2%.
+Month: AUDUSD leads +2.3%, USDNOK lags -2.5%.
 
 Volatility leans calmer near-term (1/7 high-vol at 7d).
 
---- 5/6 (212 chars) ---
+--- 5/6 (213 chars) ---
 
-Commodities: 12 of 18 higher. PALLADIUM +6.7%, COFFEE -10.2%.
+Commodities: 11 of 18 higher. PALLADIUM +5.8%, COFFEE -10.2%.
 
-Week: 11 of 18 up, WTI OIL best at +9.8%.
+Week: 11 of 18 up, WTI OIL best at +10.1%.
 
-Month: CORN leads +21.9%, COFFEE lags -9.0%.
+Month: CORN leads +22.2%, COFFEE lags -9.0%.
 
 Volatility leans turbulent near-term (13/16 high-vol at 7d).
 
