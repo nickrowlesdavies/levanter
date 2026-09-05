@@ -2,15 +2,15 @@
 
 ## Crypto
 
-**Yesterday.** 16 of 35 coins closed higher. Best NEAR +14.5%, weakest ADA -6.2%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **calmer** conditions near-term (0/3 flagged high-vol at 7d). Most active names to watch: ENA, UNI.
+**Yesterday.** 14 of 35 coins closed higher. Best NEAR +14.6%, weakest ADA -5.6%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **calmer** conditions near-term (0/3 flagged high-vol at 7d). Most active names to watch: ENA, UNI.
 
 ## FX
 
-**Yesterday.** 5 of 16 pairs closed higher. Best AUDUSD +0.6%, weakest USDJPY -1.7%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **calmer** conditions near-term (1/7 flagged high-vol at 7d). Most active names to watch: USDZAR, USDSEK.
+**Yesterday.** 6 of 16 pairs closed higher. Best USDCAD +0.3%, weakest USDJPY -1.7%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **calmer** conditions near-term (1/7 flagged high-vol at 7d). Most active names to watch: USDZAR, USDSEK.
 
 ## Commodities
 
-**Yesterday.** 8 of 18 markets closed higher. Best CORN +4.2%, weakest COFFEE -9.7%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **turbulent** conditions near-term (12/16 flagged high-vol at 7d). Most active names to watch: BRENT OIL, COFFEE.
+**Yesterday.** 5 of 18 markets closed higher. Best GASOLINE +2.5%, weakest WHEAT -2.7%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **turbulent** conditions near-term (11/16 flagged high-vol at 7d). Most active names to watch: BRENT OIL, WTI OIL.
 
 ---
 Live dashboard: levantermarkets.com     Subscribe: read.levantermarkets.com
