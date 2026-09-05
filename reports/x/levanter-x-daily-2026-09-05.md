@@ -1,11 +1,11 @@
 # Levanter daily thread · Saturday 5 September
 X. 6 posts, each inside the 280-character limit. Post in order as a thread. The separator lines are not part of any post.
 
---- 1/6 (214 chars) ---
+--- 1/6 (188 chars) ---
 
 Levanter daily · Saturday 5 September
 
-ZEC led the whole board yesterday (+7.9%), COFFEE lagged (-9.7%). 18 of 69 markets closed higher. Breadth negative, most of the board lower.
+NEAR led the whole board yesterday (+14.5%), COFFEE lagged (-9.7%). 29 of 69 markets closed higher. Breadth mixed.
 
 Crypto, FX and commodities below.
 
@@ -13,13 +13,13 @@ Crypto, FX and commodities below.
 
 Commodities have 12 of 16 markets flagged high-vol for the week ahead, while crypto and FX both read calm. Same board, very different weather.
 
---- 3/6 (186 chars) ---
+--- 3/6 (189 chars) ---
 
-Crypto: 5 of 35 higher. ZEC +7.9%, XRP -5.5%.
+Crypto: 16 of 35 higher. NEAR +14.5%, ADA -6.2%.
 
-Week: 28 of 35 up, UNI best at +41.5%.
+Week: 26 of 35 up, UNI best at +40.9%.
 
-Month: ZEC leads +100.1%, ONDO lags -5.0%.
+Month: ZEC leads +102.8%, ONDO lags -0.9%.
 
 Volatility leans calmer near-term (0/3 high-vol at 7d).
 
@@ -27,9 +27,9 @@ Volatility leans calmer near-term (0/3 high-vol at 7d).
 
 FX: 5 of 16 higher. AUDUSD +0.6%, USDJPY -1.7%.
 
-Week: 5 of 16 up, USDCHF best at +0.8%.
+Week: 5 of 16 up, USDCHF best at +0.7%.
 
-Month: AUDUSD leads +2.3%, USDZAR lags -2.7%.
+Month: AUDUSD leads +2.2%, USDNOK lags -2.5%.
 
 Volatility leans calmer near-term (1/7 high-vol at 7d).
 

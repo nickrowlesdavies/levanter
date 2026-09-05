@@ -1,8 +1,8 @@
-# Levanter Daily · Friday, 4 September 2026
+# Levanter Daily · Saturday, 5 September 2026
 
 ## Crypto
 
-**Yesterday.** 5 of 35 coins closed higher. Best ZEC +7.9%, weakest XRP -5.5%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **calmer** conditions near-term (0/3 flagged high-vol at 7d). Most active names to watch: ENA, UNI.
+**Yesterday.** 16 of 35 coins closed higher. Best NEAR +14.5%, weakest ADA -6.2%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **calmer** conditions near-term (0/3 flagged high-vol at 7d). Most active names to watch: ENA, UNI.
 
 ## FX
 
