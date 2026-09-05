@@ -2593,7 +2593,7 @@ TAB_JS = (
     "var b=document.querySelector('#tabs .tab[data-t=\"'+t+'\"]');"
     "var el=document.getElementById('pane-'+t);"
     "if(b)b.classList.add('active');if(el)el.classList.add('active');}"
-    "tabs.forEach(function(b){b.addEventListener('click',function(){go(b.dataset.t);"
+    "tabs.forEach(function(b){b.addEventListener('click',function(){if(!b.dataset.t){return;}go(b.dataset.t);"
     "history.replaceState(null,'','#'+b.dataset.t);window.scrollTo(0,0);});});"
     "window.levTab=go;"
     "window.revShow=function(id,btn){var ps=document.querySelectorAll('.rev-pane');"
@@ -2981,7 +2981,8 @@ def main():
   .tabs{{display:flex;gap:5px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);
     border-radius:14px;padding:6px;box-shadow:var(--shadow);margin-bottom:20px;position:sticky;top:8px;z-index:20}}
   .tab{{appearance:none;border:0;background:transparent;color:var(--muted);font-weight:700;
-    font-size:13px;padding:9px 15px;border-radius:10px;cursor:pointer;font-family:inherit}}
+    font-size:13px;padding:9px 15px;border-radius:10px;cursor:pointer;font-family:inherit;
+    text-decoration:none;display:inline-flex;align-items:center}}
   .tab:hover{{color:var(--fg)}}
   .tab.active{{background:var(--grad);color:#fff}}
   .tabpane{{display:none}}
@@ -3112,6 +3113,7 @@ def main():
     <button class="tab" data-t="fx">FX</button>
     <button class="tab" data-t="commodities">Commodities</button>
     <button class="tab" data-t="reviews">Reviews</button>
+    <a class="tab" href="/off-exchange/">Off-Exchange</a>
     <button class="tab" data-t="track">Track record</button>
     <button class="tab" data-t="watchlist">☆ Watchlist</button>
     {strat_btn}
@@ -3144,7 +3146,7 @@ def main():
     <div class="lfoot-nav">
       <span onclick="levTab('home')">Home</span><span onclick="levTab('crypto')">Crypto</span>
       <span onclick="levTab('fx')">FX</span><span onclick="levTab('commodities')">Commodities</span>
-      <span onclick="levTab('reviews')">Reviews</span><span onclick="levTab('about')">About</span>
+      <span onclick="levTab('reviews')">Reviews</span><span onclick="location.href='/off-exchange/'">Off-Exchange</span><span onclick="levTab('about')">About</span>
       <a href="{SUBSCRIBE_URL}" target="_blank" rel="noopener" class="lfoot-sub">Subscribe &rarr;</a></div>
     <div class="lfoot-note">Educational market analysis across crypto, FX and commodities.
     Historical moves and mechanical signals only, not forecasts, not financial advice.
