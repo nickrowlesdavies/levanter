@@ -5,7 +5,7 @@ X. 6 posts, each inside the 280-character limit. Post in order as a thread. The 
 
 Levanter daily · Saturday 5 September
 
-NEAR led the whole board yesterday (+12.9%), PUMP lagged (-4.0%). 28 of 69 markets closed higher. Breadth mixed.
+NEAR led the whole board yesterday (+13.0%), PEPE lagged (-3.8%). 28 of 69 markets closed higher. Breadth mixed.
 
 Crypto, FX and commodities below.
 
@@ -15,7 +15,7 @@ Commodities have 11 of 16 markets flagged high-vol for the week ahead, while cry
 
 --- 3/6 (189 chars) ---
 
-Crypto: 17 of 35 higher. NEAR +12.9%, PUMP -4.0%.
+Crypto: 17 of 35 higher. NEAR +13.0%, PEPE -3.8%.
 
 Week: 28 of 35 up, UNI best at +40.7%.
 
