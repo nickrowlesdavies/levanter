@@ -126,9 +126,9 @@ def _chrome_top():
             f'<a href="{BASE}/app/">Dashboard</a></nav></header>')
 
 
-def _footer():
+def _footer(disclaimer=DISCLAIMER):
     y = "2026"
-    return (f'<footer class="site"><p class="disc">{_html.escape(DISCLAIMER)}</p>'
+    return (f'<footer class="site"><p class="disc">{_html.escape(disclaimer)}</p>'
             f'<p class="cr">&copy; {y} Levanter. <a href="{BASE}/app/">Live dashboard</a> '
             f'&middot; <a href="{BASE}/reviews/">All reviews</a></p></footer>')
 
@@ -199,7 +199,10 @@ def index_page(reviews):
         f'</main>{_footer()}</body></html>')
 
 
-def sitemap(reviews):
+def sitemap(reviews, extra=None):
+    # extra: optional list of (loc, lastmod, changefreq, priority) tuples appended
+    # verbatim, so a sibling generator (e.g. build_offexchange.py) can register its
+    # pages in the one generated sitemap rather than clobbering it with a second.
     def url(loc, lastmod=None, freq=None, pri=None):
         s = f"  <url>\n    <loc>{loc}</loc>\n"
         if lastmod:
@@ -215,6 +218,8 @@ def sitemap(reviews):
     body += url(f"{BASE}/reviews/", newest, "daily", "0.8")
     for r in sorted(reviews, key=lambda x: x["date"], reverse=True):
         body += url(f"{BASE}/reviews/{r['slug']}/", r["date"], "monthly", "0.7")
+    for loc, lastmod, freq, pri in (extra or []):
+        body += url(loc, lastmod, freq, pri)
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
             + body + "</urlset>\n")
@@ -266,6 +271,14 @@ main.review h1{font-size:clamp(26px,4vw,36px);line-height:1.15;font-weight:800;l
 .rl{font-weight:700}.rp{display:block;color:var(--muted);font-size:14px;margin-top:5px}
 footer.site{border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;margin-top:20px}
 footer.site .cr a{color:var(--brand)}
+.oe-aside{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--brand);
+  border-radius:10px;padding:12px 16px;color:var(--muted);font-size:14px;margin:14px 0 22px}
+.oe-stand{font-size:18px;font-weight:600;line-height:1.5;margin:0 0 20px}
+.oe{font-size:16.5px}
+.oe h2{font-size:20px;font-weight:800;letter-spacing:-.2px;margin:26px 0 8px}
+.oe p{margin:0 0 15px}
+.oe hr{border:0;border-top:1px solid var(--line);margin:24px 0}
+.oe em,.oe i{color:var(--muted)}
 """
 
 
