@@ -5,7 +5,7 @@ X. 6 posts, each inside the 280-character limit. Post in order as a thread. The 
 
 Levanter daily · Saturday 5 September
 
-NEAR led the whole board yesterday (+11.9%), ADA lagged (-4.2%). 27 of 69 markets closed higher. Breadth mixed.
+NEAR led the whole board yesterday (+11.2%), ADA lagged (-4.6%). 27 of 69 markets closed higher. Breadth mixed.
 
 Crypto, FX and commodities below.
 
@@ -15,7 +15,7 @@ Commodities have 11 of 16 markets flagged high-vol for the week ahead, while cry
 
 --- 3/6 (188 chars) ---
 
-Crypto: 16 of 35 higher. NEAR +11.9%, ADA -4.2%.
+Crypto: 16 of 35 higher. NEAR +11.2%, ADA -4.6%.
 
 Week: 29 of 35 up, UNI best at +41.3%.
 
