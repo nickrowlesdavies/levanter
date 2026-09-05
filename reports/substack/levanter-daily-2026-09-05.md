@@ -2,7 +2,7 @@
 
 ## Crypto
 
-**Yesterday.** 17 of 35 coins closed higher. Best NEAR +13.0%, weakest PEPE -3.8%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **calmer** conditions near-term (0/3 flagged high-vol at 7d). Most active names to watch: ENA, UNI.
+**Yesterday.** 16 of 35 coins closed higher. Best NEAR +12.5%, weakest PEPE -4.2%. **Coming session.** The model does not call direction (that is a coin-flip); it flags what to watch. Volatility regime points to **calmer** conditions near-term (0/3 flagged high-vol at 7d). Most active names to watch: ENA, UNI.
 
 ## FX
 
