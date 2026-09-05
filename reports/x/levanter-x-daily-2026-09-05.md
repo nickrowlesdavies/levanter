@@ -1,11 +1,11 @@
 # Levanter daily thread · Saturday 5 September
 X. 6 posts, each inside the 280-character limit. Post in order as a thread. The separator lines are not part of any post.
 
---- 1/6 (186 chars) ---
+--- 1/6 (185 chars) ---
 
 Levanter daily · Saturday 5 September
 
-NEAR led the whole board yesterday (+12.5%), PEPE lagged (-4.2%). 27 of 69 markets closed higher. Breadth mixed.
+NEAR led the whole board yesterday (+11.9%), ADA lagged (-4.2%). 27 of 69 markets closed higher. Breadth mixed.
 
 Crypto, FX and commodities below.
 
@@ -13,13 +13,13 @@ Crypto, FX and commodities below.
 
 Commodities have 11 of 16 markets flagged high-vol for the week ahead, while crypto and FX both read calm. Same board, very different weather.
 
---- 3/6 (189 chars) ---
+--- 3/6 (188 chars) ---
 
-Crypto: 16 of 35 higher. NEAR +12.5%, PEPE -4.2%.
+Crypto: 16 of 35 higher. NEAR +11.9%, ADA -4.2%.
 
-Week: 28 of 35 up, UNI best at +40.7%.
+Week: 29 of 35 up, UNI best at +41.3%.
 
-Month: ZEC leads +97.2%, ONDO lags -1.1%.
+Month: ZEC leads +98.0%, ONDO lags -1.2%.
 
 Volatility leans calmer near-term (0/3 high-vol at 7d).
 
