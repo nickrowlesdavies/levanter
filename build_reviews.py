@@ -123,6 +123,7 @@ def _head(title, desc, canonical, extra=""):
 def _chrome_top():
     return (f'<header class="site"><a class="brand" href="{BASE}/">{MARK}'
             f'<span>Levanter</span></a><nav><a href="{BASE}/reviews/">Reviews</a>'
+            f'<a href="{BASE}/off-exchange/">Off-Exchange</a>'
             f'<a href="{BASE}/app/">Dashboard</a></nav></header>')
 
 
