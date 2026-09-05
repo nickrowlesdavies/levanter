@@ -67,6 +67,13 @@ cp -f brand/levanter-logo-square.png public/assets/levanter-logo-square.png 2>/d
 # (replaces any static sitemap). Reads the committed review_archive.json.
 python build_reviews.py public
 
+# Off-Exchange section under /off-exchange/ (a monthly editorial aside, separate
+# from the scored crypto/FX/commodities surfaces). Reads whatever committed
+# reports/substack/levanter-offexchange-*.md files exist and merges its pages into
+# the sitemap build_reviews just wrote; exits cleanly and leaves that sitemap
+# untouched in a month with no issue. Reads no market feed, so no source_guard.
+python build_offexchange.py public
+
 # Keep GitHub Pages from running the output through Jekyll.
 touch public/.nojekyll
 
