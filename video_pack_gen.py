@@ -156,7 +156,7 @@ def lower_third(W, H, out):
 
 def insert_volatility(W, H, out, bt):
     fig, ax = _fig(W, H)
-    _header(ax, W, H, "Volatility model — the forecast that works")
+    _header(ax, W, H, "Volatility model: the forecast that works")
     rows = [(h, bt.get(h, {})) for h in ("7d", "30d", "90d") if bt.get(h)]
     y = 340
     for h, d in rows:
@@ -176,7 +176,7 @@ def insert_volatility(W, H, out, bt):
 def insert_map(W, H, out, turbulent, calm_n):
     import textwrap
     fig, ax = _fig(W, H)
-    _header(ax, W, H, "This week's map — where the ranges are")
+    _header(ax, W, H, "This week's map: where the ranges are")
     ax.text(120, 290, "TURBULENT", color="#dc2626", fontsize=48, fontweight="heavy", va="center", ha="left")
     ax.text(120, 355, f"{len(turbulent)} commodities flagged high-vol for the week ahead",
             color=INK, fontsize=32, va="center", ha="left")
@@ -195,7 +195,7 @@ def insert_map(W, H, out, turbulent, calm_n):
 
 def insert_scoreboard(W, H, out, byc):
     fig, ax = _fig(W, H)
-    _header(ax, W, H, "Direction — the honest scoreboard")
+    _header(ax, W, H, "Direction: the honest scoreboard")
     y = 320
     for c in byc:
         if c.get("acc") is None:
